@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>CANTIERE OFFICINA</title>
+    <title>CANTIERE - GESTIONALE</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -11,208 +11,186 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        /* RIPRESA DAL TUO CSS.TXT */
+        /* CSS REPLICATO DAI TUOI FILE */
         :root {
             --bg-dark: #0a0a0a;
-            --bg-panel: #1a1a1a;
+            --bg-panel: #161616;
             --accent: #FFD700;
-            --text-main: #f0f0f0;
-            --c-box: #D2691E;   /* Cartone */
-            --c-pack: #00BFFF;  /* Pacco */
+            --c-box: #D2691E;
+            --c-pack: #00BFFF;
         }
 
-        body {
-            background: var(--bg-dark);
-            color: white;
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
+        body { background: var(--bg-dark); color: white; font-family: 'Roboto', sans-serif; margin: 0; }
+        .teko { font-family: 'Teko', sans-serif; text-transform: uppercase; }
 
-        h1, h2, .brand-title { font-family: 'Teko', sans-serif; text-transform: uppercase; }
-
-        /* NAVBAR ORIGINALE */
+        /* NAVBAR FISSA */
         .navbar {
-            background: rgba(0,0,0,0.9);
-            border-bottom: 2px solid var(--accent);
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky; top: 0; z-index: 100;
+            background: #000; border-bottom: 2px solid var(--accent);
+            padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 1000;
         }
 
-        /* CARD PRODOTTO STILE "CANTIERE" */
+        /* FILTRI E RICERCA */
+        .search-container { padding: 15px; background: #000; }
+        .dark-input {
+            background: #1a1a1a; border: 1px solid #333; color: white;
+            padding: 12px; width: 100%; border-radius: 8px; outline: none;
+        }
+        .dark-input:focus { border-color: var(--accent); }
+
+        .cat-chips {
+            display: flex; gap: 10px; overflow-x: auto; padding: 10px 0;
+            scrollbar-width: none;
+        }
+        .chip {
+            background: #222; border: 1px solid #444; padding: 5px 15px;
+            border-radius: 20px; white-space: nowrap; font-size: 14px; cursor: pointer;
+        }
+        .chip.active { background: var(--accent); color: black; font-weight: bold; border-color: var(--accent); }
+
+        /* GRID PRODOTTI */
+        .grid-container {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px; padding: 15px;
+        }
         .prod-card {
-            background: var(--bg-panel);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-left: 4px solid var(--accent);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            background: var(--bg-panel); border-radius: 12px; padding: 12px;
+            text-align: center; border-bottom: 3px solid #333; transition: 0.2s;
         }
+        .prod-card:active { transform: scale(0.95); }
+        .prod-name { font-family: 'Teko'; font-size: 18px; color: var(--accent); min-height: 44px; display: flex; align-items: center; justify-content: center; line-height: 1.1; }
 
-        .prod-name { font-family: 'Teko'; font-size: 22px; color: var(--accent); letter-spacing: 1px; }
-
-        /* UNIT PILLS (Badge come nel tuo vecchio sistema) */
+        /* UNIT PILLS */
         .unit-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: #222;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 14px;
-            margin-right: 5px;
-            border: 1px solid #333;
+            display: inline-flex; align-items: center; gap: 4px;
+            background: #000; padding: 3px 8px; border-radius: 5px;
+            font-size: 12px; border: 1px solid #333; margin: 2px;
         }
         .icon-box { color: var(--c-box); }
         .icon-pack { color: var(--c-pack); }
 
-        /* BOTTONI OPERATIVI */
-        .qty-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: #000;
-            padding: 8px;
-            border-radius: 10px;
-            margin-top: 10px;
+        /* CONTROLLI */
+        .qty-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 10px; background: #000; border-radius: 8px; padding: 5px;
         }
-        .btn-op {
-            width: 45px; height: 45px;
-            border-radius: 50%;
-            border: 2px solid #333;
-            background: #1a1a1a;
-            color: var(--accent);
-            font-size: 20px;
-            font-weight: bold;
+        .btn-qty {
+            width: 35px; height: 35px; border-radius: 6px; border: none;
+            background: #222; color: var(--accent); font-weight: bold; font-size: 18px;
         }
 
-        /* LOGIN */
-        #login-screen {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-        }
-        .login-box {
-            background: var(--bg-panel);
-            padding: 40px;
-            border-radius: 20px;
-            border: 1px solid var(--accent);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-        .dark-input {
-            background: #000;
-            border: 1px solid #444;
-            color: white;
-            padding: 12px;
-            width: 100%;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
+        #login-screen { height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <div class="login-box">
-            <h1 class="brand-title" style="font-size: 50px; color: var(--accent);">CANTIERE</h1>
-            <p class="text-muted mb-4">OFFICINA GESTIONALE</p>
-            <input type="email" id="email" class="dark-input" placeholder="USERNAME">
-            <input type="password" id="password" class="dark-input" placeholder="PASSWORD">
-            <button onclick="login()" class="btn w-100 py-3 fw-bold" style="background: var(--accent); color: black;">ENTRA NEL SISTEMA</button>
+        <div style="background: var(--bg-panel); padding: 30px; border-radius: 15px; border: 1px solid var(--accent); width: 100%; max-width: 350px; text-align: center;">
+            <h1 class="teko" style="font-size: 45px; color: var(--accent); margin-bottom: 0;">CANTIERE</h1>
+            <p class="text-muted small mb-4">LOGISTICA & MAGAZZINO</p>
+            <input type="email" id="email" class="dark-input mb-3" placeholder="EMAIL">
+            <input type="password" id="password" class="dark-input mb-4" placeholder="PASSWORD">
+            <button onclick="login()" class="btn w-100 py-3 fw-bold" style="background: var(--accent); color: black;">ENTRA</button>
         </div>
     </div>
 
     <div id="app-screen" class="hidden">
         <nav class="navbar">
-            <div class="brand-title" style="font-size: 28px; color: var(--accent);">CANTIERE</div>
-            <div id="user-tag" class="small fw-bold text-white"></div>
+            <div class="teko" style="font-size: 24px; color: var(--accent);">CANTIERE</div>
+            <div id="user-tag" class="small fw-bold"></div>
         </nav>
 
-        <div class="container mt-4">
-            <div id="lista-prodotti">
+        <div class="search-container">
+            <input type="text" id="searchInput" class="dark-input" placeholder="🔍 Cerca ricambio..." oninput="caricaDati()">
+            <div class="cat-chips" id="catChips">
+                <div class="chip active" onclick="filtraCategoria('TUTTI', this)">TUTTI</div>
                 </div>
         </div>
+
+        <div class="grid-container" id="lista-prodotti">
+            </div>
     </div>
 
     <script>
         const URL_S = 'https://jkekmxhrwwidkfoizhde.supabase.co';
         const KEY_S = 'sb_publishable_XrgaVytrjL8CpZVy1xhRmw_rbsmc4f1';
         const _supabase = supabase.createClient(URL_S, KEY_S);
+        
+        let categoriaAttuale = 'TUTTI';
 
         async function login() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-            if (error) Swal.fire('Errore', 'Accesso negato', 'error');
-            else mostraApp(data.user.email.split('@')[0].toUpperCase());
+            if (error) Swal.fire('Errore', 'Dati non validi', 'error');
+            else mostraApp(data.user.email.split('@')[0]);
         }
 
         function mostraApp(user) {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
-            document.getElementById('user-tag').innerText = user;
+            document.getElementById('user-tag').innerText = user.toUpperCase();
             caricaDati();
             attivaRealtime();
         }
 
         function attivaRealtime() {
-            _supabase.channel('magazzino').on('postgres_changes', { event: '*', schema: 'public', table: 'prodotti' }, () => {
-                caricaDati();
-            }).subscribe();
+            _supabase.channel('db').on('postgres_changes', { event: '*', schema: 'public', table: 'prodotti' }, () => caricaDati()).subscribe();
         }
 
         async function caricaDati() {
-            const { data } = await _supabase.from('prodotti').select('*').order('nome');
+            let { data } = await _supabase.from('prodotti').select('*').order('nome');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            
+            // Filtro Ricerca e Categoria
+            data = data.filter(p => {
+                const matchSearch = p.nome.toLowerCase().includes(search);
+                const matchCat = categoriaAttuale === 'TUTTI' || p.categoria === categoriaAttuale;
+                return matchSearch && matchCat;
+            });
+
+            // Aggiorna Chips Categorie
+            aggiornaChips(data);
+
             let html = '';
             data.forEach(p => {
                 html += `
                 <div class="prod-card">
                     <div class="prod-name">${p.nome}</div>
-                    <div class="mt-2">
-                        ${renderBadges(p)}
-                    </div>
-                    <div class="qty-controls">
-                        <button onclick="updateQty(${p.id}, ${p.quantita - 1})" class="btn-op">-</button>
-                        <div style="flex-grow:1; text-align:center;">
-                            <span style="font-size:24px; font-weight:bold; font-family:'Teko'">${p.quantita}</span>
-                            <span class="text-muted small"> pz</span>
-                        </div>
-                        <button onclick="updateQty(${p.id}, ${p.quantita + 1})" class="btn-op">+</button>
+                    <div style="min-height: 30px;">${renderBadges(p)}</div>
+                    <div class="qty-row">
+                        <button onclick="updateQty(${p.id}, ${p.quantita - 1})" class="btn-qty">-</button>
+                        <span class="teko" style="font-size: 22px;">${p.quantita}</span>
+                        <button onclick="updateQty(${p.id}, ${p.quantita + 1})" class="btn-qty" style="color:var(--accent)">+</button>
                     </div>
                 </div>`;
             });
             document.getElementById('lista-prodotti').innerHTML = html;
         }
 
-        // LOGICA BADGE ORIGINALE (dal tuo js.txt)
         function renderBadges(p) {
             let html = '';
             let rem = p.quantita;
-            const pCrt = p.pezzi_per_cartone || 1;
-            const pPck = p.pezzi_per_pacco || 1;
-
-            if (pCrt > 1 && rem >= pCrt) {
-                const c = Math.floor(rem / pCrt);
-                rem %= pCrt;
-                html += `<span class="unit-pill icon-box"><i class="bi bi-box-seam-fill"></i> <b>${c}</b></span>`;
+            if (p.pezzi_per_cartone > 1 && rem >= p.pezzi_per_cartone) {
+                const c = Math.floor(rem / p.pezzi_per_cartone);
+                rem %= p.pezzi_per_cartone;
+                html += `<span class="unit-pill icon-box"><i class="bi bi-box-seam-fill"></i> ${c}</span>`;
             }
-            if (pPck > 1 && rem >= pPck) {
-                const pk = Math.floor(rem / pPck);
-                rem %= pPck;
-                html += `<span class="unit-pill icon-pack"><i class="bi bi-layers-fill"></i> <b>${pk}</b></span>`;
+            if (p.pezzi_per_pacco > 1 && rem >= p.pezzi_per_pacco) {
+                const pk = Math.floor(rem / p.pezzi_per_pacco);
+                rem %= p.pezzi_per_pacco;
+                html += `<span class="unit-pill icon-pack"><i class="bi bi-layers-fill"></i> ${pk}</span>`;
             }
-            html += `<span class="unit-pill" style="color:#aaa"><i class="bi bi-nut"></i> ${rem}</span>`;
+            html += `<span class="unit-pill" style="color:#666">${rem} pz</span>`;
             return html;
+        }
+
+        function filtraCategoria(cat, el) {
+            categoriaAttuale = cat;
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            caricaDati();
         }
 
         async function updateQty(id, newQty) {
@@ -222,10 +200,8 @@
 
         window.onload = async () => {
             const { data } = await _supabase.auth.getSession();
-            if (data.session) mostraApp(data.session.user.email.split('@')[0].toUpperCase());
+            if (data.session) mostraApp(data.session.user.email.split('@')[0]);
         };
     </script>
 </body>
 </html>
-
-
