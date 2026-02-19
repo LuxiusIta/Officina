@@ -3,20 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Officina Smart - Accesso Riservato</title>
+    <title>Officina Live</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --gold: #D4AF37; --dark: #1a1a1a; }
-        body { background-color: #f4f4f9; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f4f4f9; font-family: 'Segoe UI', sans-serif; padding-bottom: 30px; }
         .navbar-custom { background: var(--dark); border-bottom: 3px solid var(--gold); color: white; padding: 12px; }
-        .card-prodotto { border: none; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); background: white; }
-        #login-screen { max-width: 400px; margin: 100px auto; padding: 20px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .card-prodotto { border: none; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: white; margin-bottom: 10px; }
+        .btn-qty { width: 40px; height: 40px; border-radius: 10px; border: 1px solid #ddd; background: white; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
+        .btn-qty:active { background: #eee; transform: scale(0.95); }
+        .qty-number { font-size: 1.4rem; font-weight: bold; min-width: 45px; display: inline-block; text-align: center; }
+        #login-screen { max-width: 400px; margin: 80px auto; padding: 30px; background: white; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
+
+    <div id="login-screen" class="container">
+        <div class="text-center mb-4">
+            <i class="bi bi-gear-wide-connected text-warning" style="font-size: 3.5rem;"></i>
+            <h2 class="fw-bold mt-2">Officina Live</h2>
+            <p class="text-muted">Inserisci le credenziali</p>
+        </div>
+        <input type="email" id="email" class="form-control mb-3 p-3" placeholder="Email">
+        <input type="password" id="password" class="form-control mb-3 p-3" placeholder="Password">
+        <button onclick="login()" class="btn btn-dark w-100 py-3 fw-bold">ACCEDI</button>
+        <div id="login-error" class="text-danger mt-3 text-center"></div>
+    </div>
+
+    <div id="app-screen" class="hidden">
+        <nav class="navbar navbar-custom sticky-top mb-3">
+            <div class="container-fluid">
+                <span class="navbar-brand m-0 text-white fw-bold">🛠️ MAGAZZINO LIVE</span>
+                <button class="btn btn-warning btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalAggiungi">+ NUOVO</button>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div id="lista-prodotti" class="row g-2">
+                </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalAggiungi" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 20px;">
+                <div class="modal-body p-4">
+                    <h5 class="fw-bold mb-3">Nuovo Ricambio</h5>
+                    <input type="text" id="addNome" class="form-control mb-3" placeholder="Nome Articolo">
+                    <input type="number" id="addQuantita" class="form-control mb-3" placeholder="Quantità" value="1">
+                    <input type="number" id="addPrezzo" class="form-control mb-3" placeholder="Prezzo €">
+                    <button onclick="salvaNuovoProdotto()" class="btn btn-dark w-100 py-2">SALVA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // CONFIGURAZIONE SUPABASE
+        const URL_S = 'https://jkekmxhrwwidkfoizhde.supabase.co';
+        const KEY_S = 'sb_publishable_XrgaVytrjL8CpZVy1xhRmw_rbsmc4f1';
+        const _supabase = supabase.createClient(URL_S, KEY_S);
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const { error } = await _supabase.auth.signInWithPassword({ email, password });
+            if (error) document.getElementById('login-error').innerText = "Email o Password errata";
+            else mostraApp();
+        }
+
+        function mostraApp() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            caricaDati();
+            attivaRealtime(); 
+        }
+
+        // ASCOLTA I CAMBIAMENTI LIVE
+        function attivaRealtime() {
+            _supabase
+                .channel('cambiamenti')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'prodotti' }, (payload) => {
+                    console.log('Cambio rilevato!', payload);
+                    caricaDati(); 
+                })
+                .subscribe();
+        }
+
+        async function caricaDati() {
+            const { data, error } = await _supabase.from('prodotti').select('*').order('nome');
+            if (error) return;
+            let html = '';
+            data.forEach(p => {
+                const coloreQty = p.quantita <= 2 ? 'text-danger' : 'text-dark';
+                html += `
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card card-prodotto p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div style="max-width: 60%;">
+                                <div class="fw-bold text-uppercase text-truncate" style="font-size: 0.9rem;">${p.nome}</div>
+                                <div class="text-success fw-bold">€ ${p.prezzo}</div>
+                            </div>
+                            <div class="d-flex align-items-center bg-light rounded-3 p-1">
+                                <button onclick="aggiornaQty(${p.id}, ${p.quantita - 1})" class="btn-qty text-danger"> - </button>
+                                <span class="qty-number ${coloreQty}">${p.quantita}</span>
+                                <button onclick="aggiornaQty(${p.id}, ${p.quantita + 1})" class="btn-qty text-dark"> + </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('lista-prodotti').innerHTML = html;
+        }
+
+        async function aggiornaQty(id, nuovaQty) {
+            if (nuovaQty < 0) return;
+            await _supabase.from('prodotti').update({ quantita: nuovaQty }).eq('id', id);
+        }
+
+        async function salvaNuovoProdotto() {
+            const nome = document.getElementById('addNome').value;
+            const quantita = parseInt(document.getElementById('addQuantita').value);
+            const prezzo = parseFloat(document.getElementById('addPrezzo').value);
+            if(!nome) return alert("Inserisci il nome del pezzo!");
+            
+            const { error } = await _supabase.from('prodotti').insert([{ nome, quantita, prezzo }]);
+            if (error) alert("Errore nel salvataggio");
+            else {
+                bootstrap.Modal.getInstance(document.getElementById('modalAggiungi')).hide();
+                // Pulisci i campi dopo il salvataggio
+                document.getElementById('addNome').value = '';
+                document.getElementById('addPrezzo').value = '';
+            }
+        }
+
+        window.onload = async () => {
+            const { data } = await _supabase.auth.getSession();
+            if (data.session) mostraApp();
+        };
+    </script>
+</body>
+</html>
 
     <div id="login-screen" class="container">
         <div class="text-center mb-4">
@@ -131,4 +262,5 @@
         };
     </script>
 </body>
+
 </html>
