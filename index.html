@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Officina Smart - Accesso Riservato</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --gold: #D4AF37; --dark: #1a1a1a; }
+        body { background-color: #f4f4f9; font-family: 'Segoe UI', sans-serif; }
+        .navbar-custom { background: var(--dark); border-bottom: 3px solid var(--gold); color: white; padding: 12px; }
+        .card-prodotto { border: none; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); background: white; }
+        #login-screen { max-width: 400px; margin: 100px auto; padding: 20px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen" class="container">
+        <div class="text-center mb-4">
+            <i class="bi bi-shield-lock-fill text-warning" style="font-size: 3rem;"></i>
+            <h3 class="fw-bold">Area Riservata</h3>
+            <p class="text-muted">Accedi per gestire l'officina</p>
+        </div>
+        <div class="mb-3">
+            <label class="small fw-bold">EMAIL</label>
+            <input type="email" id="email" class="form-control" placeholder="nome@officina.it">
+        </div>
+        <div class="mb-3">
+            <label class="small fw-bold">PASSWORD</label>
+            <input type="password" id="password" class="form-control" placeholder="••••••••">
+        </div>
+        <button onclick="login()" class="btn btn-dark w-100 py-2 fw-bold">ACCEDI</button>
+        <div id="login-error" class="text-danger small mt-2 text-center"></div>
+    </div>
+
+    <div id="app-screen" class="hidden">
+        <nav class="navbar navbar-custom sticky-top mb-4">
+            <div class="container-fluid d-flex justify-content-between">
+                <span class="navbar-brand m-0 text-white fw-bold">🛠️ OFFICINA SMART</span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">Esci</button>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="d-flex justify-content-between mb-3">
+                <div id="stato" class="small text-success">● Connesso</div>
+                <button class="btn btn-warning btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalAggiungi">+ NUOVO</button>
+            </div>
+            <div id="lista-prodotti" class="row g-3"></div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalAggiungi" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header"><h5>Nuovo Articolo</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <input type="text" id="addNome" class="form-control mb-2" placeholder="Nome Articolo">
+                    <input type="number" id="addQuantita" class="form-control mb-2" placeholder="Quantità" value="1">
+                    <input type="number" id="addPrezzo" class="form-control mb-2" placeholder="Prezzo €">
+                </div>
+                <div class="modal-footer"><button onclick="salvaNuovoProdotto()" class="btn btn-dark w-100">Salva</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const URL_S = 'https://jkekmxhrwwidkfoizhde.supabase.co';
+        const KEY_S = 'sb_publishable_XrgaVytrjL8CpZVy1xhRmw_rbsmc4f1';
+        const _supabase = supabase.createClient(URL_S, KEY_S);
+
+        // FUNZIONE LOGIN
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                document.getElementById('login-error').innerText = "Credenziali errate";
+            } else {
+                mostraApp();
+            }
+        }
+
+        function mostraApp() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            caricaDati();
+        }
+
+        async function logout() {
+            await _supabase.auth.signOut();
+            location.reload();
+        }
+
+        async function caricaDati() {
+            const { data, error } = await _supabase.from('prodotti').select('*').order('created_at', { ascending: false });
+            if (error) return;
+            let html = '';
+            data.forEach(p => {
+                html += `
+                <div class="col-6 col-md-4">
+                    <div class="card card-prodotto p-3 h-100 text-center shadow-sm">
+                        <div class="fw-bold text-truncate small">${p.nome}</div>
+                        <div class="text-success fw-bold">€ ${p.prezzo}</div>
+                        <div class="small text-muted">Disp: ${p.quantita}</div>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('lista-prodotti').innerHTML = html;
+        }
+
+        async function salvaNuovoProdotto() {
+            const nome = document.getElementById('addNome').value;
+            const quantita = document.getElementById('addQuantita').value;
+            const prezzo = document.getElementById('addPrezzo').value;
+            const { error } = await _supabase.from('prodotti').insert([{ nome, quantita: parseInt(quantita), prezzo: parseFloat(prezzo) }]);
+            if (!error) { 
+                bootstrap.Modal.getInstance(document.getElementById('modalAggiungi')).hide();
+                caricaDati(); 
+            }
+        }
+
+        // Controllo se l'utente è già loggato all'apertura
+        window.onload = async () => {
+            const { data } = await _supabase.auth.getSession();
+            if (data.session) mostraApp();
+        };
+    </script>
+</body>
+</html>
