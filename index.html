@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>CANTIERE - GESTIONALE</title>
+    <title>CANTIERE OFFICINA - PRO</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -11,27 +11,37 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        /* CSS REPLICATO DAI TUOI FILE */
         :root {
             --bg-dark: #0a0a0a;
             --bg-panel: #161616;
             --accent: #FFD700;
-            --c-box: #D2691E;
-            --c-pack: #00BFFF;
+            --c-box: #D2691E;   /* Cartone marrone */
+            --c-pack: #00BFFF;  /* Pacco azzurro */
         }
 
-        body { background: var(--bg-dark); color: white; font-family: 'Roboto', sans-serif; margin: 0; }
-        .teko { font-family: 'Teko', sans-serif; text-transform: uppercase; }
+        body {
+            background: var(--bg-dark);
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
 
-        /* NAVBAR FISSA */
+        .teko { font-family: 'Teko', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* NAVBAR */
         .navbar {
-            background: #000; border-bottom: 2px solid var(--accent);
-            padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
+            background: #000;
+            border-bottom: 2px solid var(--accent);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             position: sticky; top: 0; z-index: 1000;
         }
 
-        /* FILTRI E RICERCA */
-        .search-container { padding: 15px; background: #000; }
+        /* RICERCA E FILTRI */
+        .header-controls { padding: 15px; background: #000; }
         .dark-input {
             background: #1a1a1a; border: 1px solid #333; color: white;
             padding: 12px; width: 100%; border-radius: 8px; outline: none;
@@ -39,73 +49,106 @@
         .dark-input:focus { border-color: var(--accent); }
 
         .cat-chips {
-            display: flex; gap: 10px; overflow-x: auto; padding: 10px 0;
+            display: flex; gap: 10px; overflow-x: auto; padding: 12px 0;
             scrollbar-width: none;
         }
+        .cat-chips::-webkit-scrollbar { display: none; }
         .chip {
-            background: #222; border: 1px solid #444; padding: 5px 15px;
+            background: #222; border: 1px solid #444; padding: 6px 18px;
             border-radius: 20px; white-space: nowrap; font-size: 14px; cursor: pointer;
+            transition: 0.2s;
         }
         .chip.active { background: var(--accent); color: black; font-weight: bold; border-color: var(--accent); }
 
         /* GRID PRODOTTI */
         .grid-container {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 12px; padding: 15px;
         }
-        .prod-card {
-            background: var(--bg-panel); border-radius: 12px; padding: 12px;
-            text-align: center; border-bottom: 3px solid #333; transition: 0.2s;
-        }
-        .prod-card:active { transform: scale(0.95); }
-        .prod-name { font-family: 'Teko'; font-size: 18px; color: var(--accent); min-height: 44px; display: flex; align-items: center; justify-content: center; line-height: 1.1; }
 
-        /* UNIT PILLS */
+        .prod-card {
+            background: var(--bg-panel);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 3px solid #333;
+            transition: 0.2s;
+            position: relative;
+        }
+        .prod-card:active { transform: scale(0.96); }
+
+        .prod-name {
+            font-family: 'Teko';
+            font-size: 20px;
+            color: var(--accent);
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        /* UNIT BADGES (Pezzi, Pacchi, Cartoni) */
         .unit-pill {
             display: inline-flex; align-items: center; gap: 4px;
-            background: #000; padding: 3px 8px; border-radius: 5px;
-            font-size: 12px; border: 1px solid #333; margin: 2px;
+            background: #000; padding: 4px 8px; border-radius: 6px;
+            font-size: 13px; border: 1px solid #333; margin: 2px;
         }
         .icon-box { color: var(--c-box); }
         .icon-pack { color: var(--c-pack); }
 
-        /* CONTROLLI */
+        /* CONTROLLI QUANTITÀ */
         .qty-row {
             display: flex; justify-content: space-between; align-items: center;
-            margin-top: 10px; background: #000; border-radius: 8px; padding: 5px;
+            margin-top: 15px; background: #000; border-radius: 10px; padding: 6px;
         }
         .btn-qty {
-            width: 35px; height: 35px; border-radius: 6px; border: none;
-            background: #222; color: var(--accent); font-weight: bold; font-size: 18px;
+            width: 40px; height: 40px; border-radius: 8px; border: none;
+            background: #222; color: white; font-size: 20px;
+        }
+        .btn-plus { color: var(--accent) !important; }
+
+        /* LOGIN */
+        #login-screen {
+            height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .login-box {
+            background: var(--bg-panel); padding: 40px; border-radius: 20px;
+            border: 1px solid var(--accent); width: 100%; max-width: 400px; text-align: center;
         }
 
-        #login-screen { height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <div style="background: var(--bg-panel); padding: 30px; border-radius: 15px; border: 1px solid var(--accent); width: 100%; max-width: 350px; text-align: center;">
-            <h1 class="teko" style="font-size: 45px; color: var(--accent); margin-bottom: 0;">CANTIERE</h1>
-            <p class="text-muted small mb-4">LOGISTICA & MAGAZZINO</p>
-            <input type="email" id="email" class="dark-input mb-3" placeholder="EMAIL">
+        <div class="login-box">
+            <h1 class="teko" style="font-size: 55px; color: var(--accent); margin: 0;">CANTIERE</h1>
+            <p class="text-muted small mb-4">GESTIONE OFFICINA LIVE</p>
+            <input type="email" id="email" class="dark-input mb-3" placeholder="EMAIL UTENTE">
             <input type="password" id="password" class="dark-input mb-4" placeholder="PASSWORD">
-            <button onclick="login()" class="btn w-100 py-3 fw-bold" style="background: var(--accent); color: black;">ENTRA</button>
+            <button onclick="login()" class="btn w-100 py-3 fw-bold teko" style="background: var(--accent); color: black; font-size: 20px;">ENTRA NEL SISTEMA</button>
+            <div id="login-error" class="text-danger mt-3 small"></div>
         </div>
     </div>
 
     <div id="app-screen" class="hidden">
         <nav class="navbar">
-            <div class="teko" style="font-size: 24px; color: var(--accent);">CANTIERE</div>
-            <div id="user-tag" class="small fw-bold"></div>
+            <div class="teko" style="font-size: 28px; color: var(--accent);">CANTIERE</div>
+            <div class="d-flex align-items-center gap-3">
+                <span id="user-tag" class="small fw-bold teko text-white"></span>
+                <i class="bi bi-box-arrow-right text-danger fs-4" onclick="logout()" style="cursor:pointer"></i>
+            </div>
         </nav>
 
-        <div class="search-container">
-            <input type="text" id="searchInput" class="dark-input" placeholder="🔍 Cerca ricambio..." oninput="caricaDati()">
+        <div class="header-controls">
+            <input type="text" id="searchInput" class="dark-input" placeholder="🔍 Cerca per nome..." oninput="caricaDati()">
             <div class="cat-chips" id="catChips">
                 <div class="chip active" onclick="filtraCategoria('TUTTI', this)">TUTTI</div>
-                </div>
+            </div>
         </div>
 
         <div class="grid-container" id="lista-prodotti">
@@ -119,77 +162,101 @@
         
         let categoriaAttuale = 'TUTTI';
 
+        // --- AUTH ---
         async function login() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-            if (error) Swal.fire('Errore', 'Dati non validi', 'error');
-            else mostraApp(data.user.email.split('@')[0]);
+            if (error) document.getElementById('login-error').innerText = "ERRORE: ACCESSO NEGATO";
+            else mostraApp(data.user.email);
         }
 
-        function mostraApp(user) {
+        async function logout() {
+            await _supabase.auth.signOut();
+            location.reload();
+        }
+
+        function mostraApp(email) {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
-            document.getElementById('user-tag').innerText = user.toUpperCase();
+            document.getElementById('user-tag').innerText = email.split('@')[0].toUpperCase();
             caricaDati();
             attivaRealtime();
         }
 
+        // --- CORE LOGIC ---
         function attivaRealtime() {
-            _supabase.channel('db').on('postgres_changes', { event: '*', schema: 'public', table: 'prodotti' }, () => caricaDati()).subscribe();
+            _supabase.channel('custom').on('postgres_changes', { event: '*', schema: 'public', table: 'prodotti' }, () => {
+                caricaDati();
+            }).subscribe();
         }
 
         async function caricaDati() {
-            let { data } = await _supabase.from('prodotti').select('*').order('nome');
+            let { data, error } = await _supabase.from('prodotti').select('*').order('nome');
+            if (error) return;
+
             const search = document.getElementById('searchInput').value.toLowerCase();
             
-            // Filtro Ricerca e Categoria
+            // Creazione Chip Categorie Dinamiche
+            const cats = ['TUTTI', ...new Set(data.map(p => p.categoria))];
+            renderChips(cats);
+
+            // Filtro Ricerca + Categoria
             data = data.filter(p => {
                 const matchSearch = p.nome.toLowerCase().includes(search);
                 const matchCat = categoriaAttuale === 'TUTTI' || p.categoria === categoriaAttuale;
                 return matchSearch && matchCat;
             });
 
-            // Aggiorna Chips Categorie
-            aggiornaChips(data);
-
             let html = '';
             data.forEach(p => {
                 html += `
-                <div class="prod-card">
+                <div class="prod-card shadow">
                     <div class="prod-name">${p.nome}</div>
-                    <div style="min-height: 30px;">${renderBadges(p)}</div>
+                    <div style="min-height: 35px;">${renderBadges(p)}</div>
                     <div class="qty-row">
                         <button onclick="updateQty(${p.id}, ${p.quantita - 1})" class="btn-qty">-</button>
-                        <span class="teko" style="font-size: 22px;">${p.quantita}</span>
-                        <button onclick="updateQty(${p.id}, ${p.quantita + 1})" class="btn-qty" style="color:var(--accent)">+</button>
+                        <div class="teko" style="font-size: 24px;">${p.quantita}</div>
+                        <button onclick="updateQty(${p.id}, ${p.quantita + 1})" class="btn-qty btn-plus">+</button>
                     </div>
                 </div>`;
             });
-            document.getElementById('lista-prodotti').innerHTML = html;
+            document.getElementById('lista-prodotti').innerHTML = html || '<p class="text-center w-100 mt-4 text-muted">Nessun prodotto trovato</p>';
         }
 
+        // LOGICA BADGE (Replica esatta del tuo vecchio sistema)
         function renderBadges(p) {
             let html = '';
             let rem = p.quantita;
-            if (p.pezzi_per_cartone > 1 && rem >= p.pezzi_per_cartone) {
-                const c = Math.floor(rem / p.pezzi_per_cartone);
-                rem %= p.pezzi_per_cartone;
-                html += `<span class="unit-pill icon-box"><i class="bi bi-box-seam-fill"></i> ${c}</span>`;
+            const pCrt = p.pezzi_per_cartone || 0;
+            const pPck = p.pezzi_per_pacco || 0;
+
+            if (pCrt > 1 && rem >= pCrt) {
+                const c = Math.floor(rem / pCrt);
+                rem %= pCrt;
+                html += `<span class="unit-pill icon-box"><i class="bi bi-box-seam-fill"></i><b>${c}</b></span>`;
             }
-            if (p.pezzi_per_pacco > 1 && rem >= p.pezzi_per_pacco) {
-                const pk = Math.floor(rem / p.pezzi_per_pacco);
-                rem %= p.pezzi_per_pacco;
-                html += `<span class="unit-pill icon-pack"><i class="bi bi-layers-fill"></i> ${pk}</span>`;
+            if (pPck > 1 && rem >= pPck) {
+                const pk = Math.floor(rem / pPck);
+                rem %= pPck;
+                html += `<span class="unit-pill icon-pack"><i class="bi bi-layers-fill"></i><b>${pk}</b></span>`;
             }
-            html += `<span class="unit-pill" style="color:#666">${rem} pz</span>`;
+            if (rem > 0 || html === '') {
+                html += `<span class="unit-pill" style="color:#888">${rem} pz</span>`;
+            }
             return html;
+        }
+
+        function renderChips(cats) {
+            const container = document.getElementById('catChips');
+            const current = categoriaAttuale;
+            container.innerHTML = cats.map(c => `
+                <div class="chip ${c === current ? 'active' : ''}" onclick="filtraCategoria('${c}', this)">${c}</div>
+            `).join('');
         }
 
         function filtraCategoria(cat, el) {
             categoriaAttuale = cat;
-            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
             caricaDati();
         }
 
@@ -198,10 +265,12 @@
             await _supabase.from('prodotti').update({ quantita: newQty }).eq('id', id);
         }
 
+        // Controllo Sessione al caricamento
         window.onload = async () => {
             const { data } = await _supabase.auth.getSession();
-            if (data.session) mostraApp(data.session.user.email.split('@')[0]);
+            if (data.session) mostraApp(data.session.user.email);
         };
     </script>
 </body>
 </html>
+
