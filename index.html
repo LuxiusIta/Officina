@@ -3,163 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Officina Smart - Pro</title>
+    <title>MAGAZZINO PRO</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <style>
-        /* DESIGN INDIPENDENTE - NO GOOGLE FONTS */
+        /* REPLICA STILE GESTIONALE VECCHIO */
         :root { 
-            --gold: #D4AF37; 
-            --dark-bg: #0f0f0f; 
-            --card-bg: #1a1a1a;
-            --text-main: #ffffff;
+            --yellow: #ffcc00; 
+            --bg-dark: #0a0a0a; 
+            --card-dark: #161616;
+            --text-gray: #b0b0b0;
         }
 
         body { 
-            background-color: var(--dark-bg); 
-            color: var(--text-main);
-            font-family: system-ui, -apple-system, sans-serif; 
+            background-color: var(--bg-dark); 
+            color: white; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
             margin: 0;
-            padding-bottom: 50px;
         }
 
-        /* BARRA SUPERIORE */
-        .navbar-custom { 
-            background: #000; 
-            border-bottom: 2px solid var(--gold); 
-            padding: 15px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        /* SCHERMATA ACCESSO */
+        /* LOGIN STYLE (image_0e94e1) */
         #login-screen { 
-            max-width: 400px; 
-            margin: 80px auto; 
-            padding: 40px; 
-            background: var(--card-bg); 
-            border-radius: 20px; 
-            border: 1px solid #333;
-            text-align: center;
+            max-width: 450px; margin: 10vh auto; padding: 40px; 
+            background: var(--card-dark); border: 2px solid var(--yellow); 
+            border-radius: 10px; text-align: center;
         }
-
-        /* TESSERE PRODOTTI (CARDS) */
-        .card-prodotto { 
-            background: var(--card-bg); 
-            border: 1px solid #2a2a2a;
-            border-radius: 18px; 
-            padding: 18px;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-
-        .nome-pezzo {
-            color: var(--gold);
-            font-weight: 700;
+        .btn-main { 
+            background: var(--yellow); color: black; font-weight: 900; 
+            border: none; padding: 15px; border-radius: 8px; width: 100%;
             text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 0.5px;
         }
 
-        .prezzo-pezzo {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #4CAF50; /* Verde per il prezzo */
+        /* NAVBAR (image_0e9507) */
+        .nav-pro { 
+            background: black; border-bottom: 2px solid var(--yellow); 
+            padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
         }
+        .nav-title { color: white; font-weight: 900; font-size: 1.4rem; text-transform: uppercase; }
 
-        /* CONTROLLI + e - */
-        .qty-container {
-            background: #252525;
-            border-radius: 12px;
-            padding: 4px;
-            display: flex;
-            align-items: center;
-            border: 1px solid #333;
+        /* CARDS PRODOTTI (image_0e9507) */
+        .grid-prodotti { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+            gap: 15px; padding: 20px; 
         }
-
-        .btn-qty { 
-            width: 40px; 
-            height: 40px; 
-            border-radius: 8px; 
-            border: none; 
-            background: #333; 
-            color: white;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
+        .card-pro { 
+            background: var(--card-dark); border-radius: 12px; overflow: hidden; 
+            text-align: center; border-bottom: 3px solid #333; transition: 0.2s;
         }
-
-        .btn-plus { background: var(--gold); color: black; font-weight: bold; }
-        .btn-qty:active { transform: scale(0.9); }
-
-        .qty-number { 
-            font-size: 1.4rem; 
-            font-weight: 800; 
-            min-width: 45px; 
-            text-align: center; 
+        .card-pro:hover { border-color: var(--yellow); }
+        
+        .img-placeholder { 
+            width: 100%; height: 120px; background: white; 
+            display: flex; align-items: center; justify-content: center;
         }
+        .card-body-pro { padding: 15px; }
+        .p-name { font-weight: 800; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 10px; }
+        
+        /* BADGES QUANTITA */
+        .badge-qty { 
+            background: #222; border: 1px solid #444; border-radius: 5px; 
+            padding: 4px 10px; display: inline-flex; align-items: center; gap: 5px;
+            font-size: 0.8rem; font-weight: bold;
+        }
+        .icon-box { color: #00aaff; } /* Colore pacchi */
+        .icon-gear { color: var(--yellow); } /* Colore sfusi */
 
-        .low-stock { color: #ff3b3b !important; }
+        .total-display { border-top: 1px solid #333; padding-top: 10px; font-weight: 900; font-size: 1.1rem; }
+
+        /* MODALE OPERAZIONI (image_0e980c) */
+        .op-box { background: #000; border-radius: 10px; padding: 15px; margin-bottom: 10px; border: 1px solid #333; }
+        .btn-qty-round { 
+            width: 45px; height: 45px; border-radius: 50%; border: 2px solid #444; 
+            background: #222; color: var(--yellow); font-size: 1.5rem; font-weight: bold;
+        }
 
         #app-screen { display: none; }
-
-        /* INPUT LOGIN */
-        .form-control {
-            background: #222;
-            border: 1px solid #444;
-            color: white;
-            padding: 12px;
-        }
-        .form-control:focus { background: #222; color: white; border-color: var(--gold); box-shadow: none; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <i class="bi bi-shield-lock text-warning" style="font-size: 3rem;"></i>
-        <h3 class="fw-bold mt-3" style="color:var(--gold)">OFFICINA SMART</h3>
-        <p class="text-muted small">Inserisci le credenziali per entrare</p>
+        <div class="mb-4">
+            <i class="bi bi-wrench-adjustable-circle text-warning" style="font-size: 4rem;"></i>
+        </div>
+        <h2 class="fw-bold text-white mb-1">CANTIERE</h2>
+        <h2 class="fw-bold mb-4" style="color:var(--yellow)">OFFICINA</h2>
         
-        <input type="email" id="email" class="form-control mb-3 mt-4" placeholder="Email">
-        <input type="password" id="password" class="form-control mb-4" placeholder="Password">
-        <button onclick="login()" class="btn btn-warning w-100 py-2 fw-bold">ACCEDI</button>
-        <div id="login-error" class="text-danger mt-3 small"></div>
+        <div class="text-start mb-3">
+            <label class="small text-muted text-uppercase fw-bold"><i class="bi bi-person-fill"></i> Identificativo</label>
+            <input type="email" id="email" class="form-control bg-black text-white border-secondary p-3" placeholder="user@officina.it">
+        </div>
+        <div class="text-start mb-4">
+            <label class="small text-muted text-uppercase fw-bold"><i class="bi bi-key-fill"></i> Password</label>
+            <input type="password" id="password" class="form-control bg-black text-white border-secondary p-3" placeholder="••••••">
+        </div>
+        <button onclick="login()" class="btn-main mb-3">ENTRA NEL SISTEMA</button>
+        <div id="login-error" class="text-danger small"></div>
     </div>
 
     <div id="app-screen">
-        <nav class="navbar navbar-custom mb-3">
-            <div class="container-fluid d-flex justify-content-between">
-                <span class="fw-bold" style="color:var(--gold)">🛠️ MAGAZZINO LIVE</span>
-                <button class="btn btn-warning btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalAggiungi">+ NUOVO</button>
+        <nav class="nav-pro">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-list text-warning fs-3"></i>
+                <span class="nav-title">MAGAZZINO</span>
             </div>
+            <div class="bg-dark px-3 py-1 rounded text-warning fw-bold small">SIMO</div>
         </nav>
 
-        <div class="container">
-            <div id="lista-prodotti" class="row g-2">
+        <div class="p-3">
+            <input type="text" class="form-control bg-black text-white border-secondary mb-2" placeholder="🔍 Cerca prodotto...">
+            <button class="btn btn-outline-warning w-100 fw-bold mb-3"><i class="bi bi-printer"></i> STAMPA GIACENZA</button>
+            
+            <div id="lista-prodotti" class="grid-prodotti">
                 </div>
         </div>
     </div>
 
-    <div class="modal fade" id="modalAggiungi" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark text-white" style="border: 1px solid var(--gold); border-radius: 20px;">
-                <div class="modal-body p-4">
-                    <h5 class="fw-bold mb-4">Aggiungi al Magazzino</h5>
-                    <input type="text" id="addNome" class="form-control mb-3" placeholder="Nome Articolo">
-                    <input type="number" id="addQuantita" class="form-control mb-3" placeholder="Quantità" value="1">
-                    <input type="number" id="addPrezzo" class="form-control mb-4" placeholder="Prezzo €">
-                    <button onclick="salvaNuovoProdotto()" class="btn btn-warning w-100 py-2 fw-bold">SALVA ARTICOLO</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const URL_S = 'https://jkekmxhrwwidkfoizhde.supabase.co';
         const KEY_S = 'sb_publishable_XrgaVytrjL8CpZVy1xhRmw_rbsmc4f1';
@@ -169,20 +130,20 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const { error } = await _supabase.auth.signInWithPassword({ email, password });
-            if (error) document.getElementById('login-error').innerText = "Errore: controlla i dati";
+            if (error) document.getElementById('login-error').innerText = "ACCESSO NEGATO";
             else mostraApp();
         }
 
         function mostraApp() {
-            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-screen').style.display = 'block';
             caricaDati();
-            attivaRealtime(); 
+            attivaRealtime();
         }
 
         function attivaRealtime() {
-            _supabase.channel('db').on('postgres_changes', { event: '*', schema: 'public', table: 'prodotti' }, () => {
-                caricaDati(); 
+            _supabase.channel('custom').on('postgres_changes', { event: '*', schema: 'public', table: 'prodotti' }, () => {
+                caricaDati();
             }).subscribe();
         }
 
@@ -190,20 +151,20 @@
             const { data } = await _supabase.from('prodotti').select('*').order('nome');
             let html = '';
             data.forEach(p => {
-                const stockColor = p.quantita <= 2 ? 'low-stock' : '';
                 html += `
-                <div class="col-12 col-md-6">
-                    <div class="card-prodotto">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div style="max-width: 50%;">
-                                <div class="nome-pezzo">${p.nome}</div>
-                                <div class="prezzo-pezzo">€ ${p.prezzo}</div>
-                            </div>
-                            <div class="qty-container">
-                                <button onclick="aggiornaQty(${p.id}, ${p.quantita - 1})" class="btn-qty text-danger">-</button>
-                                <span class="qty-number ${stockColor}">${p.quantita}</span>
-                                <button onclick="aggiornaQty(${p.id}, ${p.quantita + 1})" class="btn-qty btn-plus">+</button>
-                            </div>
+                <div class="card-pro">
+                    <div class="img-placeholder">
+                        <i class="bi bi-box-seam text-secondary fs-1"></i>
+                    </div>
+                    <div class="card-body-pro">
+                        <div class="p-name">${p.nome}</div>
+                        <div class="d-flex justify-content-center gap-2 mb-3">
+                            <div class="badge-qty"><i class="bi bi-archive icon-box"></i> ${p.quantita}</div>
+                        </div>
+                        <div class="total-display">
+                             <button onclick="aggiornaQty(${p.id}, ${p.quantita + 1})" class="btn-qty-round">+</button>
+                             <span class="mx-2">${p.quantita}</span>
+                             <button onclick="aggiornaQty(${p.id}, ${p.quantita - 1})" class="btn-qty-round">-</button>
                         </div>
                     </div>
                 </div>`;
@@ -216,15 +177,6 @@
             await _supabase.from('prodotti').update({ quantita: nuovaQty }).eq('id', id);
         }
 
-        async function salvaNuovoProdotto() {
-            const nome = document.getElementById('addNome').value;
-            const quantita = parseInt(document.getElementById('addQuantita').value);
-            const prezzo = parseFloat(document.getElementById('addPrezzo').value);
-            if(!nome) return;
-            await _supabase.from('prodotti').insert([{ nome, quantita, prezzo }]);
-            bootstrap.Modal.getInstance(document.getElementById('modalAggiungi')).hide();
-        }
-
         window.onload = async () => {
             const { data } = await _supabase.auth.getSession();
             if (data.session) mostraApp();
@@ -232,3 +184,4 @@
     </script>
 </body>
 </html>
+
