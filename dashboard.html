@@ -6,52 +6,108 @@
     <title>Cantiere | Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --cantiere-gold: #ffc107; --cantiere-dark: #121212; }
-        body { background-color: var(--cantiere-dark); color: #fff; }
-        .navbar { background: #000; border-bottom: 2px solid var(--cantiere-gold); }
-        .nav-link { color: #fff !important; font-weight: bold; margin-right: 15px; }
-        .maga-card { background: #1e1e1e; border: 1px solid #333; border-radius: 15px; padding: 2rem; text-align: center; cursor: pointer; transition: 0.3s; }
-        .maga-card:hover { border-color: var(--cantiere-gold); transform: translateY(-5px); }
-        .maga-icon { font-size: 3rem; color: var(--cantiere-gold); }
+        :root { --cantiere-gold: #ffc107; --cantiere-dark: #121212; --cantiere-card: #1e1e1e; }
+        body { background-color: var(--cantiere-dark); color: #fff; font-family: 'Inter', sans-serif; }
+        
+        /* Navbar Professionale */
+        .navbar { background: #000; border-bottom: 2px solid var(--cantiere-gold); padding: 1rem; }
+        .nav-link { color: #fff !important; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; margin-right: 10px; }
+        .nav-link:hover { color: var(--cantiere-gold) !important; }
+        
+        /* Icona Chat Speciale */
+        .chat-link { position: relative; color: var(--cantiere-gold) !important; font-size: 1.2rem; }
+        .chat-badge { position: absolute; top: -5px; right: -10px; font-size: 0.6rem; padding: 3px 6px; }
+
+        /* Magazzini */
+        .maga-card { 
+            background: var(--cantiere-card); border: 1px solid #333; border-radius: 15px; 
+            padding: 2.5rem; text-align: center; cursor: pointer; transition: 0.3s; 
+        }
+        .maga-card:hover { border-color: var(--cantiere-gold); transform: translateY(-5px); background: #252525; }
+        .maga-icon { font-size: 3.5rem; color: var(--cantiere-gold); margin-bottom: 1rem; }
+        
+        .status-bar { font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg p-3">
-        <div class="container-fluid">
-            <span class="navbar-brand fw-bold text-warning">CANTIERE</span>
-            <div class="navbar-nav">
-                <a class="nav-link" href="movimenti.html">MOVIMENTI</a>
-                <a class="nav-link" href="prodotti.html">PRODOTTI</a>
-                <a class="nav-link" href="storico.html">STORICO</a>
-                <button class="btn btn-outline-danger btn-sm" onclick="localStorage.clear(); location.href='index.html'">LOGOUT</button>
+
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold text-white" href="#"><i class="bi bi-cone-striped me-2 text-warning"></i>CANTIERE</a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="movimenti.html"><i class="bi bi-arrow-left-right"></i> Movimenti</a></li>
+                <li class="nav-item"><a class="nav-link" href="prodotti.html"><i class="bi bi-box-seam"></i> Prodotti</a></li>
+                <li class="nav-item"><a class="nav-link" href="storico.html"><i class="bi bi-clock-history"></i> Storico</a></li>
+                <li class="nav-item"><a class="nav-link" href="utenti.html"><i class="bi bi-people"></i> Utenti</a></li>
+            </ul>
+            
+            <div class="d-flex align-items-center">
+                <a href="chat.html" class="nav-link chat-link me-4">
+                    <i class="bi bi-chat-dots-fill"></i>
+                    <span class="badge rounded-pill bg-danger chat-badge">LIVE</span>
+                </a>
+                <button class="btn btn-outline-warning btn-sm fw-bold" onclick="logout()">LOGOUT</button>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <div class="container mt-5">
-        <h2 class="fw-bold mb-4">SITUAZIONE MAGAZZINI</h2>
-        <div class="row g-4" id="maga-list"></div>
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">CENTRALE OPERATIVA</h1>
+        <div class="status-bar"><i class="bi bi-circle-fill text-success me-1" style="font-size: 0.5rem;"></i> Sistema Realtime Attivo</div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        if(!localStorage.getItem('cantiere_user')) location.href='index.html';
-        const _supabase = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
+    <div class="row g-4" id="maga-list">
+        </div>
+</div>
 
-        async function carica() {
-            const { data } = await _supabase.from('magazzini').select('*').order('nome');
-            document.getElementById('maga-list').innerHTML = data.map(m => `
-                <div class="col-md-4">
-                    <div class="maga-card" onclick="location.href='dettaglio_magazzino.html?id=${m.id}&nome=${m.nome}'">
-                        <div class="maga-icon"><i class="bi bi-house-door-fill"></i></div>
-                        <h4 class="fw-bold mt-2">${m.nome}</h4>
-                        <p class="text-secondary small">Clicca per visualizzare scorte</p>
-                    </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // --- IL BUTTAFUORI ---
+    if (!localStorage.getItem('cantiere_user')) { location.href = "index.html"; }
+
+    const _supabase = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
+
+    async function caricaMagazzini() {
+        const { data: mags } = await _supabase.from('magazzini').select('*').order('nome');
+        const container = document.getElementById('maga-list');
+        
+        container.innerHTML = mags.map(m => `
+            <div class="col-md-4">
+                <div class="maga-card" onclick="location.href='dettaglio_magazzino.html?id=${m.id}&nome=${encodeURIComponent(m.nome)}'">
+                    <div class="maga-icon"><i class="bi bi-house-door-fill"></i></div>
+                    <h4 class="fw-bold text-uppercase mb-0">${m.nome}</h4>
+                    <hr class="border-secondary my-3">
+                    <span class="text-secondary small">VEDI GIACENZE <i class="bi bi-chevron-right"></i></span>
                 </div>
-            `).join('');
-        }
-        carica();
-    </script>
+            </div>
+        `).join('');
+    }
+
+    function logout() {
+        Swal.fire({
+            title: 'Vuoi uscire?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#ffc107',
+            confirmButtonText: 'Sì, Logout'
+        }).then((r) => { if(r.isConfirmed) { localStorage.clear(); location.href='index.html'; } });
+    }
+
+    // Inizializza
+    caricaMagazzini();
+
+    // Realtime per aggiornare se aggiungi/rimuovi magazzini da Supabase
+    _supabase.channel('maga-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'magazzini' }, () => caricaMagazzini()).subscribe();
+</script>
 </body>
 </html>
