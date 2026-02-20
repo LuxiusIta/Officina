@@ -8,74 +8,66 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --gold: #ffc107; --dark: #000; --card: #121212; }
+        :root { --gold: #ffc107; --dark: #000; }
         body { 
             background-color: var(--dark); 
             height: 100vh; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            font-family: 'Inter', sans-serif;
             margin: 0;
+            color: white;
+            font-family: 'Inter', sans-serif;
         }
         .login-card { 
-            background: var(--card); 
-            border: 1px solid var(--gold); 
-            padding: 3rem; 
+            background: #121212; 
+            border: 1px solid #333; 
+            padding: 2.5rem; 
             border-radius: 20px; 
             width: 100%; 
-            max-width: 400px; 
-            box-shadow: 0 10px 40px rgba(255, 193, 7, 0.1);
+            max-width: 380px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .logo-area { margin-bottom: 2rem; }
-        .logo-area i { font-size: 3rem; color: var(--gold); }
         .form-control { 
             background: #1e1e1e; 
-            border: 1px solid #333; 
+            border: 1px solid #444; 
             color: #fff; 
-            padding: 0.8rem;
+            padding: 0.75rem;
             margin-bottom: 1rem;
         }
         .form-control:focus { 
-            background: #1e1e1e; 
+            background: #252525; 
             color: #fff; 
             border-color: var(--gold); 
             box-shadow: none; 
         }
-        .btn-login { 
+        .btn-gold { 
             background: var(--gold); 
             color: #000; 
             font-weight: 800; 
-            padding: 0.8rem; 
-            border: none; 
-            letter-spacing: 1px;
+            width: 100%; 
+            padding: 0.75rem; 
+            border: none;
             transition: 0.3s;
         }
-        .btn-login:hover { background: #e5ac00; transform: translateY(-2px); }
+        .btn-gold:hover { background: #e5ac00; transform: scale(1.02); }
     </style>
 </head>
 <body>
 
 <div class="login-card text-center">
-    <div class="logo-area">
-        <i class="bi bi-cone-striped"></i>
-        <h2 class="text-white fw-bold mt-2">CANTIERE <span class="text-warning">APP</span></h2>
-        <p class="text-secondary small">Inserisci le tue credenziali per gestire il magazzino</p>
-    </div>
+    <i class="bi bi-cone-striped display-4 text-warning mb-3"></i>
+    <h3 class="fw-bold mb-4">CANTIERE <span class="text-warning">LOGIN</span></h3>
 
-    <input type="text" id="userIn" class="form-control" placeholder="Username" autocomplete="off">
-    <input type="password" id="passIn" class="form-control" placeholder="Password">
+    <input type="text" id="userIn" class="form-control" placeholder="Username" required>
+    <input type="password" id="passIn" class="form-control" placeholder="Password" required>
     
-    <button onclick="checkLogin()" class="btn btn-login w-100 mt-3">ENTRA NEL CANTIERE</button>
-    
-    <div class="mt-4">
-        <small class="text-secondary">Versione Pro 2026.1</small>
-    </div>
+    <button onclick="checkLogin()" class="btn btn-gold mt-2">ACCEDI</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    // Configurazione Supabase (la stessa del file unico)
+    // Configurazione Supabase
     const _sb = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
 
     async function checkLogin() {
@@ -83,45 +75,44 @@
         const p = document.getElementById('passIn').value;
 
         if(!u || !p) {
-            return Swal.fire({ icon: 'warning', title: 'Attenzione', text: 'Inserisci tutti i campi', confirmButtonColor: '#ffc107' });
+            return Swal.fire('Errore', 'Inserisci username e password', 'error');
         }
 
-        // Cerchiamo l'utente nel database
+        // Cerchiamo l'utente
         const { data, error } = await _sb
             .from('utenti_app')
             .select('*')
             .eq('username', u)
             .eq('password', p)
-            .single();
+            .maybeSingle();
 
         if (error || !data) {
             Swal.fire({
                 icon: 'error',
-                title: 'Accesso Negato',
-                text: 'Username o Password errati',
+                title: 'Credenziali Errate',
+                text: 'Riprova o contatta l\'amministratore',
                 confirmButtonColor: '#ffc107'
             });
         } else {
-            // SALVIAMO I DATI NEL BROWSER
+            // Salvataggio sessione
             localStorage.setItem('cantiere_user', JSON.stringify(data));
             
-            // REINDIRIZZIAMO AL FILE UNICO (cambia 'app.html' con il nome che hai dato al file unico)
             Swal.fire({
                 icon: 'success',
-                title: 'Benvenuto!',
-                text: 'Accesso effettuato con successo',
-                timer: 1500,
-                showConfirmButton: false
+                title: 'Accesso Autorizzato',
+                showConfirmButton: false,
+                timer: 1000
             }).then(() => {
-                location.href = 'app.html'; 
+                // --- ATTENZIONE QUI ---
+                // Se il tuo file con tutto il codice si chiama index.html scrivi 'index.html'
+                // Se si chiama app.html scrivi 'app.html'
+                window.location.replace('index.html'); 
             });
         }
     }
 
-    // Permette di premere INVIO per loggare
-    document.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') { checkLogin(); }
-    });
+    // Invio con tasto Enter
+    document.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkLogin(); });
 </script>
 
 </body>
