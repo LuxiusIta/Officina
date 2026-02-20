@@ -11,16 +11,16 @@
         :root { --cantiere-gold: #ffc107; --cantiere-dark: #121212; --cantiere-card: #1e1e1e; }
         body { background-color: var(--cantiere-dark); color: #fff; font-family: 'Inter', sans-serif; }
         
-        /* Navbar Professionale */
+        /* Navbar Cantiere Style */
         .navbar { background: #000; border-bottom: 2px solid var(--cantiere-gold); padding: 1rem; }
-        .nav-link { color: #fff !important; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; margin-right: 10px; }
+        .nav-link { color: #fff !important; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; margin-right: 12px; }
         .nav-link:hover { color: var(--cantiere-gold) !important; }
         
-        /* Icona Chat Speciale */
-        .chat-link { position: relative; color: var(--cantiere-gold) !important; font-size: 1.2rem; }
-        .chat-badge { position: absolute; top: -5px; right: -10px; font-size: 0.6rem; padding: 3px 6px; }
+        /* User Profile in Navbar */
+        .user-section { border-left: 1px solid #333; padding-left: 15px; margin-left: 10px; }
+        #nomeUtente { color: var(--cantiere-gold); font-weight: 800; text-transform: uppercase; }
 
-        /* Magazzini */
+        /* Magazzini Cards */
         .maga-card { 
             background: var(--cantiere-card); border: 1px solid #333; border-radius: 15px; 
             padding: 2.5rem; text-align: center; cursor: pointer; transition: 0.3s; 
@@ -28,7 +28,9 @@
         .maga-card:hover { border-color: var(--cantiere-gold); transform: translateY(-5px); background: #252525; }
         .maga-icon { font-size: 3.5rem; color: var(--cantiere-gold); margin-bottom: 1rem; }
         
-        .status-bar { font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+        /* Notifica Chat */
+        .chat-link { position: relative; color: var(--cantiere-gold) !important; }
+        .chat-badge { position: absolute; top: -5px; right: -8px; font-size: 0.6rem; }
     </style>
 </head>
 <body>
@@ -50,11 +52,17 @@
             </ul>
             
             <div class="d-flex align-items-center">
-                <a href="chat.html" class="nav-link chat-link me-4">
-                    <i class="bi bi-chat-dots-fill"></i>
+                <a href="chat.html" class="nav-link chat-link me-3">
+                    <i class="bi bi-chat-dots-fill fs-5"></i>
                     <span class="badge rounded-pill bg-danger chat-badge">LIVE</span>
                 </a>
-                <button class="btn btn-outline-warning btn-sm fw-bold" onclick="logout()">LOGOUT</button>
+
+                <div class="user-section d-none d-md-block me-3">
+                    <span class="text-secondary small">OPERATORE:</span><br>
+                    <span id="nomeUtente">CARICAMENTO...</span>
+                </div>
+
+                <button class="btn btn-outline-danger btn-sm fw-bold" onclick="logout()">LOGOUT</button>
             </div>
         </div>
     </div>
@@ -62,8 +70,8 @@
 
 <div class="container mt-5">
     <div class="text-center mb-5">
-        <h1 class="fw-bold">CENTRALE OPERATIVA</h1>
-        <div class="status-bar"><i class="bi bi-circle-fill text-success me-1" style="font-size: 0.5rem;"></i> Sistema Realtime Attivo</div>
+        <h1 class="fw-bold text-uppercase">Centrale Operativa</h1>
+        <p class="text-secondary">Seleziona un magazzino per gestire le scorte</p>
     </div>
 
     <div class="row g-4" id="maga-list">
@@ -72,22 +80,29 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    // --- IL BUTTAFUORI ---
-    if (!localStorage.getItem('cantiere_user')) { location.href = "index.html"; }
+    // --- IL BUTTAFUORI (Sicurezza) ---
+    const sessione = localStorage.getItem('cantiere_user');
+    if (!sessione) { 
+        window.location.href = "index.html"; 
+    } else {
+        const user = JSON.parse(sessione);
+        document.getElementById('nomeUtente').innerText = user.username;
+    }
 
     const _supabase = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
 
     async function caricaMagazzini() {
-        const { data: mags } = await _supabase.from('magazzini').select('*').order('nome');
+        const { data: mags, error } = await _supabase.from('magazzini').select('*').order('nome');
+        if (error) return console.error(error);
+
         const container = document.getElementById('maga-list');
-        
         container.innerHTML = mags.map(m => `
             <div class="col-md-4">
                 <div class="maga-card" onclick="location.href='dettaglio_magazzino.html?id=${m.id}&nome=${encodeURIComponent(m.nome)}'">
                     <div class="maga-icon"><i class="bi bi-house-door-fill"></i></div>
-                    <h4 class="fw-bold text-uppercase mb-0">${m.nome}</h4>
+                    <h4 class="fw-bold text-uppercase">${m.nome}</h4>
                     <hr class="border-secondary my-3">
-                    <span class="text-secondary small">VEDI GIACENZE <i class="bi bi-chevron-right"></i></span>
+                    <span class="text-warning small fw-bold">GESTISCI SCORTE <i class="bi bi-chevron-right"></i></span>
                 </div>
             </div>
         `).join('');
@@ -96,18 +111,26 @@
     function logout() {
         Swal.fire({
             title: 'Vuoi uscire?',
-            icon: 'question',
+            text: "Dovrai rieffettuare il login per accedere.",
+            icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ffc107',
-            confirmButtonText: 'Sì, Logout'
-        }).then((r) => { if(r.isConfirmed) { localStorage.clear(); location.href='index.html'; } });
+            cancelButtonColor: '#333',
+            confirmButtonText: 'Sì, Logout',
+            cancelButtonText: 'Annulla'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.clear();
+                window.location.href = "index.html";
+            }
+        });
     }
 
-    // Inizializza
+    // Caricamento iniziale
     caricaMagazzini();
 
-    // Realtime per aggiornare se aggiungi/rimuovi magazzini da Supabase
-    _supabase.channel('maga-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'magazzini' }, () => caricaMagazzini()).subscribe();
+    // Realtime: se aggiungi un magazzino da Supabase, la lista si aggiorna da sola
+    _supabase.channel('maga-live').on('postgres_changes', { event: '*', schema: 'public', table: 'magazzini' }, () => caricaMagazzini()).subscribe();
 </script>
 </body>
 </html>
