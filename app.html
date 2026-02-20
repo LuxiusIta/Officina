@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
         :root { --gold: #ffc107; --dark: #050505; --card-bg: #111111; --border: #222222; }
         
         body { background-color: var(--dark); color: #e0e0e0; font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
@@ -17,7 +17,7 @@
         .sidebar { width: 280px; background: #000; border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 30px 20px; flex-shrink: 0; z-index: 100; }
         .sidebar h2 { font-weight: 900; color: var(--gold); letter-spacing: -1px; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
         
-        .nav-link-c { padding: 15px 20px; border-radius: 12px; cursor: pointer; font-weight: 700; color: #666; display: flex; align-items: center; gap: 15px; transition: 0.3s; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 5px; }
+        .nav-link-c { padding: 15px 20px; border-radius: 12px; cursor: pointer; font-weight: 800; color: #666; display: flex; align-items: center; gap: 15px; transition: 0.3s; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 5px; }
         .nav-link-c:hover { background: #111; color: #fff; }
         .nav-link-c.active { background: var(--gold); color: #000; box-shadow: 0 10px 20px rgba(255,193,7,0.2); }
 
@@ -28,24 +28,28 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* CARDS & STORAGE BOXES */
-        .storage-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; padding: 25px; transition: 0.3s; position: relative; overflow: hidden; }
-        .storage-card:hover { border-color: var(--gold); transform: translateY(-5px); }
-        .total-badge { position: absolute; top: 20px; right: 20px; background: var(--gold); color: #000; font-weight: 900; padding: 5px 12px; border-radius: 8px; font-size: 0.9rem; }
+        .storage-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; padding: 25px; transition: 0.3s; position: relative; overflow: hidden; cursor: default; }
+        .storage-card.clickable { cursor: pointer; }
+        .storage-card.clickable:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255,193,7,0.05); }
+        .total-badge { position: absolute; top: 20px; right: 20px; background: var(--gold); color: #000; font-weight: 900; padding: 6px 15px; border-radius: 8px; font-size: 0.9rem; }
         
         /* INPUT STYLE */
-        .c-input { background: #1a1a1a !important; border: 1px solid #333 !important; color: #fff !important; border-radius: 12px !important; padding: 15px !important; }
-        .c-input:focus { border-color: var(--gold) !important; box-shadow: none !important; }
-
+        .c-input { background: #1a1a1a !important; border: 1px solid #333 !important; color: #fff !important; border-radius: 12px !important; padding: 15px !important; font-weight: 600; }
+        .c-input:focus { border-color: var(--gold) !important; box-shadow: 0 0 0 0.25rem rgba(255,193,7,0.25) !important; }
+        .c-input:disabled { background: #0a0a0a !important; color: #666 !important; border-color: #222 !important; }
+        
         /* CHAT */
-        #chat-window { position: fixed; bottom: 100px; right: 30px; width: 400px; height: 600px; background: #000; border: 1px solid var(--gold); border-radius: 24px; display: none; flex-direction: column; box-shadow: 0 30px 60px rgba(0,0,0,0.8); z-index: 2000; }
-        .chat-bubble { padding: 12px 18px; border-radius: 18px; font-size: 0.9rem; max-width: 80%; margin-bottom: 5px; }
-        .bubble-me { background: var(--gold); color: #000; align-self: flex-end; font-weight: 700; }
-        .bubble-them { background: #222; color: #fff; align-self: flex-start; }
+        #chat-window { position: fixed; bottom: 100px; right: 30px; width: 380px; height: 500px; background: #000; border: 1px solid var(--gold); border-radius: 24px; display: none; flex-direction: column; box-shadow: 0 30px 60px rgba(0,0,0,0.8); z-index: 2000; overflow: hidden; }
+        .chat-bubble { padding: 12px 18px; border-radius: 18px; font-size: 0.9rem; max-width: 85%; margin-bottom: 15px; position: relative; word-wrap: break-word;}
+        .bubble-me { background: var(--gold); color: #000; align-self: flex-end; font-weight: 600; border-bottom-right-radius: 4px; }
+        .bubble-them { background: #1a1a1a; color: #fff; align-self: flex-start; border: 1px solid #333; border-bottom-left-radius: 4px; }
+        .chat-sender { font-size: 0.7rem; font-weight: 900; opacity: 0.7; margin-bottom: 4px; display: block; }
 
         @media (max-width: 768px) {
             body { flex-direction: column; }
             .sidebar { width: 100%; height: auto; padding: 15px; border-right: none; border-bottom: 1px solid var(--border); }
-            .nav-link-c { display: none; } /* Su mobile usiamo il menu a icone se necessario */
+            .nav-link-c { padding: 10px; font-size: 0.8rem; }
+            .main-wrapper { padding: 20px; }
         }
     </style>
 </head>
@@ -54,195 +58,571 @@
     <h2><i class="bi bi-cone-striped"></i> CANTIERE</h2>
     <div class="nav-link-c active" id="btn-dash" onclick="showV('v-dash', 'btn-dash')"><i class="bi bi-stack"></i> Magazzini</div>
     <div class="nav-link-c" id="btn-mov" onclick="showV('v-mov', 'btn-mov')"><i class="bi bi-arrow-down-up"></i> Movimenti</div>
+    <div class="nav-link-c" id="btn-lista" onclick="showV('v-lista', 'btn-lista')"><i class="bi bi-card-checklist"></i> Lista Serale</div>
     <div class="nav-link-c" id="btn-sto" onclick="showV('v-sto', 'btn-sto')"><i class="bi bi-calendar3"></i> Storico</div>
-    <div class="nav-link-c" id="btn-prod" onclick="showV('v-prod', 'btn-prod')"><i class="bi bi-tags"></i> Prodotti</div>
-    <div class="nav-link-c admin-only" id="btn-adm" onclick="showV('v-adm', 'btn-adm')"><i class="bi bi-shield-lock"></i> Admin</div>
+    <div class="nav-link-c admin-only" style="display:none;" id="btn-adm" onclick="showV('v-adm', 'btn-adm')"><i class="bi bi-shield-lock"></i> Admin</div>
     
-    <div class="mt-auto p-3 bg-dark rounded-4">
-        <small class="text-secondary d-block">USER ACTIVE</small>
-        <b id="user-name" class="text-white">...</b>
-        <button class="btn btn-link btn-sm text-danger p-0 d-block mt-2" onclick="logout()">LOGOUT</button>
+    <div class="mt-auto p-3 bg-dark rounded-4 border border-secondary">
+        <small class="text-secondary d-block fw-bold mb-1">UTENTE OPERATIVO</small>
+        <b id="user-name" class="text-warning fs-5">...</b>
+        <button class="btn btn-outline-danger btn-sm w-100 mt-3 fw-bold" onclick="logout()"><i class="bi bi-power"></i> LOGOUT</button>
     </div>
 </div>
 
 <div class="main-wrapper">
+    <!-- DASHBOARD MAGAZZINI -->
     <div id="v-dash" class="view active">
         <h1 class="fw-black mb-4">LOGISTICA <span class="text-warning">CANTIERE</span></h1>
         <div id="magazzini-grid" class="row g-4"></div>
     </div>
 
+    <!-- DETTAGLIO MAGAZZINO -->
     <div id="v-det" class="view">
         <div class="d-flex justify-content-between align-items-end mb-5">
-            <div><h1 id="det-title" class="text-warning fw-black mb-0"></h1><p class="text-secondary">Analisi scorte in tempo reale</p></div>
-            <button class="btn btn-outline-light rounded-pill px-4" onclick="showV('v-dash', 'btn-dash')">CHIUDI AREA</button>
+            <div><h1 id="det-title" class="text-warning fw-black mb-0"></h1><p class="text-secondary fw-bold">Scorte in tempo reale</p></div>
+            <button class="btn btn-outline-light rounded-pill px-4 fw-bold" onclick="showV('v-dash', 'btn-dash')"><i class="bi bi-arrow-left"></i> TORNA AI MAGAZZINI</button>
         </div>
-        <div id="prodotti-list"></div>
+        <div id="prodotti-list" class="row g-4"></div>
     </div>
 
+    <!-- MOVIMENTI -->
     <div id="v-mov" class="view">
-        <div class="row justify-content-center"><div class="col-lg-8"><div class="storage-card p-5">
-            <h2 class="fw-black text-center mb-5"><i class="bi bi-node-plus text-warning"></i> NUOVO MOVIMENTO</h2>
-            <div class="row g-3">
-                <div class="col-md-6"><label class="small fw-bold">PRODOTTO</label><select id="mov-prod" class="form-select c-input"></select></div>
-                <div class="col-md-6"><label class="small fw-bold">DESTINAZIONE</label><select id="mov-maga" class="form-select c-input"></select></div>
+        <div class="row justify-content-center"><div class="col-lg-10"><div class="storage-card p-5 border-warning">
+            <h2 class="fw-black text-center mb-5"><i class="bi bi-truck text-warning"></i> GESTIONE MOVIMENTI</h2>
+            
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <label class="small fw-bold text-secondary mb-2">TIPO OPERAZIONE</label>
+                    <select id="mov-tipo" class="form-select c-input text-warning fw-bold" onchange="toggleDestinazione()">
+                        <option value="CARICO">CARICO (Fornitore)</option>
+                        <option value="SCARICO CUCINA">SCARICO (Verso Cucina/Consumo)</option>
+                        <option value="SPOSTAMENTO">SPOSTAMENTO (Tra Magazzini)</option>
+                        <option value="SCARTO">SCARTO (Danneggiato/Scaduto)</option>
+                        <option value="RETTIFICA">RETTIFICA (Allineamento manuale)</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="small fw-bold text-secondary mb-2">PRODOTTO</label>
+                    <select id="mov-prod" class="form-select c-input" onchange="updateDivisorsBadge()"></select>
+                </div>
+                <div class="col-md-6">
+                    <label class="small fw-bold text-secondary mb-2" id="lbl-maga-orig">MAGAZZINO</label>
+                    <select id="mov-maga" class="form-select c-input"></select>
+                </div>
+                <div class="col-md-6" id="box-maga-dest" style="display:none;">
+                    <label class="small fw-bold text-warning mb-2">MAGAZZINO DESTINAZIONE</label>
+                    <select id="mov-maga-dest" class="form-select c-input border-warning"></select>
+                </div>
             </div>
-            <div class="row g-4 mt-4">
+
+            <div class="p-3 bg-dark rounded-4 text-center mb-4 border border-secondary" id="divisors-badge">
+                <small class="text-secondary fw-bold">Seleziona un prodotto per vedere i formati</small>
+            </div>
+
+            <div class="row g-4 mt-2">
                 <div class="col-4 text-center">
-                    <i class="bi bi-box-seam fs-2 text-warning"></i><br>
-                    <label class="small fw-bold mt-2">CARTONI</label>
-                    <input type="number" id="in-ct" class="form-control c-input text-center fs-4" value="0">
+                    <i class="bi bi-box-seam fs-1 text-warning"></i><br>
+                    <label class="small fw-black mt-2">CARTONI (CT)</label>
+                    <input type="number" id="in-ct" class="form-control c-input text-center fs-3 fw-bold mt-2" value="0" min="0" onfocus="this.select()">
                 </div>
                 <div class="col-4 text-center">
-                    <i class="bi bi-box fs-2 text-warning"></i><br>
-                    <label class="small fw-bold mt-2">PACCHI</label>
-                    <input type="number" id="in-pk" class="form-control c-input text-center fs-4" value="0">
+                    <i class="bi bi-box fs-1 text-warning"></i><br>
+                    <label class="small fw-black mt-2">PACCHI (PK)</label>
+                    <input type="number" id="in-pk" class="form-control c-input text-center fs-3 fw-bold mt-2" value="0" min="0" onfocus="this.select()">
                 </div>
                 <div class="col-4 text-center">
-                    <i class="bi bi-hammer fs-2 text-warning"></i><br>
-                    <label class="small fw-bold mt-2">SFUSI</label>
-                    <input type="number" id="in-pz" class="form-control c-input text-center fs-4" value="0">
+                    <i class="bi bi-hammer fs-1 text-warning"></i><br>
+                    <label class="small fw-black mt-2">PEZZI (PZ)</label>
+                    <input type="number" id="in-pz" class="form-control c-input text-center fs-3 fw-bold mt-2" value="0" min="0" onfocus="this.select()">
                 </div>
             </div>
-            <div class="row g-3 mt-5">
-                <div class="col-6"><button onclick="registra('CARICO')" class="btn btn-success w-100 py-3 fw-black">CARICA (+)</button></div>
-                <div class="col-6"><button onclick="registra('SCARICO')" class="btn btn-danger w-100 py-3 fw-black">SCARICA (-)</button></div>
-            </div>
+            
+            <button onclick="eseguiMovimento()" class="btn btn-warning w-100 py-3 fw-black fs-5 mt-5">CONFERMA OPERAZIONE <i class="bi bi-check2-circle"></i></button>
         </div></div></div>
     </div>
 
+    <!-- LISTA SERALE -->
+    <div id="v-lista" class="view">
+        <h1 class="fw-black mb-4"><i class="bi bi-card-checklist text-warning"></i> LISTA SERALE OPERATIVA</h1>
+        <div class="storage-card mb-4">
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label class="small fw-bold text-secondary">MAGAZZINO DA CONTROLLARE</label>
+                    <select id="lista-maga" class="form-select c-input"></select>
+                </div>
+                <div class="col-md-5">
+                    <label class="small fw-bold text-secondary">REPARTO</label>
+                    <select id="lista-rep" class="form-select c-input">
+                        <option value="TUTTI">TUTTI I REPARTI</option>
+                        <option value="GRIGLIA">GRIGLIA</option>
+                        <option value="PANINI">PANINI</option>
+                        <option value="FRITTI">FRITTI</option>
+                        <option value="BAR">BAR</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-warning w-100 py-3 fw-black" onclick="generaLista()"><i class="bi bi-search"></i> CARICA</button>
+                </div>
+            </div>
+        </div>
+        <div id="lista-body" class="row g-4"></div>
+    </div>
+
+    <!-- STORICO -->
     <div id="v-sto" class="view">
-        <h1 class="fw-black mb-4 text-warning">STORICO OPERAZIONI</h1>
-        <div class="storage-card p-0 overflow-hidden"><table class="table table-dark table-hover mb-0">
-            <thead class="bg-black"><tr><th class="p-3">DATA</th><th>UTENTE</th><th>ARTICOLO</th><th>TIPO</th><th class="text-end p-3">TOTALE PEZZI</th></tr></thead>
-            <tbody id="sto-body"></tbody>
-        </table></div>
+        <h1 class="fw-black mb-4"><i class="bi bi-calendar3 text-warning"></i> STORICO OPERAZIONI</h1>
+        <div class="storage-card p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0 align-middle">
+                    <thead class="bg-black">
+                        <tr>
+                            <th class="p-4 text-secondary">DATA E ORA</th>
+                            <th class="text-secondary">UTENTE</th>
+                            <th class="text-secondary">ARTICOLO E MAGAZZINO</th>
+                            <th class="text-secondary">TIPO</th>
+                            <th class="text-end p-4 text-secondary">Q.TÀ MOVIMENTATA</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sto-body"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
-<div id="chat-trigger" onclick="toggleChat()" style="position:fixed; bottom:30px; right:30px; width:70px; height:70px; background:var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:2rem; color:#000; box-shadow:0 10px 30px rgba(255,193,7,0.4);"><i class="bi bi-chat-dots-fill"></i></div>
+<!-- CHAT REALTIME -->
+<div id="chat-trigger" onclick="toggleChat()" style="position:fixed; bottom:30px; right:30px; width:70px; height:70px; background:var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:2rem; color:#000; box-shadow:0 10px 30px rgba(255,193,7,0.4); z-index: 1999; transition: 0.3s;">
+    <i class="bi bi-chat-dots-fill"></i>
+    <span id="chat-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none; font-size: 0.7rem;">!</span>
+</div>
 <div id="chat-window">
-    <div class="p-3 border-bottom border-secondary d-flex justify-content-between align-items-center bg-dark">
-        <b class="text-warning">RADIO COMUNICAZIONI</b>
+    <div class="p-3 border-bottom border-secondary d-flex justify-content-between align-items-center bg-black">
+        <b class="text-warning"><i class="bi bi-broadcast"></i> RADIO CANTIERE</b>
         <button class="btn-close btn-close-white" onclick="toggleChat()"></button>
     </div>
-    <div id="chat-body" class="p-3 d-flex flex-column overflow-auto" style="flex:1;"></div>
-    <div class="p-3 border-top border-secondary bg-dark">
-        <div class="input-group"><input type="text" id="chat-in" class="form-control c-input" placeholder="Parla col cantiere..."><button class="btn btn-warning" onclick="sendMsg()"><i class="bi bi-send"></i></button></div>
+    <div id="chat-body" class="p-3 d-flex flex-column overflow-auto" style="flex:1; background: #0a0a0a;"></div>
+    <div class="p-3 border-top border-secondary bg-black">
+        <form onsubmit="sendMsg(event)" class="input-group">
+            <input type="text" id="chat-in" class="form-control c-input" placeholder="Comunica con la squadra..." required autocomplete="off">
+            <button type="submit" class="btn btn-warning fw-bold"><i class="bi bi-send-fill"></i></button>
+        </form>
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+    // INIZIALIZZAZIONE
     const _sb = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
     const session = JSON.parse(localStorage.getItem('cantiere_user'));
-    if(!session) window.location.replace('index.html');
+    
+    if(!session) { window.location.replace('index.html'); }
     document.getElementById('user-name').innerText = session.username.toUpperCase();
     if(session.ruolo === 'admin') document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'flex');
 
+    // VARIABILI GLOBALI (Cache)
+    let globalProdotti = [];
+    let globalMagazzini =[];
+
+    // STARTUP APP
+    async function initApp() {
+        await fetchGlobals();
+        showV('v-dash', 'btn-dash');
+        initChatRealtime();
+    }
+
+    async function fetchGlobals() {
+        const { data: p } = await _sb.from('prodotti').select('*').order('nome_prodotto');
+        const { data: m } = await _sb.from('magazzini').select('*').order('nome');
+        globalProdotti = p || [];
+        globalMagazzini = m ||[];
+        
+        // Popola Dropdowns globali
+        const optP = globalProdotti.map(x => `<option value="${x.id}">${x.nome_prodotto}</option>`).join('');
+        const optM = globalMagazzini.map(x => `<option value="${x.id}">${x.nome}</option>`).join('');
+        
+        document.getElementById('mov-prod').innerHTML = optP;
+        document.getElementById('mov-maga').innerHTML = optM;
+        document.getElementById('mov-maga-dest').innerHTML = optM;
+        document.getElementById('lista-maga').innerHTML = optM;
+        updateDivisorsBadge();
+    }
+
+    // GESTIONE VISTE
     function showV(id, bId) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.querySelectorAll('.nav-link-c').forEach(n => n.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         if(bId) document.getElementById(bId).classList.add('active');
+        
         if(id === 'v-dash') loadMagazzini();
-        if(id === 'v-mov') loadMovimentData();
         if(id === 'v-sto') loadStorico();
+        
+        // Reset Inputs Movimenti
+        if(id === 'v-mov') {
+            document.getElementById('in-ct').value = 0;
+            document.getElementById('in-pk').value = 0;
+            document.getElementById('in-pz').value = 0;
+            document.getElementById('mov-tipo').value = 'CARICO';
+            toggleDestinazione();
+        }
     }
 
-    // LOGICA DI CALCOLO UNITA' (Dall'originale Google Script)
-    function calculateUnits(total, p) {
-        const ct = Math.floor(total / p.pezzi_per_cartone);
-        const rem = total % p.pezzi_per_cartone;
-        const pk = Math.floor(rem / p.pezzi_per_pacco);
-        const pz = rem % p.pezzi_per_pacco;
+    // CORE LOGICA: CONVERSIONI PEZZI <-> CT/PK/PZ
+    function calcolaUnita(totalePezzi, prodotto) {
+        // Valori di default a 1 per evitare divisioni per zero se i campi sono nulli
+        const ppc = prodotto.pezzi_per_cartone || 1; 
+        const ppp = prodotto.pezzi_per_pacco || 1;   
+
+        let ct = 0, pk = 0, pz = totalePezzi;
+
+        if (ppc > 1) {
+            ct = Math.floor(pz / ppc);
+            pz = pz % ppc;
+        }
+        if (ppp > 1) {
+            pk = Math.floor(pz / ppp);
+            pz = pz % ppp;
+        }
         return { ct, pk, pz };
     }
 
+    function calcolaTotalePezzi(ct, pk, pz, prodotto) {
+        const ppc = prodotto.pezzi_per_cartone || 1;
+        const ppp = prodotto.pezzi_per_pacco || 1;
+        return (ct * ppc) + (pk * ppp) + pz;
+    }
+
+    // DASHBOARD & MAGAZZINI
     async function loadMagazzini() {
-        const { data: magazzini } = await _sb.from('magazzini').select('*').order('nome');
-        const { data: giacenze } = await _sb.from('giacenze').select('quantita_totale_pezzi');
-        
-        document.getElementById('magazzini-grid').innerHTML = magazzini.map(m => `
-            <div class="col-md-4"><div class="storage-card" onclick="openMaga('${m.id}', '${m.nome}')">
-                <i class="bi bi-box-seam-fill text-warning fs-1"></i>
-                <h4 class="mt-3 fw-black">${m.nome}</h4>
-                <small class="text-secondary">Gestione scorte e giacenze</small>
-            </div></div>`).join('');
+        document.getElementById('magazzini-grid').innerHTML = globalMagazzini.map(m => `
+            <div class="col-md-4">
+                <div class="storage-card clickable" onclick="openMaga('${m.id}', '${m.nome}')">
+                    <i class="bi bi-cone-striped text-warning fs-1"></i>
+                    <h4 class="mt-3 fw-black text-uppercase">${m.nome}</h4>
+                    <small class="text-secondary fw-bold">Clicca per ispezionare le giacenze</small>
+                </div>
+            </div>`).join('');
     }
 
     async function openMaga(id, nome) {
         document.getElementById('det-title').innerText = nome;
         const { data } = await _sb.from('giacenze').select('*, prodotti(*)').eq('magazzino_id', id);
         
-        document.getElementById('prodotti-list').innerHTML = data.map(g => {
-            const units = calculateUnits(g.quantita_totale_pezzi, g.prodotti);
-            return `
-            <div class="storage-card mb-3">
-                <div class="total-badge">${g.quantita_totale_pezzi} PZ TOTALI</div>
-                <h4 class="fw-black text-warning">${g.prodotti.nome_prodotto}</h4>
-                <div class="row mt-3 text-center">
-                    <div class="col-4 border-end border-secondary">
-                        <i class="bi bi-box-seam d-block opacity-50"></i><b>${units.ct}</b><br><small>CARTONI</small>
+        if(!data || data.length === 0) {
+            document.getElementById('prodotti-list').innerHTML = `<div class="col-12 text-center py-5"><h3 class="text-secondary">Nessun articolo in questo magazzino</h3></div>`;
+        } else {
+            document.getElementById('prodotti-list').innerHTML = data.map(g => {
+                const p = g.prodotti;
+                const unita = calcolaUnita(g.quantita_totale_pezzi, p);
+                const color = g.quantita_totale_pezzi <= (p.scorta_minima || 0) ? 'border-danger' : 'border-secondary';
+                
+                return `
+                <div class="col-md-6 col-lg-4">
+                    <div class="storage-card ${color}">
+                        <div class="total-badge shadow-sm">${g.quantita_totale_pezzi} PZ TOTALI</div>
+                        <h5 class="fw-black text-warning mt-2">${p.nome_prodotto}</h5>
+                        <small class="text-secondary fw-bold">1 CT = ${p.pezzi_per_cartone} PZ | 1 PK = ${p.pezzi_per_pacco} PZ</small>
+                        
+                        <div class="row mt-4 text-center">
+                            <div class="col-4 border-end border-secondary">
+                                <i class="bi bi-box-seam d-block fs-3 opacity-75 mb-1"></i><b class="fs-4">${unita.ct}</b><br><small class="text-secondary fw-bold">CT</small>
+                            </div>
+                            <div class="col-4 border-end border-secondary">
+                                <i class="bi bi-box d-block fs-3 opacity-75 mb-1"></i><b class="fs-4">${unita.pk}</b><br><small class="text-secondary fw-bold">PK</small>
+                            </div>
+                            <div class="col-4">
+                                <i class="bi bi-hammer d-block fs-3 opacity-75 mb-1"></i><b class="fs-4">${unita.pz}</b><br><small class="text-secondary fw-bold">PZ</small>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-4 border-end border-secondary">
-                        <i class="bi bi-box d-block opacity-50"></i><b>${units.pk}</b><br><small>PACCHI</small>
-                    </div>
-                    <div class="col-4">
-                        <i class="bi bi-hammer d-block opacity-50"></i><b>${units.pz}</b><br><small>SFUSI</small>
-                    </div>
-                </div>
-            </div>`;
-        }).join('');
+                </div>`;
+            }).join('');
+        }
         showV('v-det');
     }
 
-    async function registra(tipo) {
+    // MOVIMENTI
+    function toggleDestinazione() {
+        const tipo = document.getElementById('mov-tipo').value;
+        const boxDest = document.getElementById('box-maga-dest');
+        const lblOrig = document.getElementById('lbl-maga-orig');
+        
+        if(tipo === 'SPOSTAMENTO') {
+            boxDest.style.display = 'block';
+            lblOrig.innerText = 'MAGAZZINO ORIGINE';
+        } else {
+            boxDest.style.display = 'none';
+            lblOrig.innerText = 'MAGAZZINO';
+        }
+    }
+
+    function updateDivisorsBadge() {
         const pId = document.getElementById('mov-prod').value;
-        const mId = document.getElementById('mov-maga').value;
-        const { data: prod } = await _sb.from('prodotti').select('*').eq('id', pId).single();
-        
-        const tot = (parseInt(document.getElementById('in-ct').value) * prod.pezzi_per_cartone) +
-                    (parseInt(document.getElementById('in-pk').value) * prod.pezzi_per_pacco) +
-                    parseInt(document.getElementById('in-pz').value);
-        
-        if(tot <= 0) return Swal.fire({ icon: 'error', title: 'ALT!', text: 'Inserisci quantità valide', background: '#111', color: '#fff' });
-
-        const { data: es } = await _sb.from('giacenze').select('*').eq('prodotto_id', pId).eq('magazzino_id', mId).maybeSingle();
-        const nQ = es ? (tipo === 'CARICO' ? es.quantita_totale_pezzi + tot : es.quantita_totale_pezzi - tot) : (tipo === 'CARICO' ? tot : -tot);
-
-        await _sb.from('giacenze').upsert({ id: es?.id, prodotto_id: pId, magazzino_id: mId, quantita_totale_pezzi: nQ });
-        await _sb.from('movimenti').insert([{ prodotto_id: pId, magazzino_id: mId, tipo_movimento: tipo, quantita_pezzi: tot, utente_id: session.id }]);
-        
-        Swal.fire({ icon: 'success', title: 'OPERAZIONE REGISTRATA', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
-        showV('v-dash', 'btn-dash');
+        const p = globalProdotti.find(x => x.id == pId);
+        if(p) {
+            document.getElementById('divisors-badge').innerHTML = `<span class="text-warning fw-bold">INFO PRODOTTO:</span> 1 Cartone = ${p.pezzi_per_cartone} Pz | 1 Pacco = ${p.pezzi_per_pacco} Pz`;
+        }
     }
 
+    async function eseguiMovimento() {
+        const tipo = document.getElementById('mov-tipo').value;
+        const pId = document.getElementById('mov-prod').value;
+        const mIdOrigine = document.getElementById('mov-maga').value;
+        
+        const ct = parseInt(document.getElementById('in-ct').value) || 0;
+        const pk = parseInt(document.getElementById('in-pk').value) || 0;
+        const pz = parseInt(document.getElementById('in-pz').value) || 0;
+        
+        const prod = globalProdotti.find(x => x.id == pId);
+        const quantita_movimento = calcolaTotalePezzi(ct, pk, pz, prod);
+        
+        if(quantita_movimento <= 0 && tipo !== 'RETTIFICA') {
+            return Swal.fire({ icon: 'error', title: 'ERRORE', text: 'Inserisci una quantità maggiore di zero.', background: '#111', color: '#fff' });
+        }
+
+        // Recupera giacenza attuale origine
+        const { data: giacOrig } = await _sb.from('giacenze').select('*').eq('prodotto_id', pId).eq('magazzino_id', mIdOrigine).maybeSingle();
+        const scortaAttuale = giacOrig ? giacOrig.quantita_totale_pezzi : 0;
+
+        let nuovaScortaOrigine = scortaAttuale;
+        
+        // Calcolo logica in base al tipo
+        if(tipo === 'CARICO') nuovaScortaOrigine += quantita_movimento;
+        else if (tipo === 'RETTIFICA') nuovaScortaOrigine = quantita_movimento; // La rettifica sovrascrive
+        else {
+            // Scarico, Scarto, Spostamento
+            nuovaScortaOrigine -= quantita_movimento;
+            if (nuovaScortaOrigine < 0) {
+                const conferma = await Swal.fire({
+                    title: 'Giacenza Negativa!',
+                    text: `L'operazione porterà la giacenza a ${nuovaScortaOrigine} Pz. Vuoi forzare?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'FORZA OPERAZIONE',
+                    confirmButtonColor: '#d33',
+                    background: '#111', color: '#fff'
+                });
+                if(!conferma.isConfirmed) return;
+            }
+        }
+
+        try {
+            // Upsert Giacenza Origine
+            await _sb.from('giacenze').upsert({ id: giacOrig?.id, prodotto_id: pId, magazzino_id: mIdOrigine, quantita_totale_pezzi: nuovaScortaOrigine });
+            
+            // Inserisci Movimento Origine
+            await _sb.from('movimenti').insert();
+
+            // Se è spostamento, gestisco la destinazione
+            if(tipo === 'SPOSTAMENTO') {
+                const mIdDest = document.getElementById('mov-maga-dest').value;
+                if(mIdOrigine === mIdDest) throw new Error("Stesso magazzino selezionato.");
+                
+                const { data: giacDest } = await _sb.from('giacenze').select('*').eq('prodotto_id', pId).eq('magazzino_id', mIdDest).maybeSingle();
+                const scortaDest = giacDest ? giacDest.quantita_totale_pezzi : 0;
+                
+                await _sb.from('giacenze').upsert({ id: giacDest?.id, prodotto_id: pId, magazzino_id: mIdDest, quantita_totale_pezzi: scortaDest + quantita_movimento });
+                await _sb.from('movimenti').insert();
+            }
+
+            Swal.fire({ icon: 'success', title: 'OPERAZIONE REGISTRATA', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#111', color: '#fff' });
+            showV('v-dash', 'btn-dash');
+
+        } catch (e) {
+            Swal.fire({ icon: 'error', title: 'ERRORE DI SISTEMA', text: e.message, background: '#111', color: '#fff' });
+        }
+    }
+
+    // LISTA SERALE
+    async function generaLista() {
+        const mId = document.getElementById('lista-maga').value;
+        const rep = document.getElementById('lista-rep').value;
+        
+        let filtri = rep === 'TUTTI' ? globalProdotti : globalProdotti.filter(p => p.reparto === rep);
+        
+        const { data: giacenze } = await _sb.from('giacenze').select('*').eq('magazzino_id', mId);
+        
+        document.getElementById('lista-body').innerHTML = filtri.map(p => {
+            const giacenza = giacenze.find(g => g.prodotto_id === p.id);
+            const teorica = giacenza ? giacenza.quantita_totale_pezzi : 0;
+            const uniTeo = calcolaUnita(teorica, p);
+            
+            return `
+            <div class="col-12">
+                <div class="storage-card d-flex align-items-center flex-wrap gap-4">
+                    <div style="flex: 1; min-width: 250px;">
+                        <h4 class="fw-black text-warning mb-1">${p.nome_prodotto}</h4>
+                        <span class="badge bg-dark text-secondary border border-secondary mb-2">${p.reparto || 'NESSUN REPARTO'}</span>
+                        <div class="text-secondary fw-bold small">GIACENZA TEORICA: 
+                            <span class="text-white">${uniTeo.ct} CT | ${uniTeo.pk} PK | ${uniTeo.pz} PZ</span> (${teorica} Pz Tot)
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2" style="max-width: 400px;">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-black text-warning border-secondary fw-bold">CT</span>
+                            <input type="number" id="ls-ct-${p.id}" class="form-control c-input py-2 text-center" placeholder="0" min="0" onfocus="this.select()">
+                        </div>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-black text-warning border-secondary fw-bold">PK</span>
+                            <input type="number" id="ls-pk-${p.id}" class="form-control c-input py-2 text-center" placeholder="0" min="0" onfocus="this.select()">
+                        </div>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-black text-warning border-secondary fw-bold">PZ</span>
+                            <input type="number" id="ls-pz-${p.id}" class="form-control c-input py-2 text-center" placeholder="0" min="0" onfocus="this.select()">
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-outline-warning fw-bold py-2 px-4" onclick="applicaRettificaSerale('${p.id}', '${mId}', ${teorica})">
+                        SALVA <i class="bi bi-save"></i>
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    async function applicaRettificaSerale(pId, mId, teorica) {
+        const prod = globalProdotti.find(x => x.id == pId);
+        const ct = parseInt(document.getElementById(`ls-ct-${pId}`).value) || 0;
+        const pk = parseInt(document.getElementById(`ls-pk-${pId}`).value) || 0;
+        const pz = parseInt(document.getElementById(`ls-pz-${pId}`).value) || 0;
+        
+        const contato = calcolaTotalePezzi(ct, pk, pz, prod);
+        
+        if(contato === teorica) {
+            return Swal.fire({ icon: 'info', title: 'OK', text: 'Conteggio perfetto, nessuna differenza.', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#111', color: '#fff' });
+        }
+
+        const delta = contato - teorica;
+        
+        const conf = await Swal.fire({
+            title: 'DIFFERENZA RILEVATA',
+            html: `Teorico: <b>${teorica} Pz</b><br>Contato: <b>${contato} Pz</b><br>Delta: <b class="${delta > 0 ? 'text-success' : 'text-danger'}">${delta > 0 ? '+'+delta : delta} Pz</b><br><br>Vuoi confermare la Rettifica?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'CONFERMA RETTIFICA',
+            confirmButtonColor: '#ffc107',
+            background: '#111', color: '#fff'
+        });
+
+        if(conf.isConfirmed) {
+            const { data: giacOrig } = await _sb.from('giacenze').select('*').eq('prodotto_id', pId).eq('magazzino_id', mId).maybeSingle();
+            await _sb.from('giacenze').upsert({ id: giacOrig?.id, prodotto_id: pId, magazzino_id: mId, quantita_totale_pezzi: contato });
+            await _sb.from('movimenti').insert();
+            
+            Swal.fire({ icon: 'success', title: 'SALVATO', toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, background: '#111', color: '#fff' });
+            generaLista(); // Ricarica
+        }
+    }
+
+    // STORICO
     async function loadStorico() {
-        const { data } = await _sb.from('movimenti').select('*, prodotti(nome_prodotto), utenti_app(username)').order('data_movimento', {ascending: false});
-        document.getElementById('sto-body').innerHTML = data.map(m => `
+        const { data } = await _sb.from('movimenti')
+            .select('*, prodotti(nome_prodotto), magazzini(nome), utenti_app(username)')
+            .order('data_movimento', {ascending: false})
+            .limit(50);
+            
+        document.getElementById('sto-body').innerHTML = data.map(m => {
+            let colorBadge = 'bg-secondary';
+            if(m.tipo_movimento === 'CARICO') colorBadge = 'bg-success text-dark';
+            if(m.tipo_movimento === 'SCARICO CUCINA' || m.tipo_movimento === 'SCARTO') colorBadge = 'bg-danger';
+            if(m.tipo_movimento === 'SPOSTAMENTO') colorBadge = 'bg-primary';
+            if(m.tipo_movimento === 'RETTIFICA') colorBadge = 'bg-warning text-dark';
+
+            return `
             <tr>
-                <td class="p-3 opacity-50 small">${new Date(m.data_movimento).toLocaleString()}</td>
-                <td class="fw-bold">${m.utenti_app.username.toUpperCase()}</td>
-                <td>${m.prodotti.nome_prodotto}</td>
-                <td><span class="badge ${m.tipo_movimento === 'CARICO' ? 'bg-success text-dark' : 'bg-danger'}">${m.tipo_movimento}</span></td>
-                <td class="text-end fw-black text-warning p-3">${m.quantita_pezzi} PZ</td>
-            </tr>`).join('');
+                <td class="p-4 fw-bold text-secondary small">${new Date(m.data_movimento).toLocaleString('it-IT')}</td>
+                <td class="fw-black text-white"><i class="bi bi-person-badge text-warning"></i> ${m.utenti_app?.username.toUpperCase() || 'SISTEMA'}</td>
+                <td><b class="text-warning">${m.prodotti?.nome_prodotto}</b><br><small class="text-secondary">📍 ${m.magazzini?.nome}</small></td>
+                <td><span class="badge ${colorBadge} fw-black px-3 py-2">${m.tipo_movimento}</span></td>
+                <td class="text-end fw-black fs-5 p-4 ${m.quantita_pezzi > 0 ? 'text-success' : (m.quantita_pezzi < 0 ? 'text-danger' : 'text-white')}">
+                    ${m.quantita_pezzi > 0 && m.tipo_movimento !== 'RETTIFICA' ? '+'+m.quantita_pezzi : m.quantita_pezzi} PZ
+                </td>
+            </tr>`;
+        }).join('');
     }
 
-    async function loadMovimentData() {
-        const { data: p } = await _sb.from('prodotti').select('*');
-        const { data: m } = await _sb.from('magazzini').select('*');
-        document.getElementById('mov-prod').innerHTML = p.map(x => `<option value="${x.id}">${x.nome_prodotto}</option>`).join('');
-        document.getElementById('mov-maga').innerHTML = m.map(x => `<option value="${x.id}">${x.nome}</option>`).join('');
-    }
-
+    // CHAT REALTIME
     function toggleChat() { 
         const w = document.getElementById('chat-window'); 
-        w.style.display = w.style.display === 'flex' ? 'none' : 'flex'; 
-        if(w.style.display === 'flex') loadChat();
+        const badge = document.getElementById('chat-badge');
+        if(w.style.display === 'flex') {
+            w.style.display = 'none';
+        } else {
+            w.style.display = 'flex'; 
+            badge.style.display = 'none';
+            loadChatHistory();
+        }
     }
 
-    function logout() { localStorage.clear(); window.location.replace('index.html'); }
-    loadMagazzini();
+    async function loadChatHistory() {
+        const { data } = await _sb.from('messaggi_chat').select('*, utenti_app(username)').order('created_at', {ascending: true}).limit(30);
+        const box = document.getElementById('chat-body');
+        box.innerHTML = '';
+        data.forEach(msg => appendMessageUI(msg));
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function appendMessageUI(msg) {
+        const box = document.getElementById('chat-body');
+        const isMe = msg.utente_id === session.id;
+        const uName = msg.utenti_app?.username || 'Sconosciuto';
+        const cssClass = isMe ? 'bubble-me' : 'bubble-them';
+        
+        box.innerHTML += `
+            <div class="chat-bubble ${cssClass} shadow-sm">
+                ${!isMe ? `<span class="chat-sender text-warning">${uName.toUpperCase()}</span>` : ''}
+                ${msg.messaggio}
+            </div>`;
+        box.scrollTop = box.scrollHeight;
+    }
+
+    async function sendMsg(e) {
+        e.preventDefault();
+        const input = document.getElementById('chat-in');
+        if(!input.value.trim()) return;
+        
+        await _sb.from('messaggi_chat').insert();
+        input.value = '';
+    }
+
+    function initChatRealtime() {
+        _sb.channel('public:messaggi_chat')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messaggi_chat' }, async payload => {
+                // Recupera l'username che Postgres trigger non manda diretto
+                const { data: utente } = await _sb.from('utenti_app').select('username').eq('id', payload.new.utente_id).single();
+                payload.new.utenti_app = utente;
+                
+                const w = document.getElementById('chat-window');
+                if(w.style.display !== 'flex' && payload.new.utente_id !== session.id) {
+                    const badge = document.getElementById('chat-badge');
+                    badge.style.display = 'block';
+                    // Optional play sound here
+                }
+                appendMessageUI(payload.new);
+            })
+            .subscribe();
+    }
+
+    function logout() { 
+        Swal.fire({
+            title: 'Uscire?',
+            text: 'Torni alla schermata di login.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'LOGOUT',
+            confirmButtonColor: '#d33',
+            background: '#111', color: '#fff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.removeItem('cantiere_user'); 
+                window.location.replace('index.html'); 
+            }
+        });
+    }
+
+    // BOOT
+    initApp();
 </script>
 </body>
 </html>
