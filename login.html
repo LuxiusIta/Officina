@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cantiere | Accesso</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --gold: #ffc107; --dark: #000; --card: #121212; }
+        body { 
+            background-color: var(--dark); 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+        }
+        .login-card { 
+            background: var(--card); 
+            border: 1px solid var(--gold); 
+            padding: 3rem; 
+            border-radius: 20px; 
+            width: 100%; 
+            max-width: 400px; 
+            box-shadow: 0 10px 40px rgba(255, 193, 7, 0.1);
+        }
+        .logo-area { margin-bottom: 2rem; }
+        .logo-area i { font-size: 3rem; color: var(--gold); }
+        .form-control { 
+            background: #1e1e1e; 
+            border: 1px solid #333; 
+            color: #fff; 
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .form-control:focus { 
+            background: #1e1e1e; 
+            color: #fff; 
+            border-color: var(--gold); 
+            box-shadow: none; 
+        }
+        .btn-login { 
+            background: var(--gold); 
+            color: #000; 
+            font-weight: 800; 
+            padding: 0.8rem; 
+            border: none; 
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .btn-login:hover { background: #e5ac00; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+<div class="login-card text-center">
+    <div class="logo-area">
+        <i class="bi bi-cone-striped"></i>
+        <h2 class="text-white fw-bold mt-2">CANTIERE <span class="text-warning">APP</span></h2>
+        <p class="text-secondary small">Inserisci le tue credenziali per gestire il magazzino</p>
+    </div>
+
+    <input type="text" id="userIn" class="form-control" placeholder="Username" autocomplete="off">
+    <input type="password" id="passIn" class="form-control" placeholder="Password">
+    
+    <button onclick="checkLogin()" class="btn btn-login w-100 mt-3">ENTRA NEL CANTIERE</button>
+    
+    <div class="mt-4">
+        <small class="text-secondary">Versione Pro 2026.1</small>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // Configurazione Supabase (la stessa del file unico)
+    const _sb = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
+
+    async function checkLogin() {
+        const u = document.getElementById('userIn').value;
+        const p = document.getElementById('passIn').value;
+
+        if(!u || !p) {
+            return Swal.fire({ icon: 'warning', title: 'Attenzione', text: 'Inserisci tutti i campi', confirmButtonColor: '#ffc107' });
+        }
+
+        // Cerchiamo l'utente nel database
+        const { data, error } = await _sb
+            .from('utenti_app')
+            .select('*')
+            .eq('username', u)
+            .eq('password', p)
+            .single();
+
+        if (error || !data) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Accesso Negato',
+                text: 'Username o Password errati',
+                confirmButtonColor: '#ffc107'
+            });
+        } else {
+            // SALVIAMO I DATI NEL BROWSER
+            localStorage.setItem('cantiere_user', JSON.stringify(data));
+            
+            // REINDIRIZZIAMO AL FILE UNICO (cambia 'app.html' con il nome che hai dato al file unico)
+            Swal.fire({
+                icon: 'success',
+                title: 'Benvenuto!',
+                text: 'Accesso effettuato con successo',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                location.href = 'app.html'; 
+            });
+        }
+    }
+
+    // Permette di premere INVIO per loggare
+    document.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') { checkLogin(); }
+    });
+</script>
+
+</body>
+</html>
