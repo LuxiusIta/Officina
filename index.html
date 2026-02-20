@@ -107,9 +107,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    const SUB_URL = "jkekmxhrwwidkfoizhde";
+    // 1. URL completo e Chiave
+    const SUB_URL = "https://jkekmxhrwwidkfoizhde.supabase.co"; 
     const SUB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg";
-    const supabase = supabase.createClient(SUB_URL, SUB_KEY);
+    
+    // 2. Inizializzazione corretta (usiamo _supabase per evitare errori)
+    const _supabase = supabase.createClient(SUB_URL, SUB_KEY);
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -117,15 +120,14 @@
         const user = document.getElementById('username').value;
         const pass = document.getElementById('password').value;
 
-        // SweetAlert di caricamento
         Swal.fire({
             title: 'Verifica in corso...',
             allowOutsideClick: false,
             didOpen: () => { Swal.showLoading() }
         });
 
-        // Controllo su Supabase
-        const { data, error } = await supabase
+        // 3. Controllo dati
+        const { data, error } = await _supabase
             .from('utenti_app')
             .select('*')
             .eq('username', user)
@@ -140,7 +142,6 @@
                 confirmButtonColor: '#ffc107'
             });
         } else {
-            // Successo! Salviamo la sessione (molto semplice)
             localStorage.setItem('cantiere_user', JSON.stringify(data));
             
             Swal.fire({
@@ -150,7 +151,6 @@
                 timer: 1500,
                 showConfirmButton: false
             }).then(() => {
-                // Qui reindirizzeremo alla Dashboard
                 window.location.href = "dashboard.html"; 
             });
         }
@@ -159,4 +159,5 @@
 
 </body>
 </html>
+
 
