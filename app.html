@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Cantiere | Magazzino</title>
+
+    <!-- SISTEMA DI PROTEZIONE ACCESSI NON AUTORIZZATI -->
+    <script>
+        const localSession = localStorage.getItem('cantiere_user');
+        if (!localSession) {
+            window.location.replace('index.html');
+        }
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0a0a0a; --bg-panel: #1a1a1a; --accent: #FFD700;
+            --text-main: #f0f0f0; --danger: #FF4444; --steel: #cfd8dc;
+            --c-box: #D2691E; --c-pack: #00BFFF; --c-piece: #ffffff;
+        }
+
+        html, body { margin: 0; padding: 0; font-family: 'Roboto', sans-serif; background: #0a0a0a; color: white; overflow-x: hidden; max-width: 100vw; -webkit-tap-highlight-color: transparent; }
+        h1, h2, h3, h4, .brand-title { font-family: 'Teko', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
+        .hidden { display: none !important; }
+
+        .sticky { position: fixed; bottom: 20px; left: 5%; width: 90%; max-width: 800px; z-index: 90; box-shadow: 0 5px 20px rgba(0,0,0,0.8); margin-left: auto; margin-right: auto; right: 5%; }
+        .bg-app-main { background: url('https://i.imgur.com/f0y6jAe.jpeg') no-repeat center center fixed; background-size: cover; min-height: 100vh; background-attachment: fixed; }
+
+        #main-content { display: flex; justify-content: center; width: 100%; box-sizing: border-box; padding-top: 20px; position: relative; z-index: 1; }
+        .desktop-wrapper { width: 100%; max-width: 900px; padding: 20px; box-sizing: border-box; background: #121212; border-radius: 8px; min-height: 90vh; border: 1px solid #333; box-shadow: 0 0 50px rgba(0,0,0,0.9); margin-bottom: 50px; }
+
+        .top-header { height: 60px; background: #000; display: flex; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent); position: sticky; top: 0; z-index: 100; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
+        .header-title { font-family: 'Teko'; font-size: 28px; flex-grow: 1; color: white; margin-left: 15px; letter-spacing: 1px; }
+        .user-badge { background: #222; padding: 5px 12px; border-radius: 4px; font-size: 14px; color: var(--accent); font-weight: bold; border: 1px solid #444; }
+        .icon-btn { background: none; border: none; color: var(--accent); font-size: 26px; cursor: pointer; padding: 5px; }
+
+        #sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100vh; background: #000; z-index: 2000; transition: 0.3s; border-right: 2px solid var(--accent); display: flex; flex-direction: column; box-shadow: 10px 0 50px rgba(0,0,0,1); }
+        #sidebar.active { left: 0; }
+        #sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.8); z-index: 1999; display: none; backdrop-filter: blur(5px); }
+        #sidebar-overlay.active { display: block; }
+        .sidebar-top { padding: 30px 20px; background: #111; border-bottom: 1px solid #333; }
+        .nav-links { overflow-y: auto; flex: 1; }
+        .nav-links a { display: block; padding: 12px 15px; color: #ccc; text-decoration: none; border-left: 4px solid transparent; font-size: 15px; transition: 0.2s; border-bottom: 1px solid #1a1a1a; cursor: pointer;}
+        .nav-links a i { width: 25px; text-align: center; color: var(--accent); margin-right: 10px; }
+        .nav-links a.active { background: #1a1a1a; color: white; border-left-color: var(--accent); }
+        .sidebar-footer { padding: 20px; border-top: 1px solid #333; }
+        .btn-logout { width: 100%; padding: 12px; background: #111; color: var(--danger); border: 1px solid #333; cursor: pointer; font-weight: bold; font-family: 'Teko'; font-size: 20px; letter-spacing: 1px; }
+
+        .btn-neon { background: var(--accent); color: #000; font-family: 'Teko'; font-size: 22px; border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: 700; letter-spacing: 1px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .btn-neon:hover { background: #e5c100; }
+        .dark-input, .dark-select { background: #000; border: 1px solid #444; color: white; padding: 8px 12px; border-radius: 6px; width: 100%; box-sizing: border-box; text-align: center; font-size: 14px; height: 40px; }
+        .dark-input:focus, .dark-select:focus { border-color: var(--accent); outline: none; }
+
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding-bottom: 20px; }
+        .card-item { background: #1e1e1e; border-radius: 8px; padding: 10px; border: 1px solid #333; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .card-item h4 { margin: 5px 0; color: white; font-size: 15px; }
+        .total-row { color: var(--steel); font-family: 'Teko'; font-size: 22px; margin-top: 5px; border-top: 1px solid #444; padding-top: 5px; }
+
+        .scrolling-tabs { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 10px; margin-bottom: 10px; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5000; backdrop-filter: blur(5px); justify-content: center; align-items: center; }
+        .modal-body { background: #111; margin: 20px auto; width: 95%; max-width: 500px; border-radius: 12px; padding: 25px; border: 1px solid var(--accent); max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 50px rgba(0,0,0,1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; font-size: 24px; color: var(--accent); font-family: 'Teko'; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .close-icon { font-size: 28px; cursor: pointer; color: white; }
+
+        .unit-pill { display: inline-flex; align-items: center; gap: 4px; padding: 1px 5px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-right: 4px; border: 1px solid rgba(255,255,255,0.1); }
+        .unit-pill b { font-family: 'Roboto', sans-serif; font-size: 12px; }
+        .icon-box { background: rgba(210,105,30,0.15); color: #D2691E; border-color: #D2691E; }
+        .icon-pack { background: rgba(0,191,255,0.15); color: #00BFFF; border-color: #00BFFF; }
+        .icon-piece { background: rgba(255,255,255,0.1); color: #ffffff; border-color: #ffffff; }
+
+        .search-wrapper { position: relative; margin-bottom: 15px; }
+        .search-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent); }
+        .search-wrapper input { padding-left: 45px !important; text-align: left !important; background: #000; }
+
+        .swal-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .swal-field { display: flex; flex-direction: column; align-items: center; background: #000; padding: 10px 5px; border-radius: 6px; border: 1px solid #333; }
+        .swal-field label { font-size: 10px; color: #888; margin-bottom: 5px; text-transform: uppercase; }
+        .swal-field input { width: 50px; background: transparent; border: none; color: white; text-align: center; font-size: 22px; font-weight: bold; padding: 5px 2px; outline: none; }
+        .stepper-btn { background: #222; border: 1px solid #444; color: var(--accent); width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; user-select: none; }
+        div:where(.swal2-container) div:where(.swal2-popup) { background: #151515 !important; border: 2px solid var(--accent) !important; box-shadow: 0 0 50px rgba(0,0,0,0.9); }
+
+        #loader-overlay { display:flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5000; flex-direction: column; justify-content: center; align-items: center; }
+        .loader-gear { font-size: 100px; color: #222; animation: spin 4s linear infinite; position: absolute; }
+        .loader-wrench { font-size: 50px; color: var(--accent); position: absolute; animation: rock 2s ease-in-out infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes rock { 0% { transform: rotate(-20deg); } 50% { transform: rotate(20deg); } 100% { transform: rotate(-20deg); } }
+
+        .admin-table-wrapper { overflow-x: auto; background: #111; border-radius: 8px; border: 1px solid #333; }
+        .admin-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        .admin-table th { background: #000; color: var(--accent); padding: 15px; text-transform: uppercase; font-size: 12px; border-bottom: 2px solid #333; text-align: left; }
+        .admin-table td { padding: 12px; border-bottom: 1px solid #222; font-size: 13px; }
+
+        .prod-btn-list { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .prod-btn { background: #111; border: 1px solid #333; padding: 8px 12px; border-radius: 4px; color: white; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
+        .prod-btn:hover { border-color: var(--accent); transform: translateX(5px); }
+
+        .badge-type { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; text-transform: uppercase; }
+        .tab-chip { padding: 4px 10px; border-radius: 4px; background: #1a1a1a; border: 1px solid #333; color: #888; cursor: pointer; font-size: 12px; font-weight: bold; white-space: nowrap; }
+        .tab-chip.active { background: var(--accent); color: black; border-color: var(--accent); }
+
+        .cantiere-container { background: #0d0d0d; border: 2px solid #333; border-radius: 12px; padding: 20px; box-shadow: inset 0 0 40px rgba(0,0,0,0.5); }
+        .industrial-header { background: linear-gradient(90deg, #1a1a1a 0%, #252525 50%, #1a1a1a 100%); border: 1px solid #333; padding: 15px; border-radius: 8px 8px 0 0; margin: -20px -20px 20px -20px; display: flex; justify-content: center; align-items: center; border-bottom: 3px solid var(--accent); }
+        .industrial-label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; margin-bottom: 5px; display: block; }
+        .tool-wrap { background: #151515; border: 1px solid #222; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .search-tool { border-left: 4px solid var(--accent) !important; height: 45px !important; }
+        .prod-tile { background: #1a1a1a; border: 1px solid #333; border-radius: 6px; padding: 12px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; cursor: pointer; }
+        .prod-tile:hover { background: #222; border-right: 4px solid var(--accent); }
+    </style>
+</head>
+<body class="bg-app-main">
+
+    <!-- LOADER -->
+    <div id="loader-overlay">
+        <div style="position:relative; width:120px; height:120px; display:flex; justify-content:center; align-items:center;">
+            <i class="bi bi-gear-fill loader-gear"></i>
+            <i class="bi bi-wrench-adjustable loader-wrench"></i>
+        </div>
+        <div style="margin-top:30px; font-family:'Teko'; font-size:36px; color:white; letter-spacing:4px;">CARICAMENTO DATI...</div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div class="top-header">
+        <button class="icon-btn" onclick="toggleMenu()"><i class="bi bi-list"></i></button>
+        <div class="header-title" id="page-title">MAGAZZINO</div>
+        <div class="user-badge" id="user-badge">...</div>
+    </div>
+
+    <div id="sidebar-overlay" onclick="toggleMenu()"></div>
+    <div id="sidebar">
+        <div class="sidebar-top"><h2 style="margin:0; color:var(--accent); font-size:30px">MENU OFFICINA</h2></div>
+        <div class="nav-links">
+            <a onclick="nav('dashboard')" id="nav-dashboard"><i class="bi bi-box-seam"></i> Magazzino</a>
+            <a onclick="nav('operations')" id="nav-operations"><i class="bi bi-arrow-left-right"></i> Operazioni</a>
+            <a onclick="nav('dailylist')" id="nav-dailylist"><i class="bi bi-clipboard-check"></i> Lista Serale</a>
+            
+            <div class="admin-section hidden" id="admin-menu" style="border-top:1px solid #333; margin-top:10px; background:#0f0f0f">
+                <div style="padding:15px 20px; color:#666; font-size:12px; font-weight:bold">CAPO OFFICINA</div>
+                <a onclick="nav('admin-products')" id="nav-admin-products"><i class="bi bi-boxes"></i> Anagrafica Prodotti</a>
+                <a onclick="nav('admin-movements-log')" id="nav-admin-movements-log"><i class="bi bi-table"></i> Storico Movimenti</a>
+            </div>
+        </div>
+        <div class="sidebar-footer"><button class="btn-logout" onclick="logout()">DISCONNESSIONE</button></div>
+    </div>
+
+    <div id="main-content">
+        <div class="desktop-wrapper">
+            
+            <!-- DASHBOARD -->
+            <div id="page-dashboard" class="page hidden">
+                <div class="search-wrapper"><i class="bi bi-search"></i><input type="text" id="dash-search" class="dark-input" placeholder="Cerca prodotto..." onkeyup="renderDashboard()"></div>
+                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                    <select id="dash-wh-filter" class="dark-select" onchange="renderDashboard()"></select>
+                    <select id="dash-cat-filter" class="dark-select" onchange="renderDashboard()"></select>
+                </div>
+                <div id="dashboard-grid" class="grid-container"></div>
+            </div>
+
+            <!-- OPERATIONS -->
+            <div id="page-operations" class="page hidden">
+                <div class="narrow-content-wrapper cantiere-container">
+                    <div class="industrial-header"><h3 style="color:var(--accent); margin:0;"><i class="bi bi-hammer"></i> REGISTRA MOVIMENTO</h3></div>
+                    
+                    <div class="tool-wrap">
+                        <span class="industrial-label">TIPO OPERAZIONE</span>
+                        <select id="op-type-select" class="dark-input mb-3 border-start border-warning" onchange="updateOpTypeUI()">
+                            <option value="CARICO">🟩 ARRIVO MERCE (Carico)</option>
+                            <option value="SCARICO_CUCINA">🟥 SCARICO CUCINA (Uscite)</option>
+                            <option value="SPOSTAMENTO">🟨 SPOSTAMENTO INTERNO</option>
+                            <option value="SCARTO">🗑️ SCARTO</option>
+                            <option value="RETTIFICA">⚙️ RETTIFICA INVENTARIO</option>
+                        </select>
+                        
+                        <div id="op-wh-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+                            <div id="div-op-from"><label class="industrial-label" id="lbl-from">DA MAGAZZINO:</label><select id="op-from-wh" class="dark-input"></select></div>
+                            <div id="div-op-to"><label class="industrial-label" id="lbl-to">VERSO MAGAZZINO:</label><select id="op-to-wh" class="dark-input"></select></div>
+                        </div>
+                    </div>
+
+                    <div class="tool-wrap" style="padding:10px">
+                        <div class="search-wrapper mb-2"><i class="bi bi-search"></i><input type="text" id="op-search" class="dark-input search-tool" placeholder="Cerca attrezzatura..." onkeyup="renderOpSearch()"></div>
+                        <div id="op-prod-list" style="max-height:280px; overflow-y:auto; padding:5px;"></div>
+                    </div>
+
+                    <span class="industrial-label text-center mt-4 text-warning"><i class="bi bi-clipboard-data"></i> CODA OPERAZIONI</span>
+                    <div id="op-cart-list" style="min-height:80px; max-height:300px; overflow-y:auto; margin-bottom:20px; background:#1a1a1a; border-radius:8px; padding:10px;"></div>
+                    
+                    <button id="btn-confirm-op" class="btn-neon" onclick="submitOpMovements()" style="display:none;"><i class="bi bi-check-circle-fill"></i> CONFERMA E REGISTRA</button>
+                </div>
+            </div>
+
+            <!-- DAILY LIST -->
+            <div id="page-dailylist" class="page hidden">
+                <h3>LISTA SERALE OPERATIVA</h3>
+                <div class="tool-wrap">
+                    <label class="industrial-label">MAGAZZINO DI RIFERIMENTO</label>
+                    <select id="daily-wh" class="dark-select" onchange="renderDailyList(OP_ACTIVE_DEPT)"></select>
+                </div>
+                <div class="scrolling-tabs" id="dept-tabs"></div>
+                <div id="daily-list-body" style="padding-bottom:80px"></div>
+                <button class="btn-neon sticky" onclick="submitDaily()"><i class="bi bi-save"></i> SALVA E ALLINEA</button>
+            </div>
+
+            <!-- ADMIN LOG -->
+            <div id="page-admin-movements-log" class="page hidden">
+                <h3><i class="bi bi-table"></i> REGISTRO MOVIMENTI</h3>
+                <div class="admin-table-wrapper">
+                    <table class="admin-table">
+                        <thead><tr><th>Data</th><th>Utente</th><th>Articolo</th><th>Tipo</th><th>Pz Tot</th></tr></thead>
+                        <tbody id="mov-log-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ADMIN PRODOTTI -->
+            <div id="page-admin-products" class="page hidden">
+                <h3><i class="bi bi-boxes"></i> GESTIONE PRODOTTI</h3>
+                <div class="search-wrapper"><i class="bi bi-search"></i><input type="text" id="admin-prod-search" class="dark-input" placeholder="Cerca prodotto..." onkeyup="renderAdminProds()"></div>
+                <div id="admin-prod-list"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT GESTIONALE -->
+    <script>
+        const supabaseUrl = 'https://jkekmxhrwwidkfoizhde.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg';
+        const _sb = supabase.createClient(supabaseUrl, supabaseKey);
+
+        let DB = { products: new Array(), warehouses: new Array(), inventory: {} };
+        let USER = JSON.parse(localSession);
+        let OP_CART = new Array();
+        let OP_ACTIVE_DEPT = 'GRIGLIA';
+        let DAILY_DATA = {}; 
+        
+        function showLoader(show) {
+            document.getElementById('loader-overlay').style.display = show ? 'flex' : 'none';
+        }
+
+        function logout() {
+            localStorage.removeItem('cantiere_user');
+            window.location.replace('index.html');
+        }
+        
+        function renderQtyBadges(qty, prod) {
+            if (!qty || qty <= 0) return '<span style="color:#444; font-size:12px; font-style:italic">0 pz</span>';
+            let html = ''; let rem = qty;
+            const pCrt = prod.Pezzi_per_Cartone || 1; const pPck = prod.Pezzi_per_Pacco || 1;
+            
+            if (pCrt > 1 && rem >= pCrt) { 
+                const c = Math.floor(rem / pCrt); rem %= pCrt; 
+                html += `<span class="unit-pill icon-box"><i class="bi bi-box-seam-fill"></i><b>${c}</b></span>`; 
+            }
+            if (pPck > 1 && rem >= pPck) { 
+                const pk = Math.floor(rem / pPck); rem %= pPck; 
+                html += `<span class="unit-pill icon-pack"><i class="bi bi-archive-fill"></i><b>${pk}</b></span>`; 
+            }
+            if (rem > 0 || html === '') { 
+                html += `<span class="unit-pill icon-piece"><i class="bi bi-gear-wide-connected"></i><b>${rem}</b></span>`; 
+            }
+            return html;
+        }
+
+        // AUTO-INIT AL CARICAMENTO
+        window.onload = async () => {
+            document.getElementById('user-badge').innerText = USER.username.toUpperCase();
+            if (USER.role === 'ADMIN') document.getElementById('admin-menu').classList.remove('hidden');
+            await loadDataFromSupabase();
+            nav('dashboard');
+        };
+
+        async function loadDataFromSupabase() {
+            showLoader(true);
+            try {
+                const { data: prods } = await _sb.from('prodotti').select('*').order('nome_prodotto');
+                let newProds = new Array();
+                for(let p of prods) {
+                    newProds.push({
+                        ID_Prodotto: p.id,
+                        Nome: p.nome_prodotto,
+                        Reparto: p.reparto || 'NESSUNO',
+                        Categoria: p.reparto || 'NESSUNO',
+                        Fornitore: p.fornitore || '-',
+                        Pezzi_per_Cartone: p.pezzi_per_cartone || 1,
+                        Pezzi_per_Pacco: p.pezzi_per_pacco || 1
+                    });
+                }
+                DB.products = newProds;
+
+                const { data: mags } = await _sb.from('magazzini').select('*').order('nome');
+                DB.warehouses = mags;
+
+                const { data: giac } = await _sb.from('giacenze').select('*');
+                DB.inventory = {};
+                for (let g of giac) {
+                    if (!DB.inventory) {
+                        DB.inventory = {};
+                    }
+                    DB.inventory = g.quantita_totale_pezzi;
+                }
+
+                updateSelectFilters();
+            } catch (e) {
+                Swal.fire('Errore Sync', e.message, 'error');
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        function updateSelectFilters() {
+            let whOpts = '';
+            for (let w of DB.warehouses) whOpts += `<option value="${w.id}">${w.nome}</option>`;
+            
+            document.getElementById('dash-wh-filter').innerHTML = '<option value="ALL">TOTALE OFFICINA</option>' + whOpts;
+            
+            let catArray = new Array();
+            for (let p of DB.products) {
+                if(p.Categoria && !catArray.includes(p.Categoria) && p.Categoria !== 'NESSUNO') {
+                    catArray.push(p.Categoria);
+                }
+            }
+            catArray.sort();
+            
+            let catOpts = '<option value="ALL">TUTTE LE CATEGORIE</option>';
+            for (let c of catArray) catOpts += `<option value="${c}">${c}</option>`;
+            document.getElementById('dash-cat-filter').innerHTML = catOpts;
+
+            document.getElementById('op-from-wh').innerHTML = whOpts;
+            document.getElementById('op-to-wh').innerHTML = whOpts;
+            document.getElementById('daily-wh').innerHTML = whOpts;
+        }
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebar-overlay').classList.toggle('active');
+        }
+
+        function nav(page) {
+            document.querySelectorAll('.page').forEach(e => e.classList.add('hidden'));
+            document.querySelectorAll('.nav-links a').forEach(e => e.classList.remove('active'));
+            document.getElementById('page-' + page).classList.remove('hidden');
+            
+            const activeBtn = document.getElementById('nav-' + page);
+            if (activeBtn) activeBtn.classList.add('active');
+            
+            const titles = { 'dashboard': 'MAGAZZINO', 'operations': 'OPERAZIONI', 'dailylist': 'LISTA SERALE', 'admin-products': 'PRODOTTI', 'admin-movements-log': 'REGISTRO MOVIMENTI'};
+            document.getElementById('page-title').innerText = titles || page.toUpperCase();
+            
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('sidebar-overlay').classList.remove('active');
+
+            if(page === 'dashboard') renderDashboard();
+            if(page === 'operations') { OP_CART = new Array(); renderOpCart(); updateOpTypeUI(); }
+            if(page === 'dailylist') renderDailyList('GRIGLIA');
+            if(page === 'admin-products') renderAdminProds();
+            if(page === 'admin-movements-log') loadMovementsLog();
+        }
+
+        function renderDashboard() {
+            const q = document.getElementById('dash-search').value.toLowerCase();
+            const wh = document.getElementById('dash-wh-filter').value;
+            const cat = document.getElementById('dash-cat-filter').value;
+            const grid = document.getElementById('dashboard-grid');
+            grid.innerHTML = '';
+
+            for (let p of DB.products) {
+                if (q && p.Nome.toLowerCase().indexOf(q) === -1) continue;
+                if (cat !== 'ALL' && p.Categoria !== cat) continue;
+
+                let total = 0;
+                let prodInv = DB.inventory || {};
+                
+                if (wh === 'ALL') { 
+                    for (let mId in prodInv) total += prodInv; 
+                } else { 
+                    total = prodInv || 0; 
+                }
+
+                grid.innerHTML += `
+                    <div class="card-item">
+                        <h4 class="text-warning">${p.Nome}</h4>
+                        <div style="font-size:11px; color:#888">${p.Categoria}</div>
+                        <div class="mt-2">${renderQtyBadges(total, p)}</div>
+                        <div class="total-row">${total} <span style="font-size:12px; color:#888">pz</span></div>
+                    </div>`;
+            }
+        }
+
+        function updateOpTypeUI() {
+            const t = document.getElementById('op-type-select').value;
+            const dFrom = document.getElementById('div-op-from');
+            const dTo = document.getElementById('div-op-to');
+            const lTo = document.getElementById('lbl-to');
+            const lFrom = document.getElementById('lbl-from');
+            
+            dFrom.style.display = 'block'; 
+            dTo.style.display = 'block';
+            lTo.innerText = "VERSO MAGAZZINO:";
+            lFrom.innerText = "DA MAGAZZINO:";
+            
+            if (t === 'CARICO') { dFrom.style.display = 'none'; }
+            if (t === 'SCARICO_CUCINA' || t === 'SCARTO') { dTo.style.display = 'none'; }
+            if (t === 'RETTIFICA') { dFrom.style.display = 'none'; lTo.innerText = "MAGAZZINO DA RETTIFICARE:"; }
+            
+            renderOpSearch();
+        }
+
+        function renderOpSearch() {
+            const q = document.getElementById('op-search').value.toLowerCase();
+            const div = document.getElementById('op-prod-list'); 
+            div.innerHTML = '';
+            
+            let count = 0;
+            for (let p of DB.products) {
+                if (count > 30) break;
+                if (!q || p.Nome.toLowerCase().indexOf(q) !== -1) {
+                    div.innerHTML += `<div class="prod-tile" onclick="openQtyPopup('${p.ID_Prodotto}', 'OP')"><b>${p.Nome}</b><i class="bi bi-chevron-right"></i></div>`;
+                    count++;
+                }
+            }
+        }
+
+        function openQtyPopup(pId, context) {
+            let p = DB.products.find(x => x.ID_Prodotto === pId);
+            if (!p) return;
+
+            window.tempP = p;
+            Swal.fire({
+                title: p.Nome,
+                html: `
+                <div class="swal-grid">
+                    <div class="swal-field"><label>CARTONI (x${p.Pezzi_per_Cartone})</label><input id="s-c" type="number" min="0" value="0" oninput="uPT()"></div>
+                    <div class="swal-field"><label>PACCHI (x${p.Pezzi_per_Pacco})</label><input id="s-pk" type="number" min="0" value="0" oninput="uPT()"></div>
+                    <div class="swal-field"><label>SFUSI</label><input id="s-ps" type="number" min="0" value="0" oninput="uPT()"></div>
+                </div>
+                <div class="mt-3" style="font-family:'Teko'; font-size:24px; color:var(--accent)">Totale: <b id="s-t">0</b> pz</div>`,
+                showCancelButton: true, confirmButtonText: 'AGGIUNGI',
+                preConfirm: () => {
+                    const c = parseInt(document.getElementById('s-c').value||0);
+                    const pk = parseInt(document.getElementById('s-pk').value||0);
+                    const ps = parseInt(document.getElementById('s-ps').value||0);
+                    return (c * p.Pezzi_per_Cartone) + (pk * p.Pezzi_per_Pacco) + ps;
+                }
+            }).then(res => {
+                if (res.isConfirmed && res.value >= 0) { 
+                    if (context === 'OP' && res.value > 0) addToOpCart(p, res.value);
+                    if (context === 'DAILY') { DAILY_DATA = res.value; renderDailyList(OP_ACTIVE_DEPT); }
+                }
+            });
+        }
+        
+        function uPT() {
+            const p = window.tempP;
+            const c = parseInt(document.getElementById('s-c').value||0) * p.Pezzi_per_Cartone;
+            const pk = parseInt(document.getElementById('s-pk').value||0) * p.Pezzi_per_Pacco;
+            const ps = parseInt(document.getElementById('s-ps').value||0);
+            document.getElementById('s-t').innerText = c + pk + ps;
+        }
+
+        function addToOpCart(p, totPz) {
+            const t = document.getElementById('op-type-select').value;
+            const f = document.getElementById('op-from-wh').value;
+            const to = document.getElementById('op-to-wh').value;
+            
+            let fWh = DB.warehouses.find(w => w.id === f);
+            let tWh = DB.warehouses.find(w => w.id === to);
+            let fName = fWh ? fWh.nome : "Sconosciuto";
+            let tName = tWh ? tWh.nome : "Sconosciuto";
+
+            OP_CART.push({ p: p, tot: totPz, type: t, fromId: f, toId: to, fromName: fName, toName: tName });
+            renderOpCart();
+        }
+
+        function renderOpCart() {
+            const div = document.getElementById('op-cart-list');
+            const btn = document.getElementById('btn-confirm-op');
+            div.innerHTML = OP_CART.length ? '' : '<div class="text-center text-secondary">Nessuna operazione in coda</div>';
+            btn.style.display = OP_CART.length ? 'block' : 'none';
+
+            let i = 0;
+            for (let it of OP_CART) {
+                let path = '';
+                if(it.type === 'CARICO') path = `IN -> ${it.toName}`;
+                else if(it.type === 'SCARICO_CUCINA' || it.type === 'SCARTO') path = `${it.fromName} -> OUT`;
+                else if(it.type === 'RETTIFICA') path = `OVERRIDE -> ${it.toName}`;
+                else path = `${it.fromName} -> ${it.toName}`;
+
+                div.innerHTML += `
+                <div class="cart-item-row">
+                    <div>
+                        <b class="text-white">${it.p.Nome}</b><br>
+                        <span class="badge bg-dark border border-secondary text-warning">${it.type}</span> 
+                        <span style="font-size:11px; color:#aaa">${path}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <b style="font-size:18px; color:var(--accent)">${it.tot} pz</b>
+                        <i class="bi bi-x-circle cart-del-btn" onclick="OP_CART.splice(${i},1); renderOpCart()"></i>
+                    </div>
+                </div>`;
+                i++;
+            }
+        }
+
+        async function submitOpMovements() {
+            if(!OP_CART.length) return;
+            showLoader(true);
+            try {
+                for (let item of OP_CART) {
+                    let pId = item.p.ID_Prodotto;
+                    
+                    if (item.type === 'CARICO') {
+                        await _updateGiacenza(pId, item.toId, item.tot, true);
+                        await _logMovimento(pId, item.toId, 'CARICO', item.tot, 'Carico da fornitore');
+                    } else if (item.type === 'SCARICO_CUCINA' || item.type === 'SCARTO') {
+                        await _updateGiacenza(pId, item.fromId, -item.tot, true);
+                        await _logMovimento(pId, item.fromId, item.type, item.tot, item.type);
+                    } else if (item.type === 'SPOSTAMENTO') {
+                        await _updateGiacenza(pId, item.fromId, -item.tot, true);
+                        await _updateGiacenza(pId, item.toId, item.tot, true);
+                        await _logMovimento(pId, item.fromId, 'SPOSTAMENTO', -item.tot, 'Uscita verso ' + item.toName);
+                        await _logMovimento(pId, item.toId, 'SPOSTAMENTO', item.tot, 'Entrata da ' + item.fromName);
+                    } else if (item.type === 'RETTIFICA') {
+                        await _updateGiacenza(pId, item.toId, item.tot, false);
+                        await _logMovimento(pId, item.toId, 'RETTIFICA', item.tot, 'Rettifica manuale admin');
+                    }
+                }
+                Swal.fire('Successo', 'Operazioni Registrate', 'success');
+                OP_CART = new Array(); 
+                renderOpCart();
+                await loadDataFromSupabase(); 
+            } catch(e) {
+                Swal.fire('Errore Server', e.message, 'error');
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        async function _updateGiacenza(pId, mId, delta, isRelative) {
+            const { data: es } = await _sb.from('giacenze').select('*').eq('prodotto_id', pId).eq('magazzino_id', mId).maybeSingle();
+            const oldVal = es ? es.quantita_totale_pezzi : 0;
+            const newVal = isRelative ? oldVal + delta : delta;
+            
+            if (es) {
+                await _sb.from('giacenze').update({ quantita_totale_pezzi: newVal, aggiornato_il: new Date() }).eq('id', es.id);
+            } else {
+                await _sb.from('giacenze').insert({ prodotto_id: pId, magazzino_id: mId, quantita_totale_pezzi: newVal });
+            }
+        }
+
+        async function _logMovimento(pId, mId, tipo, qta, causale) {
+            await _sb.from('movimenti').insert({ utente_id: USER.id, prodotto_id: pId, magazzino_id: mId, tipo_movimento: tipo, quantita_pezzi: qta, causale: causale });
+        }
+
+        function renderDailyList(dept) {
+            OP_ACTIVE_DEPT = dept;
+            
+            let repArray = new Array();
+            for (let p of DB.products) {
+                if(p.Reparto && !repArray.includes(p.Reparto) && p.Reparto !== 'NESSUNO') {
+                    repArray.push(p.Reparto);
+                }
+            }
+            if(repArray.length === 0) repArray.push(dept);
+
+            let htmlTabs = '';
+            for (let d of repArray) {
+                htmlTabs += `<div class="tab-chip ${d === dept ? 'active' : ''}" onclick="renderDailyList('${d}')">${d}</div>`;
+            }
+            document.getElementById('dept-tabs').innerHTML = htmlTabs;
+            
+            const div = document.getElementById('daily-list-body'); 
+            div.innerHTML = '';
+            const wh = document.getElementById('daily-wh').value;
+
+            for (let p of DB.products) {
+                if (p.Reparto !== dept) continue;
+
+                let entered = DAILY_DATA;
+                let prodInv = DB.inventory || {};
+                let invTeorico = prodInv || 0;
+                
+                let valHtml = (entered !== undefined && entered !== null) ? 
+                    `<b style="color:var(--accent); font-size:18px">${entered} pz</b>` : 
+                    `<span style="color:#666; font-size:12px">Teorico: ${invTeorico}</span>`;
+
+                div.innerHTML += `
+                    <div class="prod-btn mb-2" onclick="openQtyPopup('${p.ID_Prodotto}', 'DAILY')">
+                        <div><b>${p.Nome}</b><br><small style="color:#888">${p.Categoria}</small></div>
+                        <div class="text-end">${valHtml}</div>
+                    </div>`;
+            }
+        }
+
+        async function submitDaily() {
+            let pIds = Object.keys(DAILY_DATA);
+            if(pIds.length === 0) return Swal.fire('Attenzione', 'Nessun conteggio inserito', 'info');
+            
+            const whId = document.getElementById('daily-wh').value;
+            if(!whId) return Swal.fire('Errore', 'Seleziona un magazzino valido', 'error');
+
+            showLoader(true);
+            try {
+                for (let pId of pIds) {
+                    let contato = DAILY_DATA;
+                    let prodInv = DB.inventory || {};
+                    let teorico = prodInv || 0;
+                    
+                    await _sb.from('liste_serali').insert({ reparto: OP_ACTIVE_DEPT, utente_id: USER.id, prodotto_id: pId, quantita_contata_pezzi: contato, note: 'Check list serale' });
+                    
+                    if (contato !== teorico) {
+                        await _updateGiacenza(pId, whId, contato, false);
+                        await _logMovimento(pId, whId, 'RETTIFICA', contato, 'Rettifica da Check Serale (Teorico era: '+teorico+')');
+                    }
+                }
+                
+                DAILY_DATA = {}; 
+                await loadDataFromSupabase(); 
+                renderDailyList(OP_ACTIVE_DEPT); 
+                Swal.fire('Successo', 'Dati serali salvati e giacenze allineate!', 'success');
+            } catch(e) {
+                Swal.fire('Errore', e.message, 'error');
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        async function loadMovementsLog() {
+            showLoader(true);
+            try {
+                const { data } = await _sb.from('movimenti').select('*, prodotti(nome_prodotto), utenti_app(username), magazzini(nome)').order('data_ora', {ascending: false}).limit(100);
+                const tbody = document.getElementById('mov-log-body');
+                let html = '';
+                for (let m of data) {
+                    let color = m.tipo_movimento.includes('SCARICO') ? 'text-danger' : (m.tipo_movimento === 'CARICO' ? 'text-success' : 'text-warning');
+                    
+                    html += `<tr>
+                        <td>${new Date(m.data_ora).toLocaleString('it-IT').slice(0,16)}</td>
+                        <td>${m.utenti_app ? m.utenti_app.username.toUpperCase() : 'SISTEMA'}</td>
+                        <td>
+                            <b>${m.prodotti ? m.prodotti.nome_prodotto : 'Sconosciuto'}</b><br>
+                            <span style="font-size:11px; color:#888">Magazzino: ${m.magazzini ? m.magazzini.nome : '-'}</span>
+                        </td>
+                        <td class="${color} fw-bold">${m.tipo_movimento}</td>
+                        <td class="text-white fw-bold">${m.quantita_pezzi}</td>
+                    </tr>`;
+                }
+                tbody.innerHTML = html;
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        function renderAdminProds() {
+            const q = document.getElementById('admin-prod-search').value.toLowerCase();
+            const div = document.getElementById('admin-prod-list');
+            let html = '';
+            for (let p of DB.products) {
+                if (q && p.Nome.toLowerCase().indexOf(q) === -1) continue;
+                
+                html += `
+                <div class="prod-tile mb-2" style="cursor:default;">
+                    <div><b class="text-warning">${p.Nome}</b><br><small class="text-secondary">Reparto: ${p.Reparto} | Forn: ${p.Fornitore}</small></div>
+                    <div class="text-end text-secondary small">1 CT = ${p.Pezzi_per_Cartone} pz<br>1 PK = ${p.Pezzi_per_Pacco} pz</div>
+                </div>`;
+            }
+            div.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
