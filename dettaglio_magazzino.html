@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Cantiere | Dettaglio Scorte</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --cantiere-gold: #ffc107; --cantiere-dark: #121212; }
+        body { background-color: var(--cantiere-dark); color: #fff; font-family: 'Inter', sans-serif; }
+        .table-cantiere { background-color: #1e1e1e; border-radius: 12px; overflow: hidden; border: 1px solid #333; }
+        .table-cantiere th { background-color: #000; color: var(--cantiere-gold); text-transform: uppercase; border: none; padding: 15px; }
+        .table-cantiere td { padding: 15px; border-bottom: 1px solid #333; vertical-align: middle; }
+        .icon-unit { font-size: 1.2rem; color: var(--cantiere-gold); margin-right: 5px; }
+        .total-box { background: var(--cantiere-gold); color: #000; font-weight: 800; padding: 4px 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 id="titoloMaga" class="fw-bold text-uppercase text-warning">CARICAMENTO...</h2>
+        <a href="dashboard.html" class="btn btn-outline-light btn-sm">CHIUDI</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-dark table-cantiere">
+            <thead>
+                <tr>
+                    <th>Prodotto</th>
+                    <th class="text-center"><i class="bi bi-boxes"></i> Cartoni</th>
+                    <th class="text-center"><i class="bi bi-box-fill"></i> Pacchi</th>
+                    <th class="text-center"><i class="bi bi-gear-fill"></i> Pezzi</th>
+                    <th class="text-end">Totale Pezzi</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabella"></tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const magaId = params.get('id');
+    const magaNome = params.get('nome');
+    document.getElementById('titoloMaga').innerText = magaNome;
+
+    const SUB_URL = "https://jkekmxhrwwidkfoizhde.supabase.co"; 
+    const SUB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg";
+    const _supabase = supabase.createClient(SUB_URL, SUB_KEY);
+
+    async function caricaDettaglio() {
+        const { data, error } = await _supabase
+            .from('giacenze')
+            .select('*, prodotti(*)')
+            .eq('magazzino_id', magaId);
+
+        const tbody = document.getElementById('corpoTabella');
+        if(!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-secondary p-5">Magazzino vuoto</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.map(g => {
+            const p = g.prodotti;
+            const ct = Math.floor(g.quantita_totale_pezzi / p.pezzi_per_cartone);
+            const restoPerPacchi = g.quantita_totale_pezzi % p.pezzi_per_cartone;
+            const pk = Math.floor(restoPerPacchi / p.pezzi_per_pacco);
+            const pz = restoPerPacchi % p.pezzi_per_pacco;
+
+            return `
+                <tr>
+                    <td class="fw-bold">${p.nome_prodotto}</td>
+                    <td class="text-center h5">${ct}</td>
+                    <td class="text-center h5">${pk}</td>
+                    <td class="text-center h5 text-secondary">${pz}</td>
+                    <td class="text-end"><span class="total-box">${g.quantita_totale_pezzi}</span></td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // Realtime su questa pagina
+    _supabase.channel('maga-detail').on('postgres_changes', { event: '*', schema: 'public', table: 'giacenze', filter: `magazzino_id=eq.${magaId}` }, () => {
+        caricaDettaglio();
+    }).subscribe();
+
+    caricaDettaglio();
+</script>
+</body>
+</html>
