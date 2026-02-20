@@ -2,136 +2,76 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Cantiere | Carico e Scarico</title>
+    <title>Cantiere | Movimenti</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --cantiere-gold: #ffc107; --cantiere-dark: #121212; }
-        body { background-color: var(--cantiere-dark); color: #fff; font-family: 'Inter', sans-serif; }
-        .card-movimento { background: #1e1e1e; border: 1px solid #333; border-radius: 15px; padding: 2rem; }
-        .form-control, .form-select { background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 12px; }
-        .form-control:focus { background: #2a2a2a; color: #fff; border-color: var(--cantiere-gold); box-shadow: none; }
-        .btn-carico { background: #28a745; color: #fff; font-weight: 800; border: none; }
-        .btn-scarico { background: #dc3545; color: #fff; font-weight: 800; border: none; }
-        .unit-label { font-size: 0.75rem; color: var(--cantiere-gold); text-transform: uppercase; font-weight: 700; }
+        body { background-color: #121212; color: #fff; }
+        .card { background: #1e1e1e; border: 1px solid #333; padding: 2rem; border-radius: 15px; }
+        .form-control, .form-select { background: #2a2a2a; border: 1px solid #444; color: #fff; }
+        .btn-carico { background: #28a745; color: #fff; font-weight: bold; }
+        .btn-scarico { background: #dc3545; color: #fff; font-weight: bold; }
+        .gold { color: #ffc107; font-size: 0.8rem; font-weight: bold; }
     </style>
 </head>
 <body>
-
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card-movimento">
-                <h3 class="fw-bold text-center mb-4"><i class="bi bi-arrow-left-right text-warning"></i> MOVIMENTO MERCE</h3>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 card">
+                <h3 class="fw-bold mb-4 text-center text-warning">MOVIMENTO MERCE</h3>
+                <label>Prodotto</label>
+                <select id="p" class="form-select mb-3"></select>
+                <label>Magazzino</label>
+                <select id="m" class="form-select mb-4"></select>
                 
-                <form id="formMovimento">
-                    <div class="mb-3">
-                        <label class="small text-secondary">Prodotto</label>
-                        <select id="selProdotto" class="form-select" required></select>
-                    </div>
+                <div class="row mb-4 text-center">
+                    <div class="col-4"><label class="gold">CARTONI</label><input type="number" id="ct" class="form-control" value="0"></div>
+                    <div class="col-4"><label class="gold">PACCHI</label><input type="number" id="pk" class="form-control" value="0"></div>
+                    <div class="col-4"><label class="gold">PEZZI</label><input type="number" id="pz" class="form-control" value="0"></div>
+                </div>
 
-                    <div class="mb-3">
-                        <label class="small text-secondary">Magazzino</label>
-                        <select id="selMagazzino" class="form-select" required></select>
-                    </div>
-
-                    <div class="row g-2 mb-4">
-                        <div class="col-4 text-center">
-                            <label class="unit-label"><i class="bi bi-boxes"></i> Cartoni</label>
-                            <input type="number" id="q_ct" class="form-control text-center" value="0">
-                        </div>
-                        <div class="col-4 text-center">
-                            <label class="unit-label"><i class="bi bi-box-fill"></i> Pacchi</label>
-                            <input type="number" id="q_pk" class="form-control text-center" value="0">
-                        </div>
-                        <div class="col-4 text-center">
-                            <label class="unit-label"><i class="bi bi-gear-fill"></i> Pezzi</label>
-                            <input type="number" id="q_pz" class="form-control text-center" value="0">
-                        </div>
-                    </div>
-
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <button type="button" onclick="salva('CARICO')" class="btn btn-carico w-100 p-3">CARICA</button>
-                        </div>
-                        <div class="col-6">
-                            <button type="button" onclick="salva('SCARICO')" class="btn btn-scarico w-100 p-3">SCARICA</button>
-                        </div>
-                    </div>
-                    <div class="text-center mt-4">
-                        <a href="dashboard.html" class="text-secondary text-decoration-none small">Annulla e torna indietro</a>
-                    </div>
-                </form>
+                <div class="row g-2">
+                    <div class="col-6"><button onclick="salva('CARICO')" class="btn btn-carico w-100 p-3">CARICA</button></div>
+                    <div class="col-6"><button onclick="salva('SCARICO')" class="btn btn-scarico w-100 p-3">SCARICA</button></div>
+                </div>
+                <a href="dashboard.html" class="d-block text-center mt-3 text-secondary">Annulla</a>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-    // --- IL BUTTAFUORI ---
-    if (!localStorage.getItem('cantiere_user')) { window.location.href = "index.html"; }
-
-    const SUB_URL = "https://jkekmxhrwwidkfoizhde.supabase.co"; 
-    const SUB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg";
-    const _supabase = supabase.createClient(SUB_URL, SUB_KEY);
-
-    let dbProdotti = [];
-
-    async function init() {
-        const { data: p } = await _supabase.from('prodotti').select('*');
-        const { data: m } = await _supabase.from('magazzini').select('*').order('nome');
-        dbProdotti = p;
-        document.getElementById('selProdotto').innerHTML = '<option value="">Seleziona...</option>' + p.map(x => `<option value="${x.id}">${x.nome_prodotto}</option>`).join('');
-        document.getElementById('selMagazzino').innerHTML = m.map(x => `<option value="${x.id}">${x.nome}</option>`).join('');
-    }
-
-    async function salva(tipo) {
-        const pId = document.getElementById('selProdotto').value;
-        const mId = document.getElementById('selMagazzino').value;
-        if(!pId) return Swal.fire('Ehi!', 'Scegli un prodotto', 'warning');
-
-        const prod = dbProdotti.find(x => x.id === pId);
-        const ct = parseInt(document.getElementById('q_ct').value) || 0;
-        const pk = parseInt(document.getElementById('q_pk').value) || 0;
-        const pz = parseInt(document.getElementById('q_pz').value) || 0;
-
-        const totalePezzi = (ct * prod.pezzi_per_cartone) + (pk * prod.pezzi_per_pacco) + pz;
-        if(totalePezzi <= 0) return Swal.fire('Vuoto?', 'Inserisci una quantità', 'info');
-
-        // Logica DB: Cerca giacenza esistente
-        const { data: esistente } = await _supabase.from('giacenze').select('*').eq('prodotto_id', pId).eq('magazzino_id', mId).maybeSingle();
-        
-        let nuovaQty = totalePezzi;
-        if(esistente) {
-            nuovaQty = (tipo === 'CARICO') ? esistente.quantita_totale_pezzi + totalePezzi : esistente.quantita_totale_pezzi - totalePezzi;
-            await _supabase.from('giacenze').update({ quantita_totale_pezzi: nuovaQty }).eq('id', esistente.id);
-        } else {
-            if(tipo === 'SCARICO') nuovaQty = -totalePezzi;
-            await _supabase.from('giacenze').insert([{ prodotto_id: pId, magazzino_id: mId, quantita_totale_pezzi: nuovaQty }]);
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        if(!localStorage.getItem('cantiere_user')) location.href='index.html';
+        const _supabase = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
+        let prods = [];
+        async function init() {
+            const { data: p } = await _supabase.from('prodotti').select('*');
+            const { data: m } = await _supabase.from('magazzini').select('*').order('nome');
+            prods = p;
+            document.getElementById('p').innerHTML = p.map(x => `<option value="${x.id}">${x.nome_prodotto}</option>`).join('');
+            document.getElementById('m').innerHTML = m.map(x => `<option value="${x.id}">${x.nome}</option>`).join('');
         }
-
-        // --- SWEETALERT DI CONFERMA COOL ---
-        Swal.fire({
-            title: 'Operazione Riuscita!',
-            text: `Hai ${tipo === 'CARICO' ? 'caricato' : 'scaricato'} ${totalePezzi} pezzi. Vuoi tornare alla dashboard?`,
-            icon: 'success',
-            showCancelButton: true,
-            confirmButtonColor: '#ffc107',
-            cancelButtonColor: '#333',
-            confirmButtonText: 'Sì, vai alla Dashboard',
-            cancelButtonText: 'No, fai altro carico'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = "dashboard.html";
+        async function salva(t) {
+            const pId = document.getElementById('p').value;
+            const mId = document.getElementById('m').value;
+            const prod = prods.find(x => x.id === pId);
+            const tot = (parseInt(document.getElementById('ct').value)*prod.pezzi_per_cartone) + (parseInt(document.getElementById('pk').value)*prod.pezzi_per_pacco) + parseInt(document.getElementById('pz').value);
+            
+            const { data: es } = await _supabase.from('giacenze').select('*').eq('prodotto_id', pId).eq('magazzino_id', mId).maybeSingle();
+            let nq = tot;
+            if(es) {
+                nq = (t==='CARICO') ? es.quantita_totale_pezzi + tot : es.quantita_totale_pezzi - tot;
+                await _supabase.from('giacenze').update({ quantita_totale_pezzi: nq }).eq('id', es.id);
             } else {
-                document.getElementById('formMovimento').reset();
+                await _supabase.from('giacenze').insert([{ prodotto_id: pId, magazzino_id: mId, quantita_totale_pezzi: (t==='CARICO'?tot:-tot) }]);
             }
-        });
-    }
-
-    init();
-</script>
+            // Log Movimento
+            await _supabase.from('movimenti').insert([{ prodotto_id: pId, magazzino_id: mId, tipo_movimento: t, quantita_pezzi: tot, utente_id: JSON.parse(localStorage.getItem('cantiere_user')).id }]);
+            
+            Swal.fire('Fatto!', 'Giacenza aggiornata', 'success').then(() => location.href='dashboard.html');
+        }
+        init();
+    </script>
 </body>
 </html>
