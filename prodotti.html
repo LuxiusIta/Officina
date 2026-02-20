@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cantiere | Gestione Prodotti</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --cantiere-gold: #ffc107; --cantiere-dark: #121212; --cantiere-card: #1e1e1e; }
+        body { background-color: var(--cantiere-dark); color: #e0e0e0; font-family: 'Inter', sans-serif; }
+        .navbar { background-color: #000; border-bottom: 2px solid var(--cantiere-gold); }
+        .card { background-color: var(--cantiere-card); border: 1px solid #333; color: #fff; }
+        .form-control, .form-select { background-color: #2a2a2a; border: 1px solid #444; color: #fff; }
+        .form-control:focus { background-color: #2a2a2a; color: #fff; border-color: var(--cantiere-gold); box-shadow: none; }
+        .btn-cantiere { background-color: var(--cantiere-gold); color: #000; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark p-3">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="dashboard.html"><i class="bi bi-arrow-left me-2"></i> TORNA ALLA DASHBOARD</a>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card p-4">
+                <h4 class="fw-bold text-uppercase mb-4"><i class="bi bi-plus-circle me-2"></i>Nuovo Prodotto</h4>
+                <form id="productForm">
+                    <div class="mb-3">
+                        <label class="small text-secondary">Nome Prodotto</label>
+                        <input type="text" id="nome" class="form-control" placeholder="es. Hamburger 200g" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="small text-secondary"><i class="bi bi-box"></i> Pezzi/Cartone</label>
+                            <input type="number" id="p_cartone" class="form-control" value="1" required>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="small text-secondary"><i class="bi bi-archive"></i> Pezzi/Pacco</label>
+                            <input type="number" id="p_pacco" class="form-control" value="1" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small text-secondary">Magazzino Principale</label>
+                        <select id="magazzino_id" class="form-select" required>
+                            </select>
+                    </div>
+                    <button type="submit" class="btn btn-cantiere w-100 mt-3">SALVA PRODOTTO</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card p-4">
+                <h4 class="fw-bold text-uppercase mb-4"><i class="bi bi-list-ul me-2"></i>Anagrafica Prodotti</h4>
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover">
+                        <thead>
+                            <tr>
+                                <th>Prodotto</th>
+                                <th>Conf. (Ct/Pk)</th>
+                                <th>Magazzino</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-prodotti">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUB_URL = "https://jkekmxhrwwidkfoizhde.supabase.co"; 
+    const SUB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg";
+    const _supabase = supabase.createClient(SUB_URL, SUB_KEY);
+
+    // Carica Magazzini nel Select
+    async function init() {
+        const { data: mags } = await _supabase.from('magazzini').select('*');
+        document.getElementById('magazzino_id').innerHTML = mags.map(m => `<option value="${m.id}">${m.nome}</option>`).join('');
+        loadProducts();
+    }
+
+    // Carica lista prodotti
+    async function loadProducts() {
+        const { data: prods } = await _supabase.from('prodotti').select('*, magazzini(nome)');
+        const tbody = document.getElementById('lista-prodotti');
+        tbody.innerHTML = prods.map(p => `
+            <tr>
+                <td>${p.nome_prodotto}</td>
+                <td>${p.pezzi_per_cartone} / ${p.pezzi_per_pacco}</td>
+                <td><span class="badge bg-secondary">${p.magazzini?.nome || 'N/A'}</span></td>
+                <td><button class="btn btn-danger btn-sm" onclick="deleteProd('${p.id}')"><i class="bi bi-trash"></i></button></td>
+            </tr>
+        `).join('');
+    }
+
+    // Salvataggio
+    document.getElementById('productForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nuovo = {
+            nome_prodotto: document.getElementById('nome').value,
+            pezzi_per_cartone: document.getElementById('p_cartone').value,
+            pezzi_per_pacco: document.getElementById('p_pacco').value,
+            magazzino_main_id: document.getElementById('magazzino_id').value
+        };
+
+        const { error } = await _supabase.from('prodotti').insert([nuovo]);
+
+        if (error) {
+            Swal.fire('Errore', error.message, 'error');
+        } else {
+            Swal.fire({ icon: 'success', title: 'Prodotto aggiunto', showConfirmButton: false, timer: 1500 });
+            document.getElementById('productForm').reset();
+            loadProducts();
+        }
+    });
+
+    async function deleteProd(id) {
+        const result = await Swal.fire({
+            title: 'Sei sicuro?',
+            text: "Non potrai recuperare questo prodotto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ffc107',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sì, elimina!'
+        });
+
+        if (result.isConfirmed) {
+            await _supabase.from('prodotti').delete().eq('id', id);
+            loadProducts();
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>
