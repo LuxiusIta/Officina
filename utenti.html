@@ -3,18 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cantiere | Movimenti</title>
+    <title>Cantiere | Gestione Utenti</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --cantiere-gold: #ffc107; --cantiere-dark: #121212; }
+        :root { --cantiere-gold: #ffc107; --cantiere-dark: #121212; --cantiere-card: #1e1e1e; }
         body { background-color: var(--cantiere-dark); color: #fff; font-family: 'Inter', sans-serif; }
         .navbar { background: #000; border-bottom: 2px solid var(--cantiere-gold); }
-        .admin-only { display: none; }
-        .card-mov { background: #1e1e1e; border: 1px solid #333; border-radius: 15px; padding: 2rem; margin-top: 2rem; }
-        .form-control, .form-select { background: #2a2a2a; border: 1px solid #444; color: #fff; }
+        .user-card { background: var(--cantiere-card); border: 1px solid #333; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
         
+        /* Badges Ruoli */
+        .role-badge { font-size: 0.7rem; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; }
+        .badge-admin { background: var(--cantiere-gold); color: #000; }
+        .badge-user { background: #444; color: #fff; }
+        
+        .form-select-sm { background: #2a2a2a; color: #fff; border: 1px solid #444; }
+
         /* Widget Chat */
         #chat-widget { position: fixed; bottom: 85px; right: 20px; width: 320px; height: 400px; background: #1e1e1e; border: 2px solid var(--cantiere-gold); border-radius: 15px; display: none; flex-direction: column; z-index: 1000; }
         #chat-body { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
@@ -31,9 +36,7 @@
         <a class="navbar-brand fw-bold text-white" href="dashboard.html"><i class="bi bi-cone-striped text-warning"></i> CANTIERE</a>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link text-white" href="dashboard.html">Dashboard</a></li>
-                <li class="nav-item admin-only"><a class="nav-link text-warning" href="prodotti.html">Prodotti</a></li>
-                <li class="nav-item admin-only"><a class="nav-link text-warning" href="utenti.html">Utenti</a></li>
+                <li class="nav-item"><a class="nav-link text-white text-decoration-none" href="dashboard.html">Dashboard</a></li>
             </ul>
             <div class="text-end me-3 text-white">
                 <small class="text-secondary d-block text-uppercase" style="font-size: 0.6rem;">Operatore</small>
@@ -44,22 +47,9 @@
 </nav>
 
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6 card-mov text-center">
-            <h3 class="fw-bold mb-4 text-warning">NUOVO MOVIMENTO</h3>
-            <div class="text-start mb-3"><label class="small text-secondary">Prodotto</label><select id="pSel" class="form-select"></select></div>
-            <div class="text-start mb-4"><label class="small text-secondary">Magazzino</label><select id="mSel" class="form-select"></select></div>
-            <div class="row g-2 mb-4">
-                <div class="col-4"><label class="small text-warning">CARTONI</label><input type="number" id="cQty" class="form-control text-center" value="0"></div>
-                <div class="col-4"><label class="small text-warning">PACCHI</label><input type="number" id="pkQty" class="form-control text-center" value="0"></div>
-                <div class="col-4"><label class="small text-warning">PEZZI</label><input type="number" id="pzQty" class="form-control text-center" value="0"></div>
-            </div>
-            <div class="row g-3">
-                <div class="col-6"><button onclick="esegui('CARICO')" class="btn btn-success w-100 p-3 fw-bold">CARICA</button></div>
-                <div class="col-6"><button onclick="esegui('SCARICO')" class="btn btn-danger w-100 p-3 fw-bold">SCARICA</button></div>
-            </div>
+    <h3 class="fw-bold text-warning mb-4">GESTIONE PERSONALE</h3>
+    <div class="row" id="userList">
         </div>
-    </div>
 </div>
 
 <div id="chat-toggle" onclick="toggleChat()"><i class="bi bi-chat-dots-fill"></i></div>
@@ -69,49 +59,73 @@
         <button class="btn-close btn-close-white" onclick="toggleChat()"></button>
     </div>
     <div id="chat-body"></div>
-    <div class="p-2 bg-black"><div class="input-group input-group-sm">
-        <input type="text" id="chatIn" class="form-control bg-dark text-white border-secondary" placeholder="Scrivi...">
-        <button class="btn btn-warning" onclick="send()"><i class="bi bi-send"></i></button>
-    </div></div>
+    <div class="p-2 bg-black">
+        <div class="input-group input-group-sm">
+            <input type="text" id="chatIn" class="form-control bg-dark text-white border-secondary" placeholder="Scrivi...">
+            <button class="btn btn-warning" onclick="send()"><i class="bi bi-send"></i></button>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    const user = JSON.parse(localStorage.getItem('cantiere_user'));
-    if(!user) location.href='index.html';
-    document.getElementById('nomeUtente').innerText = user.username.toUpperCase();
-    if(user.ruolo === 'admin') document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+    const session = JSON.parse(localStorage.getItem('cantiere_user'));
+    if(!session || session.ruolo !== 'admin') {
+        Swal.fire('Accesso Negato', 'Solo gli Admin possono gestire gli utenti.', 'error').then(() => location.href='dashboard.html');
+    }
+    document.getElementById('nomeUtente').innerText = session.username.toUpperCase();
 
     const _supabase = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
 
-    // Logica Movimenti (Init e Esegui) - Includi qui le funzioni init() ed esegui() del file precedente
-    let prods = [];
-    async function init() {
-        const { data: p } = await _supabase.from('prodotti').select('*');
-        const { data: m } = await _supabase.from('magazzini').select('*').order('nome');
-        prods = p;
-        document.getElementById('pSel').innerHTML = p.map(x => `<option value="${x.id}">${x.nome_prodotto}</option>`).join('');
-        document.getElementById('mSel').innerHTML = m.map(x => `<option value="${x.id}">${x.nome}</option>`).join('');
+    async function caricaUtenti() {
+        const { data } = await _supabase.from('utenti_app').select('*').order('username');
+        const container = document.getElementById('userList');
+        
+        container.innerHTML = data.map(u => `
+            <div class="col-md-6 col-lg-4">
+                <div class="user-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0 fw-bold text-uppercase"><i class="bi bi-person-fill text-warning me-2"></i>${u.username}</h5>
+                        <span class="role-badge ${u.ruolo === 'admin' ? 'badge-admin' : 'badge-user'}">${u.ruolo || 'user'}</span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small text-secondary">Cambia Ruolo:</label>
+                        <select class="form-select form-select-sm" onchange="cambiaRuolo('${u.id}', this.value)">
+                            <option value="user" ${u.ruolo === 'user' ? 'selected' : ''}>USER (Solo Movimenti)</option>
+                            <option value="admin" ${u.ruolo === 'admin' ? 'selected' : ''}>ADMIN (Controllo Totale)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-outline-danger btn-sm w-100" onclick="resetPassword('${u.id}', '${u.username}')">
+                        <i class="bi bi-key-fill me-1"></i> Reset Password
+                    </button>
+                </div>
+            </div>
+        `).join('');
     }
-    async function esegui(tipo) {
-        const pId = document.getElementById('pSel').value;
-        const mId = document.getElementById('mSel').value;
-        const prod = prods.find(x => x.id === pId);
-        const tot = (parseInt(document.getElementById('cQty').value)*prod.pezzi_per_cartone) + (parseInt(document.getElementById('pkQty').value)*prod.pezzi_per_pacco) + parseInt(document.getElementById('pzQty').value);
-        if(tot <= 0) return Swal.fire('Errore', 'Inserisci quantità', 'error');
 
-        const { data: es } = await _supabase.from('giacenze').select('*').eq('prodotto_id', pId).eq('magazzino_id', mId).maybeSingle();
-        if(es) {
-            let nq = (tipo === 'CARICO') ? es.quantita_totale_pezzi + tot : es.quantita_totale_pezzi - tot;
-            await _supabase.from('giacenze').update({ quantita_totale_pezzi: nq }).eq('id', es.id);
-        } else {
-            await _supabase.from('giacenze').insert([{ prodotto_id: pId, magazzino_id: mId, quantita_totale_pezzi: (tipo==='CARICO'?tot:-tot) }]);
+    async function cambiaRuolo(id, nuovoRuolo) {
+        const { error } = await _supabase.from('utenti_app').update({ ruolo: nuovoRuolo }).eq('id', id);
+        if(!error) {
+            Swal.fire({ icon: 'success', title: 'Ruolo Aggiornato', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
+            caricaUtenti();
         }
-        await _supabase.from('movimenti').insert([{ prodotto_id: pId, magazzino_id: mId, tipo_movimento: tipo, quantita_pezzi: tot, utente_id: user.id }]);
-        Swal.fire('OK', 'Giacenza aggiornata', 'success').then(() => location.reload());
     }
 
-    // Logica Chat Widget (toggleChat, loadMsgs, send)
+    async function resetPassword(id, username) {
+        const { value: nuovaPass } = await Swal.fire({
+            title: `Nuova password per ${username}`,
+            input: 'text',
+            inputPlaceholder: 'Inserisci nuova password',
+            showCancelButton: true,
+            confirmButtonColor: '#ffc107'
+        });
+        if (nuovaPass) {
+            await _supabase.from('utenti_app').update({ password: nuovaPass }).eq('id', id);
+            Swal.fire('Fatto!', 'Password aggiornata', 'success');
+        }
+    }
+
+    // --- LOGICA CHAT ---
     function toggleChat() { 
         const w = document.getElementById('chat-widget');
         w.style.display = (w.style.display==='flex') ? 'none' : 'flex';
@@ -119,17 +133,17 @@
     }
     async function loadMsgs() {
         const { data } = await _supabase.from('chat_interna').select('*, utenti_app(username)').order('creato_at', { ascending: true }).limit(20);
-        document.getElementById('chat-body').innerHTML = data.map(m => `<div class="msg ${m.utente_id===user.id?'msg-me':'msg-them'}"><small style="font-size:0.6rem; display:block"><b>${m.utenti_app?.username}</b></small>${m.messaggio}</div>`).join('');
+        document.getElementById('chat-body').innerHTML = data.map(m => `<div class="msg ${m.utente_id===session.id?'msg-me':'msg-them'}"><small style="font-size:0.6rem; display:block"><b>${m.utenti_app?.username}</b></small>${m.messaggio}</div>`).join('');
         const b = document.getElementById('chat-body'); b.scrollTop = b.scrollHeight;
     }
     async function send() {
         const i = document.getElementById('chatIn'); if(!i.value) return;
-        await _supabase.from('chat_interna').insert([{ utente_id: user.id, messaggio: i.value }]);
+        await _supabase.from('chat_interna').insert([{ utente_id: session.id, messaggio: i.value }]);
         i.value = '';
     }
-    _supabase.channel('ch1').on('postgres_changes', {event:'INSERT', schema:'public', table:'chat_interna'}, () => loadMsgs()).subscribe();
-    
-    init();
+    _supabase.channel('chUtenti').on('postgres_changes', {event:'INSERT', schema:'public', table:'chat_interna'}, () => loadMsgs()).subscribe();
+
+    caricaUtenti();
 </script>
 </body>
 </html>
