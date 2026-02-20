@@ -25,7 +25,6 @@
     <link rel="icon" type="image/x-icon" href="https://yt3.googleusercontent.com/ytc/AIdro_nC2KYqN62QVeGk8Fj8CAnW8dEJ4FNTgqqVC8dgSFaxgQ=s160-c-k-c0x00ffffff-no-rj">
 
     <style>
-        /* CSS DEL CANTIERE MANTENUTO INTATTO E SICURO */
         :root {
             --bg-dark: #0a0a0a; --bg-panel: #1a1a1a; --accent: #FFD700;
             --text-main: #f0f0f0; --danger: #FF4444; --steel: #cfd8dc;
@@ -271,12 +270,12 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg';
         const _sb = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // STATO GLOBALE DELL'APP
-        let DB = { products: [], warehouses:[], inventory: {} };
+        // STATO GLOBALE DELL'APP INIZIALIZZATO IN MODO SICURO
+        let DB = { products: new Array(), warehouses: new Array(), inventory: {} };
         let USER = null;
-        let OP_CART =[];
+        let OP_CART = new Array();
         let OP_ACTIVE_DEPT = 'GRIGLIA';
-        let DAILY_DATA = {}; // Carrello lista serale
+        let DAILY_DATA = {}; 
         
         // --- FUNZIONI DI UTILITÀ ---
         function showLoader(show) {
@@ -370,17 +369,19 @@
 
                 // 2. Fetch Magazzini (Tabella magazzini del tuo schema)
                 const { data: mags } = await _sb.from('magazzini').select('*').order('nome');
-                DB.warehouses = mags; // Salva intero oggetto {id, nome}
+                DB.warehouses = mags; // Salva intero array {id, nome}
 
                 // 3. Fetch Giacenze (Tabella giacenze del tuo schema)
                 const { data: giac } = await _sb.from('giacenze').select('*');
                 
                 // Mappa a due livelli: inventory = QTY
                 DB.inventory = {};
-                giac.forEach(g => {
-                    if (!DB.inventory) DB.inventory = {};
+                for (let g of giac) {
+                    if (!DB.inventory) {
+                        DB.inventory = {};
+                    }
                     DB.inventory = g.quantita_totale_pezzi;
-                });
+                }
 
                 updateSelectFilters();
             } catch (e) {
@@ -392,23 +393,25 @@
 
         function updateSelectFilters() {
             let whOpts = '';
-            for (let i = 0; i < DB.warehouses.length; i++) {
-                whOpts += `<option value="${DB.warehouses.id}">${DB.warehouses.nome}</option>`;
+            for (let w of DB.warehouses) {
+                whOpts += `<option value="${w.id}">${w.nome}</option>`;
             }
             
             // Dashboard Dropdowns
             document.getElementById('dash-wh-filter').innerHTML = '<option value="ALL">TOTALE OFFICINA</option>' + whOpts;
             
-            let catArray =[];
-            for (let i = 0; i < DB.products.length; i++) {
-                if(DB.products.Categoria && catArray.indexOf(DB.products.Categoria) === -1) {
-                    catArray.push(DB.products.Categoria);
+            let catArray = new Array();
+            for (let p of DB.products) {
+                if(p.Categoria && !catArray.includes(p.Categoria) && p.Categoria !== 'NESSUNO') {
+                    catArray.push(p.Categoria);
                 }
             }
             catArray.sort();
             
             let catOpts = '<option value="ALL">TUTTE LE CATEGORIE</option>';
-            for (let i = 0; i < catArray.length; i++) catOpts += `<option value="${catArray}">${catArray}</option>`;
+            for (let c of catArray) {
+                catOpts += `<option value="${c}">${c}</option>`;
+            }
             document.getElementById('dash-cat-filter').innerHTML = catOpts;
 
             // Operations Dropdowns
@@ -440,7 +443,7 @@
             document.getElementById('sidebar-overlay').classList.remove('active');
 
             if(page === 'dashboard') renderDashboard();
-            if(page === 'operations') { OP_CART =[]; renderOpCart(); updateOpTypeUI(); }
+            if(page === 'operations') { OP_CART = new Array(); renderOpCart(); updateOpTypeUI(); }
             if(page === 'dailylist') renderDailyList('GRIGLIA');
             if(page === 'admin-products') renderAdminProds();
             if(page === 'admin-movements-log') loadMovementsLog();
@@ -454,8 +457,7 @@
             const grid = document.getElementById('dashboard-grid');
             grid.innerHTML = '';
 
-            for (let i = 0; i < DB.products.length; i++) {
-                let p = DB.products;
+            for (let p of DB.products) {
                 if (q && p.Nome.toLowerCase().indexOf(q) === -1) continue;
                 if (cat !== 'ALL' && p.Categoria !== cat) continue;
 
@@ -463,7 +465,9 @@
                 let prodInv = DB.inventory || {};
                 
                 if (wh === 'ALL') { 
-                    for (let mId in prodInv) { total += prodInv; }
+                    for (let mId in prodInv) { 
+                        total += prodInv; 
+                    }
                 } else { 
                     total = prodInv || 0; 
                 }
@@ -484,14 +488,16 @@
             const dFrom = document.getElementById('div-op-from');
             const dTo = document.getElementById('div-op-to');
             const lTo = document.getElementById('lbl-to');
+            const lFrom = document.getElementById('lbl-from');
             
             dFrom.style.display = 'block'; 
             dTo.style.display = 'block';
+            lTo.innerText = "VERSO MAGAZZINO:";
+            lFrom.innerText = "DA MAGAZZINO:";
             
-            if (t === 'CARICO') { dFrom.style.display = 'none'; lTo.innerText = "VERSO MAGAZZINO:"; }
+            if (t === 'CARICO') { dFrom.style.display = 'none'; }
             if (t === 'SCARICO_CUCINA' || t === 'SCARTO') { dTo.style.display = 'none'; }
             if (t === 'RETTIFICA') { dFrom.style.display = 'none'; lTo.innerText = "MAGAZZINO DA RETTIFICARE:"; }
-            if (t === 'SPOSTAMENTO') { lTo.innerText = "VERSO MAGAZZINO:"; }
             
             renderOpSearch();
         }
@@ -502,11 +508,9 @@
             div.innerHTML = '';
             
             let count = 0;
-            for (let i = 0; i < DB.products.length; i++) {
+            for (let p of DB.products) {
                 if (count > 30) break;
-                let p = DB.products;
                 if (!q || p.Nome.toLowerCase().indexOf(q) !== -1) {
-                    let pJSON = JSON.stringify(p).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
                     div.innerHTML += `<div class="prod-tile" onclick="openQtyPopup('${p.ID_Prodotto}', 'OP')"><b>${p.Nome}</b><i class="bi bi-chevron-right"></i></div>`;
                     count++;
                 }
@@ -514,10 +518,7 @@
         }
 
         function openQtyPopup(pId, context) {
-            let p = null;
-            for (let i = 0; i < DB.products.length; i++) {
-                if (DB.products.ID_Prodotto === pId) { p = DB.products; break; }
-            }
+            let p = DB.products.find(x => x.ID_Prodotto === pId);
             if (!p) return;
 
             window.tempP = p;
@@ -562,11 +563,10 @@
             const to = document.getElementById('op-to-wh').value;
             
             // Trovo i nomi dei magazzini per stamparli carini a schermo
-            let fName = "Sconosciuto", tName = "Sconosciuto";
-            for(let i=0; i<DB.warehouses.length; i++){
-                if (DB.warehouses.id === f) fName = DB.warehouses.nome;
-                if (DB.warehouses.id === to) tName = DB.warehouses.nome;
-            }
+            let fWh = DB.warehouses.find(w => w.id === f);
+            let tWh = DB.warehouses.find(w => w.id === to);
+            let fName = fWh ? fWh.nome : "Sconosciuto";
+            let tName = tWh ? tWh.nome : "Sconosciuto";
 
             OP_CART.push({ p: p, tot: totPz, type: t, fromId: f, toId: to, fromName: fName, toName: tName });
             renderOpCart();
@@ -578,8 +578,8 @@
             div.innerHTML = OP_CART.length ? '' : '<div class="text-center text-secondary">Nessuna operazione in coda</div>';
             btn.style.display = OP_CART.length ? 'block' : 'none';
 
-            for (let i = 0; i < OP_CART.length; i++) {
-                let it = OP_CART;
+            let i = 0;
+            for (let it of OP_CART) {
                 let path = '';
                 if(it.type === 'CARICO') path = `IN -> ${it.toName}`;
                 else if(it.type === 'SCARICO_CUCINA' || it.type === 'SCARTO') path = `${it.fromName} -> OUT`;
@@ -598,6 +598,7 @@
                         <i class="bi bi-x-circle cart-del-btn" onclick="OP_CART.splice(${i},1); renderOpCart()"></i>
                     </div>
                 </div>`;
+                i++;
             }
         }
 
@@ -605,10 +606,10 @@
             if(!OP_CART.length) return;
             showLoader(true);
             try {
-                for (let i = 0; i < OP_CART.length; i++) {
-                    let item = OP_CART;
+                for (let item of OP_CART) {
                     let pId = item.p.ID_Prodotto;
                     
+                    // La tua tabella `movimenti` ha solo magazzino_id (Singolo)
                     if (item.type === 'CARICO') {
                         await _updateGiacenza(pId, item.toId, item.tot, true);
                         await _logMovimento(pId, item.toId, 'CARICO', item.tot, 'Carico da fornitore');
@@ -616,17 +617,20 @@
                         await _updateGiacenza(pId, item.fromId, -item.tot, true);
                         await _logMovimento(pId, item.fromId, item.type, item.tot, item.type);
                     } else if (item.type === 'SPOSTAMENTO') {
+                        // SPOSTAMENTO tra due magazzini: aggiorno 2 giacenze e loggo i due eventi fisici per tracciare
                         await _updateGiacenza(pId, item.fromId, -item.tot, true);
                         await _updateGiacenza(pId, item.toId, item.tot, true);
-                        // Il tuo schema ha solo 'magazzino_id' in movimenti, quindi loggo lo spostamento per il target
-                        await _logMovimento(pId, item.toId, 'SPOSTAMENTO', item.tot, 'Spostato da: ' + item.fromName);
+                        
+                        await _logMovimento(pId, item.fromId, 'SPOSTAMENTO', -item.tot, 'Uscita verso ' + item.toName);
+                        await _logMovimento(pId, item.toId, 'SPOSTAMENTO', item.tot, 'Entrata da ' + item.fromName);
                     } else if (item.type === 'RETTIFICA') {
-                        await _updateGiacenza(pId, item.toId, item.tot, false); // false = valore assoluto!
+                        await _updateGiacenza(pId, item.toId, item.tot, false); // false = valore assoluto (sovrascrivi)
                         await _logMovimento(pId, item.toId, 'RETTIFICA', item.tot, 'Rettifica manuale admin');
                     }
                 }
                 Swal.fire('Successo', 'Operazioni Registrate', 'success');
-                OP_CART =[]; renderOpCart();
+                OP_CART = new Array(); 
+                renderOpCart();
                 await loadDataFromSupabase(); // refresh DB locale
             } catch(e) {
                 Swal.fire('Errore Server', e.message, 'error');
@@ -664,33 +668,34 @@
         function renderDailyList(dept) {
             OP_ACTIVE_DEPT = dept;
             
-            let repArray =[];
-            for(let i=0; i<DB.products.length; i++){
-                if(DB.products.Reparto && repArray.indexOf(DB.products.Reparto) === -1 && DB.products.Reparto !== 'NESSUNO') {
-                    repArray.push(DB.products.Reparto);
+            let repArray = new Array();
+            for (let p of DB.products) {
+                if(p.Reparto && !repArray.includes(p.Reparto) && p.Reparto !== 'NESSUNO') {
+                    repArray.push(p.Reparto);
                 }
             }
-            if(repArray.length === 0) repArray =;
+            if(repArray.length === 0) {
+                repArray.push(dept); // Fallback sicuro
+            }
 
             let htmlTabs = '';
-            for(let i=0; i<repArray.length; i++){
-                let d = repArray;
+            for (let d of repArray) {
                 htmlTabs += `<div class="tab-chip ${d === dept ? 'active' : ''}" onclick="renderDailyList('${d}')">${d}</div>`;
             }
             document.getElementById('dept-tabs').innerHTML = htmlTabs;
             
-            const div = document.getElementById('daily-list-body'); div.innerHTML = '';
+            const div = document.getElementById('daily-list-body'); 
+            div.innerHTML = '';
             const wh = document.getElementById('daily-wh').value;
 
-            for(let i=0; i<DB.products.length; i++){
-                let p = DB.products;
+            for (let p of DB.products) {
                 if (p.Reparto !== dept) continue;
 
                 let entered = DAILY_DATA;
                 let prodInv = DB.inventory || {};
                 let invTeorico = prodInv || 0;
                 
-                let valHtml = entered !== undefined ? 
+                let valHtml = (entered !== undefined && entered !== null) ? 
                     `<b style="color:var(--accent); font-size:18px">${entered} pz</b>` : 
                     `<span style="color:#666; font-size:12px">Teorico: ${invTeorico}</span>`;
 
@@ -711,8 +716,7 @@
 
             showLoader(true);
             try {
-                for (let i = 0; i < pIds.length; i++) {
-                    let pIdNum = pIds;
+                for (let pId of pIds) {
                     let contato = DAILY_DATA;
                     
                     let prodInv = DB.inventory || {};
@@ -722,15 +726,15 @@
                     await _sb.from('liste_serali').insert({
                         reparto: OP_ACTIVE_DEPT,
                         utente_id: USER.id,
-                        prodotto_id: pIdNum,
+                        prodotto_id: pId,
                         quantita_contata_pezzi: contato,
                         note: 'Check list serale'
                     });
                     
                     // 2. Se c'è un Delta (Contatto vs Teorico), allinea la Giacenza in DB
                     if (contato !== teorico) {
-                        await _updateGiacenza(pIdNum, whId, contato, false); // Override
-                        await _logMovimento(pIdNum, whId, 'RETTIFICA', contato, 'Rettifica da Check Serale');
+                        await _updateGiacenza(pId, whId, contato, false); // Override assoluto
+                        await _logMovimento(pId, whId, 'RETTIFICA', contato, 'Rettifica da Check Serale (Teorico era: '+teorico+')');
                     }
                 }
                 
@@ -756,8 +760,7 @@
                 
                 const tbody = document.getElementById('mov-log-body');
                 let html = '';
-                for (let i = 0; i < data.length; i++) {
-                    let m = data;
+                for (let m of data) {
                     let color = m.tipo_movimento.includes('SCARICO') ? 'text-danger' : (m.tipo_movimento === 'CARICO' ? 'text-success' : 'text-warning');
                     
                     html += `<tr>
@@ -782,8 +785,7 @@
             const q = document.getElementById('admin-prod-search').value.toLowerCase();
             const div = document.getElementById('admin-prod-list');
             let html = '';
-            for (let i = 0; i < DB.products.length; i++) {
-                let p = DB.products;
+            for (let p of DB.products) {
                 if (q && p.Nome.toLowerCase().indexOf(q) === -1) continue;
                 
                 html += `
