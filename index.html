@@ -4,17 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Login | Cantiere Hambirreria</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+    <script>
+        // SE SEI GIA' LOGGATO, TI MANDA SUBITO ALL'APP
+        if (localStorage.getItem('cantiere_user')) {
+            window.location.replace('app.html');
+        }
+    </script>
+
     <style>
         :root { --accent: #FFD700; }
-        body { margin: 0; padding: 0; font-family: 'Roboto', sans-serif; background: url('https://previews.123rf.com/images/wasansos1/wasansos11901/wasansos1190100009/133826034-background-of-the-surface-of-the-steel-plate.jpg') no-repeat center center fixed; background-size: cover; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        body { margin: 0; padding: 0; font-family: 'Roboto', sans-serif; background: url('https://previews.123rf.com/images/wasansos1/wasansos11901/wasansos1190100009/133826034-background-of-the-surface-of-the-steel-plate.jpg') no-repeat center center fixed; background-size: cover; display: flex; align-items: center; justify-content: center; height: 100vh; }
         .vignette { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 0; }
         .login-container { background: #111; padding: 40px 30px; border-radius: 10px; text-align: center; width: 90%; max-width: 380px; border: 2px solid var(--accent); position: relative; box-shadow: 0 0 60px rgba(0,0,0,1); z-index: 10; }
         .brand-stripe { height: 4px; background: var(--accent); position: absolute; top: 0; left: 0; width: 100%; }
@@ -25,78 +31,61 @@
         .input-wrap input { background: transparent; border: none; color: white; padding: 15px 5px; width: 100%; font-size: 16px; outline: none; }
         .btn-neon { background: var(--accent); color: #000; font-family: 'Teko'; font-size: 22px; border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: 700; letter-spacing: 1px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
         .btn-neon:hover { background: #e5c100; }
-        
-        #loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5000; flex-direction: column; justify-content: center; align-items: center; }
-        .loader-gear { font-size: 100px; color: #222; animation: spin 4s linear infinite; position: absolute; }
-        .loader-wrench { font-size: 50px; color: var(--accent); position: absolute; animation: rock 2s ease-in-out infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes rock { 0% { transform: rotate(-20deg); } 50% { transform: rotate(20deg); } 100% { transform: rotate(-20deg); } }
     </style>
 </head>
 <body>
-
-    <!-- LOADER -->
-    <div id="loader-overlay">
-        <div style="position:relative; width:120px; height:120px; display:flex; justify-content:center; align-items:center;">
-            <i class="bi bi-gear-fill loader-gear"></i>
-            <i class="bi bi-wrench-adjustable loader-wrench"></i>
-        </div>
-        <div style="margin-top:30px; font-family:'Teko'; font-size:36px; color:white; letter-spacing:4px;">VERIFICA...</div>
-    </div>
-
     <div class="vignette"></div>
     <div class="login-container">
         <div class="brand-stripe"></div>
         <img src="https://yt3.googleusercontent.com/ytc/AIdro_nC2KYqN62QVeGk8Fj8CAnW8dEJ4FNTgqqVC8dgSFaxgQ=s160-c-k-c0x00ffffff-no-rj" class="logo-circle">
         <h1 class="brand-title">CANTIERE <span style="color:var(--accent)">HAMBIRRERIA</span></h1>
-        <div class="input-wrap"><i class="bi bi-person-fill"></i><input type="text" id="username" placeholder="IDENTIFICATIVO"></div>
-        <div class="input-wrap"><i class="bi bi-key-fill"></i><input type="password" id="password" placeholder="PASSWORD" onkeydown="if(event.key === 'Enter') attemptLogin()"></div>
-        <button class="btn-neon" onclick="attemptLogin()">ENTRA NEL SISTEMA</button>
+        
+        <div class="input-wrap">
+            <i class="bi bi-person-fill"></i>
+            <input type="text" id="username" placeholder="IDENTIFICATIVO" autocomplete="off">
+        </div>
+        <div class="input-wrap">
+            <i class="bi bi-key-fill"></i>
+            <input type="password" id="password" placeholder="PASSWORD" onkeydown="if(event.key === 'Enter') attemptLogin()">
+        </div>
+        
+        <button id="login-btn" class="btn-neon" onclick="attemptLogin()">ENTRA NEL SISTEMA</button>
     </div>
 
     <script>
-        // REDIRECT IMMEDIATO SE GIA' LOGGATO
-        if (localStorage.getItem('cantiere_user')) {
-            window.location.replace('app.html');
-        }
-
-        const supabaseUrl = 'https://jkekmxhrwwidkfoizhde.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg';
-        const _sb = supabase.createClient(supabaseUrl, supabaseKey);
+        const _sb = supabase.createClient(
+            'https://jkekmxhrwwidkfoizhde.supabase.co', 
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg'
+        );
 
         async function attemptLogin() {
             const u = document.getElementById('username').value.trim();
             const p = document.getElementById('password').value.trim();
+            const btn = document.getElementById('login-btn');
             
             if (!u || !p) return Swal.fire('Errore', 'Inserisci i dati', 'error');
 
-            const loader = document.getElementById('loader-overlay');
-            loader.style.display = 'flex';
+            btn.innerText = "VERIFICA IN CORSO...";
+            btn.style.opacity = "0.7";
 
             try {
-                // ILIKE = non fa distinzione tra maiuscole/minuscole
-                const { data, error } = await _sb.from('utenti_app')
-                    .select('*')
-                    .ilike('username', u)
-                    .eq('password', p);
+                const { data, error } = await _sb.from('utenti_app').select('*').ilike('username', u).eq('password', p);
                 
-                if (error) throw new Error(error.message);
-                
-                // Se array vuoto = utente non trovato o pass errata
-                if (!data || data.length === 0) {
+                if (error || !data || data.length === 0) {
                     throw new Error("Credenziali errate o utente inesistente.");
                 }
 
-                // Salvataggio Sessione e Redirect all'App
-                const utenteTrovato = data;
-                const session = { id: utenteTrovato.id, username: utenteTrovato.username, role: utenteTrovato.ruolo };
-                localStorage.setItem('cantiere_user', JSON.stringify(session));
+                const utente = data;
+                const session = { id: utente.id, username: utente.username, role: utente.ruolo };
                 
+                // Salvo e vado all'app
+                localStorage.setItem('cantiere_user', JSON.stringify(session));
                 window.location.replace('app.html');
 
             } catch (err) {
-                loader.style.display = 'none';
-                Swal.fire('Accesso Negato', err.message, 'error');
+                btn.innerText = "ENTRA NEL SISTEMA";
+                btn.style.opacity = "1";
+                Swal.fire({ icon: 'error', title: 'Accesso Negato', text: err.message, background: '#111', color: '#fff' });
             }
         }
     </script>
