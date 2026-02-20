@@ -3,121 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cantiere | Accesso</title>
+    <title>Cantiere | Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-    :root { --gold: #ffc107; --dark: #000; --card: #121212; }
-    body { 
-        background-color: var(--dark); 
-        height: 100vh; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        font-family: 'Inter', sans-serif;
-        margin: 0;
-    }
-    .login-card { 
-        background: var(--card); 
-        border: 1px solid #333; 
-        padding: 3rem; 
-        border-radius: 20px; 
-        width: 100%; 
-        max-width: 400px; 
-        text-align: center;
-    }
-    .bi-cone-striped { font-size: 4rem; color: var(--gold); margin-bottom: 1rem; }
-    h2 { color: white; font-weight: 800; letter-spacing: -1px; margin-bottom: 2rem; }
-    .text-warning { color: var(--gold) !important; }
-    
-    .form-control { 
-        background: #1a1a1a; 
-        border: 1px solid #333; 
-        color: #fff; 
-        padding: 12px; 
-        margin-bottom: 15px; 
-        border-radius: 8px;
-    }
-    .btn-gold { 
-        background: var(--gold); 
-        color: #000; 
-        font-weight: 900; 
-        padding: 15px; 
-        border: none; 
-        border-radius: 10px; 
-        width: 100%; 
-        text-transform: uppercase;
-        margin-top: 10px;
-        transition: 0.2s;
-    }
-    .btn-gold:hover { background: #e5ac00; transform: translateY(-2px); }
-</style>
+        :root { --gold: #ffc107; --dark: #000; }
+        body { background-color: var(--dark); color: white; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; margin: 0; }
+        .login-card { background: #121212; border: 1px solid #333; padding: 2.5rem; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .bi-cone-striped { font-size: 3.5rem; color: var(--gold); }
+        .form-control { background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 0.8rem; margin-bottom: 1rem; border-radius: 10px; }
+        .form-control:focus { background: #222; color: #fff; border-color: var(--gold); box-shadow: none; }
+        .btn-gold { background: var(--gold); color: #000; font-weight: 800; width: 100%; padding: 0.8rem; border: none; border-radius: 10px; text-transform: uppercase; transition: 0.3s; }
+        .btn-gold:hover { background: #e5ac00; transform: scale(1.02); }
+    </style>
 </head>
 <body>
+    <div class="login-card">
+        <i class="bi bi-cone-striped"></i>
+        <h2 class="fw-bold mt-2 mb-4">CANTIERE <span class="text-warning">LOGIN</span></h2>
+        <input type="text" id="userIn" class="form-control" placeholder="Username">
+        <input type="password" id="passIn" class="form-control" placeholder="Password">
+        <button onclick="checkLogin()" class="btn btn-gold">Entra nel Cantiere</button>
+    </div>
 
-<div class="login-card text-center">
-    <i class="bi bi-cone-striped display-4 text-warning mb-3"></i>
-    <h3 class="fw-bold mb-4">CANTIERE <span class="text-warning">LOGIN</span></h3>
-    <input type="text" id="userIn" class="form-control" placeholder="Username">
-    <input type="password" id="passIn" class="form-control" placeholder="Password">
-    <button onclick="checkLogin()" class="btn btn-gold">Entra nel Cantiere</button>
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const _sb = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-    const _sb = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
+        async function checkLogin() {
+            const u = document.getElementById('userIn').value;
+            const p = document.getElementById('passIn').value;
+            if(!u || !p) return Swal.fire('Errore', 'Compila tutto', 'warning');
 
-    async function checkLogin() {
-        const u = document.getElementById('userIn').value;
-        const p = document.getElementById('passIn').value;
+            const { data, error } = await _sb.from('utenti_app').select('*').eq('username', u).eq('password', p).maybeSingle();
 
-        const { data, error } = await _sb.from('utenti_app').select('*').eq('username', u) .eq('password', p).maybeSingle();
-
-        if (error || !data) {
-            Swal.fire({ icon: 'error', title: 'Accesso Negato', text: 'Credenziali errate', confirmButtonColor: '#ffc107' });
-        } else {
-            localStorage.setItem('cantiere_user', JSON.stringify(data));
-            Swal.fire({ icon: 'success', title: 'Autorizzato', showConfirmButton: false, timer: 1000 }).then(() => {
-                // Ora punta al file del gestionale
+            if (error || !data) {
+                Swal.fire({ icon: 'error', title: 'Accesso Negato', text: 'Credenziali errate', confirmButtonColor: '#ffc107' });
+            } else {
+                localStorage.setItem('cantiere_user', JSON.stringify(data));
                 window.location.href = './app.html';
-            });
+            }
         }
-    }
-    document.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkLogin(); });
-</script>
-</body>
-</html>
-
-<div class="login-card text-center">
-    <i class="bi bi-cone-striped display-4 text-warning mb-3"></i>
-    <h3 class="fw-bold mb-4">CANTIERE <span class="text-warning">APP</span></h3>
-
-    <input type="text" id="userIn" class="form-control" placeholder="Username">
-    <input type="password" id="passIn" class="form-control" placeholder="Password">
-    
-    <button onclick="checkLogin()" class="btn btn-gold">Accedi</button>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-    const _sb = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
-
-    async function checkLogin() {
-        const u = document.getElementById('userIn').value;
-        const p = document.getElementById('passIn').value;
-
-        const { data, error } = await _sb.from('utenti_app').select('*').eq('username', u).eq('password', p).maybeSingle();
-
-        if (error || !data) {
-            Swal.fire({ icon: 'error', title: 'Errore', text: 'Credenziali non valide', confirmButtonColor: '#ffc107' });
-        } else {
-            localStorage.setItem('cantiere_user', JSON.stringify(data));
-            Swal.fire({ icon: 'success', title: 'Benvenuto', showConfirmButton: false, timer: 1000 }).then(() => {
-                window.location.href = './index.html';
-            });
-        }
-    }
-</script>
+        document.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkLogin(); });
+    </script>
 </body>
 </html>
