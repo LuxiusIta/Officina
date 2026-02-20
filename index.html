@@ -11,11 +11,11 @@
         :root { --gold: #ffc107; --dark: #0a0a0a; }
         body { background-color: var(--dark); color: white; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; margin: 0; }
         .login-card { background: #111; border: 2px solid #222; padding: 3rem; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-        .bi-cone-striped { font-size: 4rem; color: var(--gold); text-shadow: 0 0 20px rgba(255,193,7,0.4); }
+        .bi-cone-striped { font-size: 4rem; color: var(--gold); }
         h2 { font-weight: 900; letter-spacing: -1px; text-transform: uppercase; margin-bottom: 2rem; }
         .form-control { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 15px; margin-bottom: 1rem; border-radius: 12px; }
         .form-control:focus { background: #222; border-color: var(--gold); box-shadow: none; color: white; }
-        .btn-gold { background: var(--gold); color: #000; font-weight: 900; width: 100%; padding: 15px; border: none; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .btn-gold { background: var(--gold); color: #000; font-weight: 900; width: 100%; padding: 15px; border: none; border-radius: 12px; text-transform: uppercase; transition: 0.3s; }
         .btn-gold:hover { background: #fff; transform: translateY(-3px); }
     </style>
 </head>
@@ -27,18 +27,13 @@
         <input type="password" id="passIn" class="form-control" placeholder="Password">
         <button onclick="checkLogin()" class="btn btn-gold">ENTRA NEL CANTIERE</button>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const _sb = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
-
         async function checkLogin() {
             const u = document.getElementById('userIn').value;
             const p = document.getElementById('passIn').value;
-            if(!u || !p) return Swal.fire({ icon: 'warning', title: 'Ehilà!', text: 'Mancano i dati', confirmButtonColor: '#ffc107' });
-
             const { data, error } = await _sb.from('utenti_app').select('*').eq('username', u).eq('password', p).maybeSingle();
-
             if (error || !data) {
                 Swal.fire({ icon: 'error', title: 'Alt!', text: 'Credenziali errate', confirmButtonColor: '#ffc107' });
             } else {
