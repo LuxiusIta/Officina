@@ -81,32 +81,40 @@
     const _supabase = supabase.createClient(SUB_URL, SUB_KEY);
 
     async function caricaMagazzini() {
-        // Prendiamo i 7 magazzini dal DB
-        const { data, error } = await _supabase.from('magazzini').select('*').order('nome');
-        
-        if (error) return;
+    // 1. Prendiamo i magazzini
+    const { data: mags, error: errM } = await _supabase.from('magazzini').select('*').order('nome');
+    // 2. Prendiamo le giacenze attuali
+    const { data: giacenze, error: errG } = await _supabase.from('giacenze').select('*, prodotti(*)');
 
-        const container = document.getElementById('magazzini-container');
-        container.innerHTML = data.map(m => `
+    if (errM) return;
+
+    const container = document.getElementById('magazzini-container');
+    
+    container.innerHTML = mags.map(m => {
+        // Filtriamo le giacenze per questo specifico magazzino
+        const giacenzeMaga = giacenze ? giacenze.filter(g => g.magazzino_id === m.id) : [];
+        
+        // Sommiamo il totale pezzi
+        const totalePezzi = giacenzeMaga.reduce((acc, curr) => acc + (curr.quantita_totale_pezzi || 0), 0);
+
+        return `
             <div class="col-md-4 col-sm-6">
-                <div class="magazzino-card">
-                    <div class="magazzino-icon"><i class="bi bi-box-seam"></i></div>
+                <div class="magazzino-card" onclick="window.location.href='dettaglio_magazzino.html?id=${m.id}'">
+                    <div class="magazzino-icon"><i class="bi bi-door-closed-fill"></i></div>
                     <h5 class="fw-bold text-white text-uppercase">${m.nome}</h5>
                     <div class="mt-3">
-                        <span class="small text-secondary">TOTALE GIACENZA:</span><br>
-                        <span class="total-badge">1.240 PEZZI</span>
+                        <span class="small text-secondary">GIACENZA TOTALE:</span><br>
+                        <span class="total-badge" style="font-size: 1.2rem;">${totalePezzi.toLocaleString()} PEZZI</span>
                     </div>
                     <hr class="border-secondary">
-                    <div class="d-flex justify-content-around small text-secondary">
-                        <span><i class="bi bi-box"></i> 12 Ct</span>
-                        <span><i class="bi bi-archive"></i> 5 Pk</span>
-                        <span><i class="bi bi-egg"></i> 10 Sf</span>
+                    <div class="text-secondary small">
+                        <i class="bi bi-info-circle me-1"></i> Clicca per gestire carichi e scarichi
                     </div>
                 </div>
             </div>
-        `).join('');
-    }
-
+        `;
+    }).join('');
+}
     function logout() {
         localStorage.removeItem('cantiere_user');
         window.location.href = "index.html";
