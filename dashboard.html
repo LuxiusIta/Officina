@@ -3,50 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cantiere | Dashboard</title>
+    <title>Cantiere | Dashboard Realtime</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         :root { --cantiere-gold: #ffc107; --cantiere-dark: #121212; --cantiere-card: #1e1e1e; }
-        body { background-color: var(--cantiere-dark); color: #e0e0e0; font-family: 'Inter', sans-serif; }
-        .navbar { background-color: #000; border-bottom: 2px solid var(--cantiere-gold); }
-        .nav-link { font-weight: 700; color: #fff !important; margin-right: 15px; }
-        .nav-link:hover { color: var(--cantiere-gold) !important; }
-        .magazzino-card { 
-            background-color: var(--cantiere-card); border: 1px solid #333; border-radius: 12px; 
-            transition: all 0.3s; cursor: pointer; padding: 25px; text-align: center; height: 100%;
+        body { 
+            background-color: var(--cantiere-dark); 
+            color: #e0e0e0; 
+            font-family: 'Inter', sans-serif; 
+            margin: 0;
         }
-        .magazzino-card:hover { border-color: var(--cantiere-gold); transform: translateY(-5px); box-shadow: 0 5px 15px rgba(255,193,7,0.2); }
-        .magazzino-icon { font-size: 3rem; color: var(--cantiere-gold); margin-bottom: 15px; }
-        .total-badge { background-color: var(--cantiere-gold); color: #000; font-weight: 800; border-radius: 6px; padding: 5px 15px; font-size: 1.3rem; }
+
+        /* Navbar Professionale */
+        .navbar { 
+            background-color: #000; 
+            border-bottom: 2px solid var(--cantiere-gold);
+            padding: 1rem;
+        }
+        .navbar-brand { font-weight: 800; letter-spacing: 2px; color: #fff !important; }
+        .nav-link { color: #fff !important; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+        .nav-link:hover { color: var(--cantiere-gold) !important; }
+
+        /* Magazzino Card Style */
+        .magazzino-card { 
+            background-color: var(--cantiere-card); 
+            border: 1px solid #333; 
+            border-radius: 12px; 
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            height: 100%;
+        }
+        .magazzino-card:hover { 
+            border-color: var(--cantiere-gold); 
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(255,193,7,0.1);
+        }
+        .magazzino-icon { font-size: 3rem; color: var(--cantiere-gold); margin-bottom: 1rem; }
+        
+        /* Badge Pezzi (Regola d'oro) */
+        .total-badge { 
+            background-color: var(--cantiere-gold); 
+            color: #000; 
+            font-weight: 800; 
+            padding: 8px 20px; 
+            border-radius: 8px; 
+            font-size: 1.4rem;
+            display: inline-block;
+        }
+
+        .status-dot {
+            height: 10px; width: 10px; background-color: #28a745; border-radius: 50%; display: inline-block; margin-right: 5px;
+        }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container-fluid">
-        <a class="navbar-brand fw-bold text-white" href="#"><i class="bi bi-cone-striped me-2"></i>CANTIERE</a>
+        <a class="navbar-brand" href="#"><i class="bi bi-cone-striped me-2"></i>CANTIERE</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" href="movimenti.html"><i class="bi bi-arrow-left-right"></i> MOVIMENTI</a></li>
-                <li class="nav-item"><a class="nav-link" href="prodotti.html"><i class="bi bi-box-seam"></i> PRODOTTI</a></li>
-                <li class="nav-item"><a class="nav-link" href="utenti.html"><i class="bi bi-people"></i> UTENTI</a></li>
+                <li class="nav-item"><a class="nav-link" href="movimenti.html"><i class="bi bi-arrow-left-right me-1"></i> Movimenti</a></li>
+                <li class="nav-item"><a class="nav-link" href="prodotti.html"><i class="bi bi-box-seam me-1"></i> Prodotti</a></li>
+                <li class="nav-item"><a class="nav-link" href="utenti.html"><i class="bi bi-people me-1"></i> Utenti</a></li>
             </ul>
             <div class="d-flex align-items-center">
-                <i class="bi bi-chat-dots-fill text-warning fs-4 me-3" style="cursor:pointer" onclick="Swal.fire('Chat','In arrivo!','info')"></i>
-                <button class="btn btn-outline-warning btn-sm" onclick="logout()">LOGOUT</button>
+                <span class="small text-secondary me-3"><span class="status-dot"></span> Realtime Live</span>
+                <button class="btn btn-outline-warning btn-sm fw-bold" onclick="logout()">LOGOUT</button>
             </div>
         </div>
     </div>
 </nav>
 
 <div class="container mt-5">
-    <div class="row mb-4"><div class="col text-center"><h1 class="fw-bold">CENTRALE OPERATIVA</h1><p class="text-secondary">Situazione magazzini in tempo reale</p></div></div>
-    <div class="row g-4" id="magazzini-container"></div>
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-5 fw-extrabold text-white">SITUAZIONE MAGAZZINI</h1>
+            <p class="text-secondary text-uppercase letter-spacing-1">Monitoraggio giacenze totali pezzi</p>
+        </div>
+    </div>
+
+    <div class="row g-4" id="magazzini-container">
+        </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -55,28 +102,66 @@
     const SUB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg";
     const _supabase = supabase.createClient(SUB_URL, SUB_KEY);
 
-    async function caricaMagazzini() {
-        const { data: mags } = await _supabase.from('magazzini').select('*').order('nome');
-        const { data: giacenze } = await _supabase.from('giacenze').select('*');
+    // Funzione Caricamento Dati
+    async function caricaDashboard() {
+        const { data: mags, error: errM } = await _supabase.from('magazzini').select('*').order('nome');
+        const { data: giacenze, error: errG } = await _supabase.from('giacenze').select('*');
+
+        if (errM || errG) return;
+
         const container = document.getElementById('magazzini-container');
-        
         container.innerHTML = mags.map(m => {
-            const totale = giacenze ? giacenze.filter(g => g.magazzino_id === m.id).reduce((a,b) => a + b.quantita_totale_pezzi, 0) : 0;
+            // Filtra giacenze per magazzino e somma i pezzi
+            const totale = giacenze
+                .filter(g => g.magazzino_id === m.id)
+                .reduce((acc, curr) => acc + (curr.quantita_totale_pezzi || 0), 0);
+
             return `
-                <div class="col-md-4">
-                    <div class="magazzino-card">
-                        <div class="magazzino-icon"><i class="bi bi-house-door"></i></div>
-                        <h4 class="fw-bold text-uppercase">${m.nome}</h4>
-                        <div class="my-3"><span class="total-badge">${totale} PEZZI</span></div>
-                        <p class="small text-secondary">Monitoraggio scorte attivo</p>
+                <div class="col-md-4 col-sm-6">
+                    <div class="magazzino-card" onclick="window.location.href='dettaglio_magazzino.html?id=${m.id}'">
+                        <div class="magazzino-icon"><i class="bi bi-archive-fill"></i></div>
+                        <h3 class="fw-bold text-white text-uppercase mb-3">${m.nome}</h3>
+                        <div class="mb-2 small text-secondary">GIACENZA TOTALE</div>
+                        <div class="total-badge">${totale.toLocaleString()} <small style="font-size:0.7rem">PZ</small></div>
+                        <hr class="border-secondary mt-4">
+                        <div class="small text-warning">VEDI DETTAGLIO <i class="bi bi-chevron-right"></i></div>
                     </div>
                 </div>
             `;
         }).join('');
     }
-    function logout() { localStorage.removeItem('cantiere_user'); window.location.href="index.html"; }
-    if(!localStorage.getItem('cantiere_user')) window.location.href="index.html";
-    else caricaMagazzini();
+
+    // --- LOGICA REALTIME ---
+    const realtimeManager = _supabase
+        .channel('dashboard-live')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'giacenze' }, (payload) => {
+            console.log('Aggiornamento Realtime ricevuto!');
+            caricaDashboard(); // Aggiorna i numeri al volo
+
+            // Notifica Swal discreta
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                background: '#1e1e1e',
+                color: '#fff'
+            });
+            Toast.fire({ icon: 'info', title: 'Giacenze aggiornate!' });
+        })
+        .subscribe();
+
+    function logout() {
+        localStorage.removeItem('cantiere_user');
+        window.location.href = "index.html";
+    }
+
+    // Controllo Accesso
+    if(!localStorage.getItem('cantiere_user')) {
+        window.location.href = "index.html";
+    } else {
+        caricaDashboard();
+    }
 </script>
 </body>
 </html>
