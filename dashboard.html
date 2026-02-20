@@ -10,68 +10,43 @@
     <style>
         :root { --cantiere-gold: #ffc107; --cantiere-dark: #121212; --cantiere-card: #1e1e1e; }
         body { background-color: var(--cantiere-dark); color: #e0e0e0; font-family: 'Inter', sans-serif; }
-        
-        /* Navbar Super Professionale */
-        .navbar { background-color: #000; border-bottom: 2px solid var(--cantiere-gold); padding: 1rem; }
-        .navbar-brand { font-weight: 800; text-transform: uppercase; color: #fff !important; letter-spacing: 2px; }
-        
-        /* Icona Chat in alto a destra */
-        .chat-icon { color: var(--cantiere-gold); font-size: 1.5rem; cursor: pointer; position: relative; }
-        .badge-notify { position: absolute; top: -5px; right: -5px; background: red; border-radius: 50%; padding: 2px 6px; font-size: 10px; color: white; }
-
-        /* Griglia Magazzini */
+        .navbar { background-color: #000; border-bottom: 2px solid var(--cantiere-gold); }
+        .nav-link { font-weight: 700; color: #fff !important; margin-right: 15px; }
+        .nav-link:hover { color: var(--cantiere-gold) !important; }
         .magazzino-card { 
-            background-color: var(--cantiere-card); border: 1px solid #333; border-radius: 10px; 
-            transition: all 0.3s; cursor: pointer; padding: 20px; text-align: center;
+            background-color: var(--cantiere-card); border: 1px solid #333; border-radius: 12px; 
+            transition: all 0.3s; cursor: pointer; padding: 25px; text-align: center; height: 100%;
         }
-        .magazzino-card:hover { border-color: var(--cantiere-gold); transform: translateY(-5px); }
-        .magazzino-icon { font-size: 2.5rem; color: var(--cantiere-gold); margin-bottom: 10px; }
-        
-        /* Regola d'oro: Totale Pezzi sempre visibile */
-        .total-badge { background-color: var(--cantiere-gold); color: #000; font-weight: 700; border-radius: 5px; padding: 2px 8px; }
+        .magazzino-card:hover { border-color: var(--cantiere-gold); transform: translateY(-5px); box-shadow: 0 5px 15px rgba(255,193,7,0.2); }
+        .magazzino-icon { font-size: 3rem; color: var(--cantiere-gold); margin-bottom: 15px; }
+        .total-badge { background-color: var(--cantiere-gold); color: #000; font-weight: 800; border-radius: 6px; padding: 5px 15px; font-size: 1.3rem; }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#"><i class="bi bi-cone-striped me-2"></i>Cantiere</a>
-        
+        <a class="navbar-brand fw-bold text-white" href="#"><i class="bi bi-cone-striped me-2"></i>CANTIERE</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
-
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="prodotti.html"><i class="bi bi-tags-fill me-1"></i> PRODOTTI</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#"><i class="bi bi-people-fill me-1"></i> UTENTI</a>
-                </li>
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="movimenti.html"><i class="bi bi-arrow-left-right"></i> MOVIMENTI</a></li>
+                <li class="nav-item"><a class="nav-link" href="prodotti.html"><i class="bi bi-box-seam"></i> PRODOTTI</a></li>
+                <li class="nav-item"><a class="nav-link" href="utenti.html"><i class="bi bi-people"></i> UTENTI</a></li>
             </ul>
-            
             <div class="d-flex align-items-center">
-                <div class="chat-icon me-3" onclick="Swal.fire({title:'Chat Interna', text:'In fase di allestimento...', icon:'info', confirmButtonColor:'#ffc107'})">
-                    <i class="bi bi-chat-dots-fill"></i>
-                    <span class="badge-notify">0</span>
-                </div>
-                <button class="btn btn-outline-warning btn-sm fw-bold" onclick="logout()">LOGOUT</button>
+                <i class="bi bi-chat-dots-fill text-warning fs-4 me-3" style="cursor:pointer" onclick="Swal.fire('Chat','In arrivo!','info')"></i>
+                <button class="btn btn-outline-warning btn-sm" onclick="logout()">LOGOUT</button>
             </div>
         </div>
     </div>
 </nav>
 
 <div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col">
-            <h2 class="fw-bold text-uppercase">I Tuoi Magazzini</h2>
-            <p class="text-secondary small">Gestione professionale scorte e giacenze</p>
-        </div>
-    </div>
-
-    <div class="row g-4" id="magazzini-container">
-        </div>
+    <div class="row mb-4"><div class="col text-center"><h1 class="fw-bold">CENTRALE OPERATIVA</h1><p class="text-secondary">Situazione magazzini in tempo reale</p></div></div>
+    <div class="row g-4" id="magazzini-container"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -81,51 +56,27 @@
     const _supabase = supabase.createClient(SUB_URL, SUB_KEY);
 
     async function caricaMagazzini() {
-    // 1. Prendiamo i magazzini
-    const { data: mags, error: errM } = await _supabase.from('magazzini').select('*').order('nome');
-    // 2. Prendiamo le giacenze attuali
-    const { data: giacenze, error: errG } = await _supabase.from('giacenze').select('*, prodotti(*)');
-
-    if (errM) return;
-
-    const container = document.getElementById('magazzini-container');
-    
-    container.innerHTML = mags.map(m => {
-        // Filtriamo le giacenze per questo specifico magazzino
-        const giacenzeMaga = giacenze ? giacenze.filter(g => g.magazzino_id === m.id) : [];
+        const { data: mags } = await _supabase.from('magazzini').select('*').order('nome');
+        const { data: giacenze } = await _supabase.from('giacenze').select('*');
+        const container = document.getElementById('magazzini-container');
         
-        // Sommiamo il totale pezzi
-        const totalePezzi = giacenzeMaga.reduce((acc, curr) => acc + (curr.quantita_totale_pezzi || 0), 0);
-
-        return `
-            <div class="col-md-4 col-sm-6">
-                <div class="magazzino-card" onclick="window.location.href='dettaglio_magazzino.html?id=${m.id}'">
-                    <div class="magazzino-icon"><i class="bi bi-door-closed-fill"></i></div>
-                    <h5 class="fw-bold text-white text-uppercase">${m.nome}</h5>
-                    <div class="mt-3">
-                        <span class="small text-secondary">GIACENZA TOTALE:</span><br>
-                        <span class="total-badge" style="font-size: 1.2rem;">${totalePezzi.toLocaleString()} PEZZI</span>
-                    </div>
-                    <hr class="border-secondary">
-                    <div class="text-secondary small">
-                        <i class="bi bi-info-circle me-1"></i> Clicca per gestire carichi e scarichi
+        container.innerHTML = mags.map(m => {
+            const totale = giacenze ? giacenze.filter(g => g.magazzino_id === m.id).reduce((a,b) => a + b.quantita_totale_pezzi, 0) : 0;
+            return `
+                <div class="col-md-4">
+                    <div class="magazzino-card">
+                        <div class="magazzino-icon"><i class="bi bi-house-door"></i></div>
+                        <h4 class="fw-bold text-uppercase">${m.nome}</h4>
+                        <div class="my-3"><span class="total-badge">${totale} PEZZI</span></div>
+                        <p class="small text-secondary">Monitoraggio scorte attivo</p>
                     </div>
                 </div>
-            </div>
-        `;
-    }).join('');
-}
-    function logout() {
-        localStorage.removeItem('cantiere_user');
-        window.location.href = "index.html";
+            `;
+        }).join('');
     }
-
-    // Controllo sicurezza: se non loggato, torna al login
-    if(!localStorage.getItem('cantiere_user')) {
-        window.location.href = "index.html";
-    } else {
-        caricaMagazzini();
-    }
+    function logout() { localStorage.removeItem('cantiere_user'); window.location.href="index.html"; }
+    if(!localStorage.getItem('cantiere_user')) window.location.href="index.html";
+    else caricaMagazzini();
 </script>
 </body>
 </html>
