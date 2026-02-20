@@ -3,117 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cantiere | Accesso</title>
+    <title>Cantiere | Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root { --gold: #ffc107; --dark: #000; }
-        body { 
-            background-color: var(--dark); 
-            height: 100vh; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            margin: 0;
-            color: white;
-            font-family: 'Inter', sans-serif;
-        }
-        .login-card { 
-            background: #121212; 
-            border: 1px solid #333; 
-            padding: 2.5rem; 
-            border-radius: 20px; 
-            width: 100%; 
-            max-width: 380px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .form-control { 
-            background: #1e1e1e; 
-            border: 1px solid #444; 
-            color: #fff; 
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-        }
-        .form-control:focus { 
-            background: #252525; 
-            color: #fff; 
-            border-color: var(--gold); 
-            box-shadow: none; 
-        }
-        .btn-gold { 
-            background: var(--gold); 
-            color: #000; 
-            font-weight: 800; 
-            width: 100%; 
-            padding: 0.75rem; 
-            border: none;
-            transition: 0.3s;
-        }
-        .btn-gold:hover { background: #e5ac00; transform: scale(1.02); }
+        body { background-color: var(--dark); color: white; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; }
+        .login-card { background: #121212; border: 1px solid #333; padding: 2.5rem; border-radius: 20px; width: 100%; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .form-control { background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 0.8rem; margin-bottom: 1.2rem; }
+        .form-control:focus { background: #222; color: #fff; border-color: var(--gold); box-shadow: none; }
+        .btn-gold { background: var(--gold); color: #000; font-weight: 800; width: 100%; padding: 0.8rem; border: none; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <div class="login-card text-center">
     <i class="bi bi-cone-striped display-4 text-warning mb-3"></i>
-    <h3 class="fw-bold mb-4">CANTIERE <span class="text-warning">LOGIN</span></h3>
+    <h3 class="fw-bold mb-4">CANTIERE <span class="text-warning">APP</span></h3>
 
-    <input type="text" id="userIn" class="form-control" placeholder="Username" required>
-    <input type="password" id="passIn" class="form-control" placeholder="Password" required>
+    <input type="text" id="userIn" class="form-control" placeholder="Username">
+    <input type="password" id="passIn" class="form-control" placeholder="Password">
     
-    <button onclick="checkLogin()" class="btn btn-gold mt-2">ACCEDI</button>
+    <button onclick="checkLogin()" class="btn btn-gold">Accedi</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    // Configurazione Supabase
     const _sb = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
 
     async function checkLogin() {
         const u = document.getElementById('userIn').value;
         const p = document.getElementById('passIn').value;
 
-        if(!u || !p) {
-            return Swal.fire('Errore', 'Inserisci username e password', 'error');
-        }
-
-        // Cerchiamo l'utente
-        const { data, error } = await _sb
-            .from('utenti_app')
-            .select('*')
-            .eq('username', u)
-            .eq('password', p)
-            .maybeSingle();
+        const { data, error } = await _sb.from('utenti_app').select('*').eq('username', u).eq('password', p).maybeSingle();
 
         if (error || !data) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Credenziali Errate',
-                text: 'Riprova o contatta l\'amministratore',
-                confirmButtonColor: '#ffc107'
-            });
+            Swal.fire({ icon: 'error', title: 'Errore', text: 'Credenziali non valide', confirmButtonColor: '#ffc107' });
         } else {
-            // Salvataggio sessione
             localStorage.setItem('cantiere_user', JSON.stringify(data));
-            
-            Swal.fire({
-                icon: 'success',
-                title: 'Accesso Autorizzato',
-                showConfirmButton: false,
-                timer: 1000
-            }).then(() => {
-                // --- ATTENZIONE QUI ---
-                // Se il tuo file con tutto il codice si chiama index.html scrivi 'index.html'
-                // Se si chiama app.html scrivi 'app.html'
-                window.location.replace('index.html'); 
+            Swal.fire({ icon: 'success', title: 'Benvenuto', showConfirmButton: false, timer: 1000 }).then(() => {
+                window.location.href = './index.html';
             });
         }
     }
-
-    // Invio con tasto Enter
-    document.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkLogin(); });
 </script>
-
 </body>
 </html>
