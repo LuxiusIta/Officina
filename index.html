@@ -310,7 +310,7 @@
 
             showLoader(true);
             try {
-                // Fetch direct from table (Assuming custom table 'utenti_app')
+                // Modifica 'utenti_app' nel nome reale della tua tabella utenti se necessario
                 const { data, error } = await _sb.from('utenti_app').select('*').eq('username', u).eq('password', p).single();
                 if(error || !data) throw new Error("Credenziali errate");
 
@@ -343,7 +343,7 @@
         async function loadDataFromSupabase() {
             showLoader(true);
             try {
-                // 1. Fetch Prodotti (Mapped to legacy properties to avoid UI rewrite)
+                // 1. Fetch Prodotti
                 const { data: prods } = await _sb.from('prodotti').select('*').order('nome_prodotto');
                 DB.products = prods.map(p => ({
                     ID_Prodotto: p.id,
@@ -358,9 +358,10 @@
                 // 2. Fetch Magazzini
                 const { data: mags } = await _sb.from('magazzini').select('*').order('nome');
                 DB.warehouses = mags.map(m => m.nome);
-                DB.whMap = {}; mags.forEach(m => DB.whMap = m.id);
+                DB.whMap = {}; 
+                mags.forEach(m => { DB.whMap = m.id; }); // Mappa: { "Frigo 1": 12, "Cucina": 15 }
 
-                // 3. Fetch Giacenze and build dictionary
+                // 3. Fetch Giacenze
                 const { data: giac } = await _sb.from('giacenze').select('*, magazzini(nome)');
                 DB.inventory = {};
                 giac.forEach(g => {
@@ -381,7 +382,7 @@
             
             // Dashboard
             document.getElementById('dash-wh-filter').innerHTML = '<option value="ALL">TOTALE OFFICINA</option>' + whOpts;
-            const cats =.sort();
+            const cats =.filter(Boolean).sort();
             document.getElementById('dash-cat-filter').innerHTML = '<option value="ALL">TUTTE LE CATEGORIE</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
 
             // Operations
@@ -431,8 +432,12 @@
 
                 let total = 0;
                 const inv = DB.inventory || {};
-                if (wh === 'ALL') { Object.values(inv).forEach(v => total += v); } 
-                else { total = inv || 0; }
+                
+                if (wh === 'ALL') { 
+                    Object.values(inv).forEach(v => total += v); 
+                } else { 
+                    total = inv || 0; 
+                }
 
                 grid.innerHTML += `
                     <div class="card-item">
@@ -555,7 +560,7 @@
                         await _updateGiacenza(pId, idTo, item.tot, true);
                         await _logMovimento(pId, idFrom, idTo, 'SPOSTAMENTO', item.tot);
                     } else if (item.type === 'RETTIFICA') {
-                        await _updateGiacenza(pId, idFrom, item.tot, false); // false = absolute value override
+                        await _updateGiacenza(pId, idFrom, item.tot, false); // false = override assoluto
                         await _logMovimento(pId, idFrom, null, 'RETTIFICA', item.tot);
                     }
                 }
@@ -572,7 +577,7 @@
         async function _updateGiacenza(pId, mId, delta, isRelative) {
             const { data: es } = await _sb.from('giacenze').select('*').eq('prodotto_id', pId).eq('magazzino_id', mId).maybeSingle();
             const oldVal = es ? es.quantita_totale_pezzi : 0;
-            const newVal = isRelative ? oldVal + delta : delta; // delta is absolute if !isRelative
+            const newVal = isRelative ? oldVal + delta : delta; // Se !isRelative significa che lo sovrascrivo (es: Rettifica)
             await _sb.from('giacenze').upsert({ id: es?.id, prodotto_id: pId, magazzino_id: mId, quantita_totale_pezzi: newVal });
         }
 
@@ -583,7 +588,9 @@
         // DAILY LIST (LISTA SERALE CUCINA)
         function renderDailyList(dept) {
             OP_ACTIVE_DEPT = dept;
-            const tabs =;
+            let tabs =.filter(Boolean);
+            if(tabs.length === 0) tabs =; // Fallback in caso i reparti siano vuoti
+
             document.getElementById('dept-tabs').innerHTML = tabs.map(d => `<div class="tab-chip ${d === dept ? 'active' : ''}" onclick="renderDailyList('${d}')">${d}</div>`).join('');
             
             const div = document.getElementById('daily-list-body'); div.innerHTML = '';
@@ -611,9 +618,11 @@
             const wh = document.getElementById('daily-wh').value;
             const whId = DB.whMap;
 
+            if(!whId) return Swal.fire('Errore', 'Seleziona un magazzino valido', 'error');
+
             showLoader(true);
             try {
-                // Genera movimenti di rettifica automatici per calcolare il delta
+                // Genera movimenti di rettifica automatici per allineare le giacenze in Supabase
                 for(let pId in DAILY_DATA) {
                     const pIdNum = parseInt(pId);
                     const contato = DAILY_DATA;
@@ -625,10 +634,10 @@
                         await _sb.from('movimenti').insert({ prodotto_id: pIdNum, magazzino_origine_id: whId, tipo_movimento: 'RETTIFICA', quantita_pezzi: contato, utente_id: USER.id, note: note });
                     }
                 }
-                DAILY_DATA = {};
-                await loadDataFromSupabase();
-                renderDailyList(OP_ACTIVE_DEPT);
-                Swal.fire('Successo', 'Allineamento completato!', 'success');
+                DAILY_DATA = {}; // Svuota il carrello serale
+                await loadDataFromSupabase(); // Aggiorna DB locale
+                renderDailyList(OP_ACTIVE_DEPT); // Ricarica UI
+                Swal.fire('Successo', 'Allineamento completato con successo!', 'success');
             } catch(e) {
                 Swal.fire('Errore', e.message, 'error');
             } finally {
@@ -646,7 +655,7 @@
                     const color = m.tipo_movimento.includes('SCARICO') ? 'text-danger' : (m.tipo_movimento === 'CARICO' ? 'text-success' : 'text-warning');
                     return `<tr>
                         <td>${new Date(m.data_movimento).toLocaleString('it-IT').slice(0,16)}</td>
-                        <td>${m.utenti_app ? m.utenti_app.username : 'Sistema'}</td>
+                        <td>${m.utenti_app ? m.utenti_app.username.toUpperCase() : 'SISTEMA'}</td>
                         <td><b>${m.prodotti ? m.prodotti.nome_prodotto : 'Sconosciuto'}</b></td>
                         <td class="${color} fw-bold">${m.tipo_movimento}</td>
                         <td class="text-white fw-bold">${m.quantita_pezzi}</td>
