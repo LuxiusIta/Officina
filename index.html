@@ -277,30 +277,46 @@
         const _sb = supabase.createClient(supabaseUrl, supabaseKey);
 
         // VARIABILI GLOBALI
-        let DB = { products: [], warehouses:[], inventory: {}, whMap: {} };
+        let DB = { products:[], warehouses:[], inventory: {}, whMap: {} };
         let USER = null;
         let OP_CART =[];
         let OP_ACTIVE_CAT = 'ALL';
         let OP_ACTIVE_DEPT = 'GRIGLIA';
-        let DAILY_DATA = {}; // Carrello lista serale
+        let DAILY_DATA = {}; 
         
         // UTILITIES
-        function showLoader(show) { document.getElementById('loader-overlay').style.display = show ? 'flex' : 'none'; }
+        function showLoader(show) { 
+            document.getElementById('loader-overlay').style.display = show ? 'flex' : 'none'; 
+        }
         
         function renderQtyBadges(qty, prod) {
             if (!qty || qty <= 0) return '<span style="color:#444; font-size:12px; font-style:italic">0 pz</span>';
-            let html = ''; let rem = qty;
-            const pCrt = prod.Pezzi_per_Cartone || 1; const pPck = prod.Pezzi_per_Pacco || 1;
-            if (pCrt > 1 && rem >= pCrt) { const c = Math.floor(rem / pCrt); rem %= pCrt; html += `<span class="unit-pill icon-box"><i class="bi bi-box-seam-fill"></i><b>${c}</b></span>`; }
-            if (pPck > 1 && rem >= pPck) { const pk = Math.floor(rem / pPck); rem %= pPck; html += `<span class="unit-pill icon-pack"><i class="bi bi-archive-fill"></i><b>${pk}</b></span>`; }
-            if (rem > 0 || html === '') { html += `<span class="unit-pill icon-piece"><i class="bi bi-gear-wide-connected"></i><b>${rem}</b></span>`; }
+            let html = ''; 
+            let rem = qty;
+            const pCrt = prod.Pezzi_per_Cartone || 1; 
+            const pPck = prod.Pezzi_per_Pacco || 1;
+            
+            if (pCrt > 1 && rem >= pCrt) { 
+                const c = Math.floor(rem / pCrt); rem %= pCrt; 
+                html += `<span class="unit-pill icon-box"><i class="bi bi-box-seam-fill"></i><b>${c}</b></span>`; 
+            }
+            if (pPck > 1 && rem >= pPck) { 
+                const pk = Math.floor(rem / pPck); rem %= pPck; 
+                html += `<span class="unit-pill icon-pack"><i class="bi bi-archive-fill"></i><b>${pk}</b></span>`; 
+            }
+            if (rem > 0 || html === '') { 
+                html += `<span class="unit-pill icon-piece"><i class="bi bi-gear-wide-connected"></i><b>${rem}</b></span>`; 
+            }
             return html;
         }
 
         // AUTHENTICATION
         window.onload = () => {
             const saved = localStorage.getItem('cantiere_user');
-            if(saved) { USER = JSON.parse(saved); initApp(); }
+            if(saved) { 
+                USER = JSON.parse(saved); 
+                initApp(); 
+            }
         };
 
         async function attemptLogin() {
@@ -310,7 +326,6 @@
 
             showLoader(true);
             try {
-                // Modifica 'utenti_app' nel nome reale della tua tabella utenti se necessario
                 const { data, error } = await _sb.from('utenti_app').select('*').eq('username', u).eq('password', p).single();
                 if(error || !data) throw new Error("Credenziali errate");
 
@@ -359,14 +374,14 @@
                 const { data: mags } = await _sb.from('magazzini').select('*').order('nome');
                 DB.warehouses = mags.map(m => m.nome);
                 DB.whMap = {}; 
-                mags.forEach(m => { DB.whMap = m.id; }); // Mappa: { "Frigo 1": 12, "Cucina": 15 }
+                mags.forEach(m => { DB.whMap = m.id; }); // Corretto: associazione Nome -> ID
 
                 // 3. Fetch Giacenze
                 const { data: giac } = await _sb.from('giacenze').select('*, magazzini(nome)');
                 DB.inventory = {};
                 giac.forEach(g => {
                     if(!DB.inventory) DB.inventory = {};
-                    if(g.magazzini) DB.inventory = g.quantita_totale_pezzi;
+                    if(g.magazzini) DB.inventory = g.quantita_totale_pezzi; // Corretto
                 });
 
                 updateSelectFilters();
@@ -382,6 +397,8 @@
             
             // Dashboard
             document.getElementById('dash-wh-filter').innerHTML = '<option value="ALL">TOTALE OFFICINA</option>' + whOpts;
+            
+            // Corretto: Estrapola categorie uniche
             const cats =.filter(Boolean).sort();
             document.getElementById('dash-cat-filter').innerHTML = '<option value="ALL">TUTTE LE CATEGORIE</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
 
@@ -491,10 +508,14 @@
             }).then(res => {
                 if(res.isConfirmed && res.value > 0 || (context==='DAILY' && res.isConfirmed)) {
                     if(context === 'OP') addToOpCart(p, res.value);
-                    if(context === 'DAILY') { DAILY_DATA = res.value; renderDailyList(OP_ACTIVE_DEPT); }
+                    if(context === 'DAILY') { 
+                        DAILY_DATA = res.value; // Corretto: Associa all'ID
+                        renderDailyList(OP_ACTIVE_DEPT); 
+                    }
                 }
             });
         }
+        
         function uPT() {
             const p = window.tempP;
             const c = parseInt(document.getElementById('s-c').value||0) * p.Pezzi_per_Cartone;
@@ -507,7 +528,7 @@
             const t = document.getElementById('op-type-select').value;
             const f = document.getElementById('op-from-wh').value;
             const to = document.getElementById('op-to-wh').value;
-            OP_CART.push({ p, tot: totPz, type: t, from: f, to: to });
+            OP_CART.push({ p: p, tot: totPz, type: t, from: f, to: to });
             renderOpCart();
         }
 
@@ -546,8 +567,8 @@
             try {
                 for(let item of OP_CART) {
                     const pId = item.p.ID_Prodotto;
-                    const idFrom = DB.whMap;
-                    const idTo = DB.whMap;
+                    const idFrom = DB.whMap; // Corretto: recupera l'ID del magazzino Origine
+                    const idTo = DB.whMap;     // Corretto: recupera l'ID del magazzino Destinazione
                     
                     if(item.type === 'CARICO') {
                         await _updateGiacenza(pId, idTo, item.tot, true);
@@ -566,7 +587,7 @@
                 }
                 Swal.fire('Successo', 'Operazioni Registrate', 'success');
                 OP_CART =[]; renderOpCart();
-                await loadDataFromSupabase(); // refresh DB
+                await loadDataFromSupabase(); // refresh DB locale
             } catch(e) {
                 Swal.fire('Errore', e.message, 'error');
             } finally {
@@ -581,15 +602,16 @@
             await _sb.from('giacenze').upsert({ id: es?.id, prodotto_id: pId, magazzino_id: mId, quantita_totale_pezzi: newVal });
         }
 
-        async function _logMovimento(pId, mFrom, mTo, tipo, qta) {
-            await _sb.from('movimenti').insert({ prodotto_id: pId, magazzino_origine_id: mFrom, magazzino_destinazione_id: mTo, tipo_movimento: tipo, quantita_pezzi: qta, utente_id: USER.id });
+        async function _logMovimento(pId, mFrom, mTo, tipo, qta, note = null) {
+            await _sb.from('movimenti').insert({ prodotto_id: pId, magazzino_origine_id: mFrom, magazzino_destinazione_id: mTo, tipo_movimento: tipo, quantita_pezzi: qta, utente_id: USER.id, note: note });
         }
 
         // DAILY LIST (LISTA SERALE CUCINA)
         function renderDailyList(dept) {
             OP_ACTIVE_DEPT = dept;
+            // Corretto: Recupera i reparti unici esistenti
             let tabs =.filter(Boolean);
-            if(tabs.length === 0) tabs =; // Fallback in caso i reparti siano vuoti
+            if(tabs.length === 0) tabs =; 
 
             document.getElementById('dept-tabs').innerHTML = tabs.map(d => `<div class="tab-chip ${d === dept ? 'active' : ''}" onclick="renderDailyList('${d}')">${d}</div>`).join('');
             
@@ -598,8 +620,8 @@
 
             const prods = DB.products.filter(p => p.Reparto === dept);
             prods.forEach(p => {
-                const entered = DAILY_DATA;
-                const invTeorico = DB.inventory ? (DB.inventory || 0) : 0;
+                const entered = DAILY_DATA; // Corretto: Associa il valore contabile salvato all'ID
+                const invTeorico = DB.inventory ? (DB.inventory || 0) : 0; // Corretto: Recupera giacenza vera
                 
                 let valHtml = entered !== undefined ? 
                     `<b style="color:var(--accent); font-size:18px">${entered} pz</b>` : 
@@ -615,8 +637,9 @@
 
         async function submitDaily() {
             if(Object.keys(DAILY_DATA).length === 0) return Swal.fire('Attenzione', 'Nessun conteggio inserito', 'info');
+            
             const wh = document.getElementById('daily-wh').value;
-            const whId = DB.whMap;
+            const whId = DB.whMap; // Corretto: recupera ID effettivo
 
             if(!whId) return Swal.fire('Errore', 'Seleziona un magazzino valido', 'error');
 
@@ -631,7 +654,7 @@
                     if(contato !== teorico) {
                         await _updateGiacenza(pIdNum, whId, contato, false); // Override assoluto
                         const note = `Rettifica Serale ${wh}. Teorico: ${teorico}, Contato: ${contato}`;
-                        await _sb.from('movimenti').insert({ prodotto_id: pIdNum, magazzino_origine_id: whId, tipo_movimento: 'RETTIFICA', quantita_pezzi: contato, utente_id: USER.id, note: note });
+                        await _logMovimento(pIdNum, whId, null, 'RETTIFICA', contato, note);
                     }
                 }
                 DAILY_DATA = {}; // Svuota il carrello serale
