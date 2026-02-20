@@ -29,6 +29,13 @@
 </head>
 <body>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // CONTROLLO ACCESSO IMMEDIATO
+    const u = JSON.parse(localStorage.getItem('cantiere_user'));
+    if(!u) { window.location.replace('./index.html'); }
+</script>
+
 <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container-fluid">
         <span class="navbar-brand fw-bold text-white"><i class="bi bi-cone-striped text-warning"></i> CANTIERE</span>
@@ -53,7 +60,6 @@
         <h3 class="fw-bold mb-4">I MIEI MAGAZZINI</h3>
         <div class="row g-4" id="m-list"></div>
     </div>
-
     <div id="v-det" class="view">
         <div class="d-flex justify-content-between mb-4 align-items-center">
             <h3 id="det-n" class="fw-bold text-warning"></h3>
@@ -66,7 +72,6 @@
             </table>
         </div>
     </div>
-
     <div id="v-mov" class="view">
         <div class="row justify-content-center">
             <div class="col-md-5 c-card">
@@ -85,12 +90,10 @@
             </div>
         </div>
     </div>
-
     <div id="v-sto" class="view">
         <h3 class="fw-bold text-warning mb-4">REGISTRO ATTIVITÀ</h3>
         <div class="table-responsive"><table class="table table-dark table-sm"><tbody id="sto-b"></tbody></table></div>
     </div>
-
     <div id="v-user" class="view">
         <h3 class="fw-bold text-warning mb-4">GESTIONE PERSONALE</h3>
         <div class="row g-3" id="usr-l"></div>
@@ -107,15 +110,15 @@
     <div class="p-2"><div class="input-group input-group-sm"><input type="text" id="c-i" class="form-control bg-dark text-white border-secondary" placeholder="Scrivi..."><button class="btn btn-warning" onclick="sm()"><i class="bi bi-send"></i></button></div></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     const _sb = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
-    const u = JSON.parse(localStorage.getItem('cantiere_user'));
-    if(!u) window.location.href='./login.html';
-
-    document.getElementById('u-n').innerText = u.username;
-    document.getElementById('u-r').innerText = u.ruolo;
-    if(u.ruolo === 'admin') document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'block');
+    
+    // Mostra dati utente
+    if(u) {
+        document.getElementById('u-n').innerText = u.username;
+        document.getElementById('u-r').innerText = u.ruolo;
+        if(u.ruolo === 'admin') document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'block');
+    }
 
     function sw(id) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -169,7 +172,7 @@
 
     async function lU() {
         const { data } = await _sb.from('utenti_app').select('*');
-        document.getElementById('usr-l').innerHTML = data.map(x => `<div class="col-md-4"><div class="c-card"><h6 class="fw-bold text-warning">${x.username.toUpperCase()}</h6><small class="d-block mb-2">Ruolo: ${x.ruolo}</small><button class="btn btn-outline-danger btn-sm w-100" onclick="rP('${x.id}')">Reset Pass</button></div></div>`).join('');
+        document.getElementById('usr-l').innerHTML = data.map(x => `<div class="col-md-4"><div class="c-card"><h6 class="fw-bold text-warning">${x.username.toUpperCase()}</h6><small class="d-block mb-2">Ruolo: ${x.ruolo}</small></div></div>`).join('');
     }
 
     function tc() { const w = document.getElementById('chat-w'); w.style.display = (w.style.display==='flex'?'none':'flex'); if(w.style.display==='flex') lMs(); }
@@ -181,7 +184,7 @@
     async function sm() { const i = document.getElementById('c-i'); if(!i.value) return; await _sb.from('chat_interna').insert([{ utente_id: u.id, messaggio: i.value }]); i.value = ''; }
     _sb.channel('ch').on('postgres_changes', {event:'INSERT', schema:'public', table:'chat_interna'}, () => lMs()).subscribe();
 
-    function logout() { localStorage.clear(); window.location.href='./login.html'; }
+    function logout() { localStorage.clear(); window.location.replace('./index.html'); }
     lM();
 </script>
 </body>
