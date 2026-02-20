@@ -3,142 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cantiere | Gestionale</title>
+    <title>Cantiere | App</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root { --gold: #ffc107; --dark: #000; --card: #121212; }
-        body { background-color: var(--dark); color: #fff; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--dark); color: #fff; font-family: 'Inter', sans-serif; margin: 0; }
         .navbar { background: #000; border-bottom: 2px solid var(--gold); }
-        .nav-link { color: #fff !important; cursor: pointer; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; }
-        .view { display: none; padding: 20px 0; }
-        .view.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .c-card { background: var(--card); border: 1px solid #333; border-radius: 15px; padding: 20px; transition: 0.3s; }
-        .maga-card:hover { border-color: var(--gold); transform: translateY(-5px); cursor: pointer; }
-        .badge-tot { background: var(--gold); color: #000; font-weight: 800; padding: 4px 8px; border-radius: 4px; }
-        #chat-w { position: fixed; bottom: 85px; right: 20px; width: 320px; height: 400px; background: #121212; border: 2px solid var(--gold); border-radius: 15px; display: none; flex-direction: column; z-index: 2000; }
+        .nav-link { color: #fff !important; cursor: pointer; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
+        .view { display: none; padding: 20px 10px; }
+        .view.active { display: block; }
+        .c-card { background: var(--card); border: 1px solid #333; border-radius: 15px; padding: 20px; margin-bottom: 15px; }
+        .badge-tot { background: var(--gold); color: #000; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; }
+        /* Chat Mobile */
+        #chat-w { position: fixed; bottom: 80px; right: 10px; width: 90%; max-width: 320px; height: 400px; background: #121212; border: 2px solid var(--gold); border-radius: 15px; display: none; flex-direction: column; z-index: 2000; }
         #chat-b { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
         .msg { padding: 8px; border-radius: 8px; font-size: 0.8rem; max-width: 85%; }
         .msg-me { background: var(--gold); color: #000; align-self: flex-end; }
         .msg-them { background: #333; align-self: flex-start; }
-        #chat-t { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; z-index: 2001; color: #000; }
+        #chat-t { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; z-index: 2001; color: #000; box-shadow: 0 4px 15px rgba(255,193,7,0.3); }
         .admin-only { display: none; }
     </style>
 </head>
 <body>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    // CONTROLLO ACCESSO IMMEDIATO
-    const u = JSON.parse(localStorage.getItem('cantiere_user'));
-    if(!u) { window.location.replace('./index.html'); }
+    // SICUREZZA: Eseguito prima del caricamento della pagina
+    const userSession = JSON.parse(localStorage.getItem('cantiere_user'));
+    if(!userSession) { window.location.replace('./index.html'); }
 </script>
 
-<nav class="navbar navbar-expand-lg sticky-top">
+<nav class="navbar navbar-expand-lg sticky-top navbar-dark">
     <div class="container-fluid">
-        <span class="navbar-brand fw-bold text-white"><i class="bi bi-cone-striped text-warning"></i> CANTIERE</span>
-        <div class="collapse navbar-collapse">
+        <span class="navbar-brand fw-bold text-warning"><i class="bi bi-cone-striped"></i> CANTIERE</span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#m-nav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="m-nav">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" onclick="sw('v-dash')">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="sw('v-dash')">Maga</a></li>
                 <li class="nav-item"><a class="nav-link" onclick="sw('v-mov')">Movimenti</a></li>
                 <li class="nav-item"><a class="nav-link" onclick="sw('v-sto')">Storico</a></li>
-                <li class="nav-item admin-only"><a class="nav-link text-warning" onclick="sw('v-user')">Utenti</a></li>
+                <li class="nav-item admin-only"><a class="nav-link text-warning" onclick="sw('v-usr')">Utenti</a></li>
             </ul>
-            <div class="text-white text-end me-3">
-                <small id="u-r" class="d-block text-secondary text-uppercase" style="font-size:0.5rem"></small>
-                <span id="u-n" class="fw-bold text-warning text-uppercase"></span>
+            <div class="d-flex align-items-center justify-content-between p-2">
+                <span id="u-display" class="text-warning fw-bold small me-3"></span>
+                <button class="btn btn-outline-danger btn-sm" onclick="logout()">LOGOUT</button>
             </div>
-            <button class="btn btn-outline-danger btn-sm fw-bold" onclick="logout()">LOGOUT</button>
         </div>
     </div>
 </nav>
 
-<div class="container mt-4">
-    <div id="v-dash" class="view active">
-        <h3 class="fw-bold mb-4">I MIEI MAGAZZINI</h3>
-        <div class="row g-4" id="m-list"></div>
-    </div>
+<div class="container">
+    <div id="v-dash" class="view active"><h4 class="fw-bold my-3">MAGAZZINI</h4><div class="row g-3" id="m-list"></div></div>
+    
     <div id="v-det" class="view">
-        <div class="d-flex justify-content-between mb-4 align-items-center">
-            <h3 id="det-n" class="fw-bold text-warning"></h3>
-            <button class="btn btn-outline-light btn-sm" onclick="sw('v-dash')">CHIUDI</button>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-dark align-middle">
-                <thead><tr class="text-secondary small"><th>PRODOTTO</th><th class="text-center">CARTONI</th><th class="text-center">PACCHI</th><th class="text-center">PEZZI</th><th class="text-end">TOTALE</th></tr></thead>
-                <tbody id="det-b"></tbody>
-            </table>
-        </div>
+        <div class="d-flex justify-content-between mb-3"><h4 id="det-n" class="text-warning fw-bold"></h4><button class="btn btn-sm btn-outline-light" onclick="sw('v-dash')">X</button></div>
+        <div class="table-responsive"><table class="table table-dark table-sm"><tbody id="det-b"></tbody></table></div>
     </div>
+
     <div id="v-mov" class="view">
-        <div class="row justify-content-center">
-            <div class="col-md-5 c-card">
-                <h4 class="text-center fw-bold text-warning mb-4">REGISTRA MOVIMENTO</h4>
-                <label class="small text-secondary">Prodotto</label><select id="mv-p" class="form-select bg-dark text-white mb-3 border-secondary"></select>
-                <label class="small text-secondary">Magazzino</label><select id="mv-m" class="form-select bg-dark text-white mb-4 border-secondary"></select>
-                <div class="row g-2 mb-4 text-center">
-                    <div class="col-4"><label class="small">CARTONI</label><input type="number" id="q-ct" class="form-control bg-dark text-white text-center" value="0"></div>
-                    <div class="col-4"><label class="small">PACCHI</label><input type="number" id="q-pk" class="form-control bg-dark text-white text-center" value="0"></div>
-                    <div class="col-4"><label class="small">PEZZI</label><input type="number" id="q-pz" class="form-control bg-dark text-white text-center" value="0"></div>
-                </div>
-                <div class="row g-2">
-                    <div class="col-6"><button onclick="doM('CARICO')" class="btn btn-success w-100 py-3 fw-bold">CARICA</button></div>
-                    <div class="col-6"><button onclick="doM('SCARICO')" class="btn btn-danger w-100 py-3 fw-bold">SCARICA</button></div>
-                </div>
+        <div class="c-card">
+            <h5 class="text-warning fw-bold mb-3">NUOVO MOVIMENTO</h5>
+            <select id="mv-p" class="form-select bg-dark text-white mb-2 border-secondary"></select>
+            <select id="mv-m" class="form-select bg-dark text-white mb-3 border-secondary"></select>
+            <div class="row g-2 mb-3 text-center">
+                <div class="col-4"><label class="small text-secondary"><i class="bi bi-carton"></i> CT</label><input type="number" id="q-ct" class="form-control bg-dark text-white text-center" value="0"></div>
+                <div class="col-4"><label class="small text-secondary"><i class="bi bi-box"></i> PK</label><input type="number" id="q-pk" class="form-control bg-dark text-white text-center" value="0"></div>
+                <div class="col-4"><label class="small text-secondary"><i class="bi bi-hammer"></i> PZ</label><input type="number" id="q-pz" class="form-control bg-dark text-white text-center" value="0"></div>
+            </div>
+            <div class="row g-2">
+                <div class="col-6"><button onclick="doM('CARICO')" class="btn btn-success w-100 fw-bold">CARICA</button></div>
+                <div class="col-6"><button onclick="doM('SCARICO')" class="btn btn-danger w-100 fw-bold">SCARICA</button></div>
             </div>
         </div>
     </div>
-    <div id="v-sto" class="view">
-        <h3 class="fw-bold text-warning mb-4">REGISTRO ATTIVITÀ</h3>
-        <div class="table-responsive"><table class="table table-dark table-sm"><tbody id="sto-b"></tbody></table></div>
-    </div>
-    <div id="v-user" class="view">
-        <h3 class="fw-bold text-warning mb-4">GESTIONE PERSONALE</h3>
-        <div class="row g-3" id="usr-l"></div>
-    </div>
+
+    <div id="v-sto" class="view"><h4 class="fw-bold text-warning mb-3">STORICO</h4><div id="sto-b"></div></div>
+    <div id="v-usr" class="view admin-only"><h4 class="fw-bold mb-3 text-warning">UTENTI</h4><div id="usr-l"></div></div>
 </div>
 
-<div id="chat-t" onclick="tc()"><i class="bi bi-chat-fill"></i></div>
+<div id="chat-t" onclick="tc()"><i class="bi bi-chat-dots-fill"></i></div>
 <div id="chat-w">
-    <div class="p-2 border-bottom border-warning d-flex justify-content-between">
-        <span class="text-warning fw-bold small">CHAT</span>
-        <button class="btn-close btn-close-white" onclick="tc()"></button>
-    </div>
+    <div class="p-2 border-bottom border-warning d-flex justify-content-between"><b>CHAT</b><button class="btn-close btn-close-white" onclick="tc()"></button></div>
     <div id="chat-b"></div>
-    <div class="p-2"><div class="input-group input-group-sm"><input type="text" id="c-i" class="form-control bg-dark text-white border-secondary" placeholder="Scrivi..."><button class="btn btn-warning" onclick="sm()"><i class="bi bi-send"></i></button></div></div>
+    <div class="p-2 bg-black"><div class="input-group"><input type="text" id="c-i" class="form-control bg-dark text-white border-secondary" placeholder="Messaggio..."><button class="btn btn-warning" onclick="sm()"><i class="bi bi-send"></i></button></div></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const _sb = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
-    
-    // Mostra dati utente
-    if(u) {
-        document.getElementById('u-n').innerText = u.username;
-        document.getElementById('u-r').innerText = u.ruolo;
-        if(u.ruolo === 'admin') document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'block');
-    }
+    const u = userSession;
+    document.getElementById('u-display').innerText = u.username.toUpperCase();
+    if(u.ruolo==='admin') document.querySelectorAll('.admin-only').forEach(e=>e.style.display='block');
 
     function sw(id) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        if(id==='v-dash') lM(); if(id==='v-mov') lMD(); if(id==='v-sto') lS(); if(id==='v-user') lU();
+        if(id==='v-dash') lM(); if(id==='v-mov') lMD(); if(id==='v-sto') lS(); if(id==='v-usr') lU();
+        const nav = document.getElementById('m-nav'); if(nav.classList.contains('show')) new bootstrap.Collapse(nav).toggle();
     }
 
     async function lM() {
         const { data } = await _sb.from('magazzini').select('*').order('nome');
-        document.getElementById('m-list').innerHTML = data.map(m => `<div class="col-md-4"><div class="c-card maga-card text-center" onclick="oM('${m.id}','${m.nome}')"><i class="bi bi-house-door text-warning display-6"></i><h5 class="mt-2 fw-bold text-uppercase">${m.nome}</h5></div></div>`).join('');
+        document.getElementById('m-list').innerHTML = data.map(m => `<div class="col-6 col-md-4"><div class="c-card text-center py-4" onclick="oM('${m.id}','${m.nome}')"><i class="bi bi-house-door text-warning fs-1"></i><div class="small fw-bold mt-2">${m.nome.toUpperCase()}</div></div></div>`).join('');
     }
 
     async function oM(id, n) {
-        document.getElementById('det-n').innerText = n.toUpperCase();
+        document.getElementById('det-n').innerText = n;
         const { data } = await _sb.from('giacenze').select('*, prodotti(*)').eq('magazzino_id', id);
         document.getElementById('det-b').innerHTML = data.map(g => {
             const p = g.prodotti; const ct = Math.floor(g.quantita_totale_pezzi/p.pezzi_per_cartone);
             const pk = Math.floor((g.quantita_totale_pezzi%p.pezzi_per_cartone)/p.pezzi_per_pacco);
             const pz = (g.quantita_totale_pezzi%p.pezzi_per_cartone)%p.pezzi_per_pacco;
-            return `<tr><td class="fw-bold">${p.nome_prodotto}</td><td class="text-center">${ct}</td><td class="text-center">${pk}</td><td class="text-center text-secondary">${pz}</td><td class="text-end"><span class="badge-tot">${g.quantita_totale_pezzi} PZ</span></td></tr>`;
+            return `<tr><td><b>${p.nome_prodotto}</b><br><small class="text-secondary">CT: ${ct} | PK: ${pk} | PZ: ${pz}</small></td><td class="text-end align-middle"><span class="badge-tot">${g.quantita_totale_pezzi}</span></td></tr>`;
         }).join('');
         sw('v-det');
     }
@@ -155,30 +135,30 @@
         const pId = document.getElementById('mv-p').value; const mId = document.getElementById('mv-m').value;
         const pr = pC.find(x => x.id === pId);
         const tot = (parseInt(document.getElementById('q-ct').value)*pr.pezzi_per_cartone) + (parseInt(document.getElementById('q-pk').value)*pr.pezzi_per_pacco) + parseInt(document.getElementById('q-pz').value);
-        if(tot <= 0) return;
+        if(tot <= 0) return Swal.fire('Errore', 'Inserisci quantità', 'error');
         const { data: es } = await _sb.from('giacenze').select('*').eq('prodotto_id', pId).eq('magazzino_id', mId).maybeSingle();
         const nQ = es ? (t==='CARICO'?es.quantita_totale_pezzi+tot:es.quantita_totale_pezzi-tot) : (t==='CARICO'?tot:-tot);
         if(es) await _sb.from('giacenze').update({ quantita_totale_pezzi: nQ }).eq('id', es.id);
         else await _sb.from('giacenze').insert([{ prodotto_id: pId, magazzino_id: mId, quantita_totale_pezzi: nQ }]);
         await _sb.from('movimenti').insert([{ prodotto_id: pId, magazzino_id: mId, tipo_movimento: t, quantita_pezzi: tot, utente_id: u.id }]);
-        Swal.fire({ icon:'success', title:'Registrato', toast:true, position:'top-end', timer:1500, showConfirmButton:false });
+        Swal.fire({ icon:'success', title: t + ' OK', toast:true, position:'top-end', timer:1500, showConfirmButton:false });
         sw('v-dash');
     }
 
     async function lS() {
-        const { data } = await _sb.from('movimenti').select('*, prodotti(nome_prodotto), utenti_app(username)').order('data_movimento', {ascending:false}).limit(30);
-        document.getElementById('sto-b').innerHTML = data.map(m => `<tr><td class="small text-secondary">${new Date(m.data_movimento).toLocaleTimeString()}</td><td><span class="badge ${m.tipo_movimento==='CARICO'?'bg-success':'bg-danger'}">${m.tipo_movimento}</span></td><td class="fw-bold">${m.prodotti?.nome_prodotto}</td><td class="text-end text-warning">${m.quantita_pezzi} PZ</td></tr>`).join('');
+        const { data } = await _sb.from('movimenti').select('*, prodotti(nome_prodotto)').order('data_movimento', {ascending:false}).limit(20);
+        document.getElementById('sto-b').innerHTML = data.map(m => `<div class="c-card py-2"><div class="d-flex justify-content-between small"><span>${m.prodotti?.nome_prodotto}</span><b class="${m.tipo_movimento==='CARICO'?'text-success':'text-danger'}">${m.tipo_movimento}</b></div><div class="fw-bold">${m.quantita_pezzi} PZ</div></div>`).join('');
     }
 
     async function lU() {
         const { data } = await _sb.from('utenti_app').select('*');
-        document.getElementById('usr-l').innerHTML = data.map(x => `<div class="col-md-4"><div class="c-card"><h6 class="fw-bold text-warning">${x.username.toUpperCase()}</h6><small class="d-block mb-2">Ruolo: ${x.ruolo}</small></div></div>`).join('');
+        document.getElementById('usr-l').innerHTML = data.map(x => `<div class="c-card py-2"><b>${x.username}</b> (${x.ruolo})</div>`).join('');
     }
 
     function tc() { const w = document.getElementById('chat-w'); w.style.display = (w.style.display==='flex'?'none':'flex'); if(w.style.display==='flex') lMs(); }
     async function lMs() {
         const { data } = await _sb.from('chat_interna').select('*, utenti_app(username)').order('creato_at', {ascending:true}).limit(20);
-        document.getElementById('chat-b').innerHTML = data.map(m => `<div class="msg ${m.utente_id===u.id?'msg-me':'msg-them'}"><small class="d-block" style="font-size:0.5rem"><b>${m.utenti_app?.username}</b></small>${m.messaggio}</div>`).join('');
+        document.getElementById('chat-b').innerHTML = data.map(m => `<div class="msg ${m.utente_id===u.id?'msg-me':'msg-them'}"><small class="d-block" style="font-size:0.55rem"><b>${m.utenti_app?.username}</b></small>${m.messaggio}</div>`).join('');
         document.getElementById('chat-b').scrollTop = document.getElementById('chat-b').scrollHeight;
     }
     async function sm() { const i = document.getElementById('c-i'); if(!i.value) return; await _sb.from('chat_interna').insert([{ utente_id: u.id, messaggio: i.value }]); i.value = ''; }
