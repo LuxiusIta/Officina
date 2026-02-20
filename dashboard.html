@@ -3,34 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cantiere | Dashboard</title>
+    <title>Cantiere | Dashboard & Chat</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root { --cantiere-gold: #ffc107; --cantiere-dark: #121212; --cantiere-card: #1e1e1e; }
-        body { background-color: var(--cantiere-dark); color: #fff; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--cantiere-dark); color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
-        /* Navbar Cantiere Style */
         .navbar { background: #000; border-bottom: 2px solid var(--cantiere-gold); padding: 1rem; }
-        .nav-link { color: #fff !important; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; margin-right: 12px; }
-        .nav-link:hover { color: var(--cantiere-gold) !important; }
-        
-        /* User Profile in Navbar */
-        .user-section { border-left: 1px solid #333; padding-left: 15px; margin-left: 10px; }
-        #nomeUtente { color: var(--cantiere-gold); font-weight: 800; text-transform: uppercase; }
+        .nav-link { color: #fff !important; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; }
+        #nomeUtente { color: var(--cantiere-gold); font-weight: 800; }
 
         /* Magazzini Cards */
         .maga-card { 
             background: var(--cantiere-card); border: 1px solid #333; border-radius: 15px; 
-            padding: 2.5rem; text-align: center; cursor: pointer; transition: 0.3s; 
+            padding: 2rem; text-align: center; cursor: pointer; transition: 0.3s; 
         }
-        .maga-card:hover { border-color: var(--cantiere-gold); transform: translateY(-5px); background: #252525; }
-        .maga-icon { font-size: 3.5rem; color: var(--cantiere-gold); margin-bottom: 1rem; }
-        
-        /* Notifica Chat */
-        .chat-link { position: relative; color: var(--cantiere-gold) !important; }
-        .chat-badge { position: absolute; top: -5px; right: -8px; font-size: 0.6rem; }
+        .maga-card:hover { border-color: var(--cantiere-gold); transform: translateY(-5px); }
+        .maga-icon { font-size: 3rem; color: var(--cantiere-gold); }
+
+        /* --- WIDGET CHAT PERSISTENTE --- */
+        #chat-widget {
+            position: fixed; bottom: 20px; right: 20px; width: 350px; height: 450px;
+            background: #1e1e1e; border: 2px solid var(--cantiere-gold);
+            border-radius: 15px; display: none; flex-direction: column;
+            z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        #chat-header {
+            background: #000; padding: 12px; border-bottom: 1px solid var(--cantiere-gold);
+            display: flex; justify-content: space-between; align-items: center; border-radius: 13px 13px 0 0;
+        }
+        #chat-body { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 8px 12px; border-radius: 10px; font-size: 0.9rem; max-width: 85%; }
+        .msg-me { background: var(--cantiere-gold); color: #000; align-self: flex-end; }
+        .msg-them { background: #333; color: #fff; align-self: flex-start; }
+        .msg-info { font-size: 0.65rem; display: block; margin-bottom: 2px; opacity: 0.8; }
+        #chat-footer { padding: 10px; background: #121212; border-radius: 0 0 13px 13px; }
+
+        /* Bottone Fluttuante */
+        #chat-toggle {
+            position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
+            background: var(--cantiere-gold); color: #000; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; cursor: pointer; z-index: 999; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
@@ -38,30 +55,14 @@
 <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container-fluid">
         <a class="navbar-brand fw-bold text-white" href="#"><i class="bi bi-cone-striped me-2 text-warning"></i>CANTIERE</a>
-        
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
-        </button>
-
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" href="movimenti.html"><i class="bi bi-arrow-left-right"></i> Movimenti</a></li>
-                <li class="nav-item"><a class="nav-link" href="prodotti.html"><i class="bi bi-box-seam"></i> Prodotti</a></li>
-                <li class="nav-item"><a class="nav-link" href="storico.html"><i class="bi bi-clock-history"></i> Storico</a></li>
-                <li class="nav-item"><a class="nav-link" href="utenti.html"><i class="bi bi-people"></i> Utenti</a></li>
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="movimenti.html">Movimenti</a></li>
+                <li class="nav-item"><a class="nav-link" href="prodotti.html">Prodotti</a></li>
+                <li class="nav-item"><a class="nav-link" href="storico.html">Storico</a></li>
             </ul>
-            
-            <div class="d-flex align-items-center">
-                <a href="chat.html" class="nav-link chat-link me-3">
-                    <i class="bi bi-chat-dots-fill fs-5"></i>
-                    <span class="badge rounded-pill bg-danger chat-badge">LIVE</span>
-                </a>
-
-                <div class="user-section d-none d-md-block me-3">
-                    <span class="text-secondary small">OPERATORE:</span><br>
-                    <span id="nomeUtente">CARICAMENTO...</span>
-                </div>
-
+            <div class="d-flex align-items-center text-white">
+                <div class="me-3 text-end"><span class="small text-secondary text-uppercase">Operatore</span><br><span id="nomeUtente">...</span></div>
                 <button class="btn btn-outline-danger btn-sm fw-bold" onclick="logout()">LOGOUT</button>
             </div>
         </div>
@@ -69,68 +70,80 @@
 </nav>
 
 <div class="container mt-5">
-    <div class="text-center mb-5">
-        <h1 class="fw-bold text-uppercase">Centrale Operativa</h1>
-        <p class="text-secondary">Seleziona un magazzino per gestire le scorte</p>
-    </div>
+    <h2 class="fw-bold text-uppercase mb-4">Centrale Operativa</h2>
+    <div class="row g-4" id="maga-list"></div>
+</div>
 
-    <div class="row g-4" id="maga-list">
+<div id="chat-toggle" onclick="toggleChat()"><i class="bi bi-chat-dots-fill"></i></div>
+
+<div id="chat-widget">
+    <div id="chat-header">
+        <span class="fw-bold text-warning"><i class="bi bi-chat-fill me-2"></i>CHAT LIVE</span>
+        <button class="btn-close btn-close-white" onclick="toggleChat()"></button>
+    </div>
+    <div id="chat-body"></div>
+    <div id="chat-footer">
+        <div class="input-group">
+            <input type="text" id="chatInput" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Scrivi..." onkeypress="if(event.key==='Enter') inviaMessaggio()">
+            <button class="btn btn-warning btn-sm" onclick="inviaMessaggio()"><i class="bi bi-send"></i></button>
         </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    // --- IL BUTTAFUORI (Sicurezza) ---
-    const sessione = localStorage.getItem('cantiere_user');
-    if (!sessione) { 
-        window.location.href = "index.html"; 
-    } else {
-        const user = JSON.parse(sessione);
-        document.getElementById('nomeUtente').innerText = user.username;
-    }
+    const user = JSON.parse(localStorage.getItem('cantiere_user'));
+    if (!user) location.href = "index.html";
+    document.getElementById('nomeUtente').innerText = user.username;
 
     const _supabase = supabase.createClient("https://jkekmxhrwwidkfoizhde.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg");
 
+    // CARICA MAGAZZINI
     async function caricaMagazzini() {
-        const { data: mags, error } = await _supabase.from('magazzini').select('*').order('nome');
-        if (error) return console.error(error);
-
-        const container = document.getElementById('maga-list');
-        container.innerHTML = mags.map(m => `
+        const { data: mags } = await _supabase.from('magazzini').select('*').order('nome');
+        document.getElementById('maga-list').innerHTML = mags.map(m => `
             <div class="col-md-4">
                 <div class="maga-card" onclick="location.href='dettaglio_magazzino.html?id=${m.id}&nome=${encodeURIComponent(m.nome)}'">
-                    <div class="maga-icon"><i class="bi bi-house-door-fill"></i></div>
-                    <h4 class="fw-bold text-uppercase">${m.nome}</h4>
-                    <hr class="border-secondary my-3">
-                    <span class="text-warning small fw-bold">GESTISCI SCORTE <i class="bi bi-chevron-right"></i></span>
+                    <div class="maga-icon"><i class="bi bi-archive-fill"></i></div>
+                    <h5 class="fw-bold mt-2">${m.nome.toUpperCase()}</h5>
+                    <span class="text-secondary small">Visualizza Giacenze</span>
                 </div>
             </div>
         `).join('');
     }
 
-    function logout() {
-        Swal.fire({
-            title: 'Vuoi uscire?',
-            text: "Dovrai rieffettuare il login per accedere.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ffc107',
-            cancelButtonColor: '#333',
-            confirmButtonText: 'Sì, Logout',
-            cancelButtonText: 'Annulla'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                localStorage.clear();
-                window.location.href = "index.html";
-            }
-        });
+    // LOGICA CHAT WIDGET
+    function toggleChat() {
+        const widget = document.getElementById('chat-widget');
+        widget.style.display = (widget.style.display === 'flex') ? 'none' : 'flex';
+        if(widget.style.display === 'flex') caricaMessaggi();
     }
 
-    // Caricamento iniziale
-    caricaMagazzini();
+    async function caricaMessaggi() {
+        const { data } = await _supabase.from('chat_interna').select('*, utenti_app(username)').order('creato_at', { ascending: true }).limit(30);
+        const body = document.getElementById('chat-body');
+        body.innerHTML = data.map(m => `
+            <div class="msg ${m.utente_id === user.id ? 'msg-me' : 'msg-them'}">
+                <span class="msg-info"><b>${m.utenti_app?.username}</b> • ${new Date(m.creato_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                ${m.messaggio}
+            </div>
+        `).join('');
+        body.scrollTop = body.scrollHeight;
+    }
 
-    // Realtime: se aggiungi un magazzino da Supabase, la lista si aggiorna da sola
-    _supabase.channel('maga-live').on('postgres_changes', { event: '*', schema: 'public', table: 'magazzini' }, () => caricaMagazzini()).subscribe();
+    async function inviaMessaggio() {
+        const input = document.getElementById('chatInput');
+        if(!input.value) return;
+        await _supabase.from('chat_interna').insert([{ utente_id: user.id, messaggio: input.value }]);
+        input.value = '';
+    }
+
+    // REALTIME: Giacenze e Chat
+    _supabase.channel('global').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_interna' }, () => caricaMessaggi()).subscribe();
+    _supabase.channel('maga').on('postgres_changes', { event: '*', schema: 'public', table: 'magazzini' }, () => caricaMagazzini()).subscribe();
+
+    function logout() { localStorage.clear(); location.href='index.html'; }
+    caricaMagazzini();
 </script>
 </body>
 </html>
