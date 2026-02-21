@@ -268,23 +268,130 @@ function showApp() {
     renderSidebar();
 }
 
+// Sostituisci la vecchia funzione renderSidebar con questa
 function renderSidebar() {
     const nav = document.getElementById('nav-menu');
     let html = `
-        <div onclick="location.reload()" style="cursor:pointer; padding:15px; border-bottom:1px solid #222; font-family:'Teko'; font-size:20px">
+        <div onclick="loadDashboard()" style="cursor:pointer; padding:15px; border-bottom:1px solid #222; font-family:'Teko'; font-size:20px">
             <i class="bi bi-grid-fill" style="color:var(--accent)"></i> DASHBOARD
         </div>
     `;
 
     if (currentUser && currentUser.ruolo === 'ADMIN') {
         html += `
-            <div onclick="Swal.fire('Admin', 'Pannello in arrivo...', 'info')" style="cursor:pointer; padding:15px; border-bottom:1px solid #222; font-family:'Teko'; font-size:20px; color:var(--accent)">
-                <i class="bi bi-shield-lock-fill"></i> PANNELLO ADMIN
+            <div onclick="loadAdminProducts()" style="cursor:pointer; padding:15px; border-bottom:1px solid #222; font-family:'Teko'; font-size:20px; color:var(--accent)">
+                <i class="bi bi-box-seam"></i> GESTIONE PRODOTTI
+            </div>
+            <div onclick="loadAdminUsers()" style="cursor:pointer; padding:15px; border-bottom:1px solid #222; font-family:'Teko'; font-size:20px">
+                <i class="bi bi-people"></i> UTENTI
             </div>
         `;
     }
-
     nav.innerHTML = html;
+}
+
+// Funzione per caricare la Dashboard (vuota per ora)
+function loadDashboard() {
+    document.getElementById('view-title').innerText = "DASHBOARD";
+    document.getElementById('dynamic-view').innerHTML = `<p style="color:#666">Benvenuto nel Cantiere, ${currentUser.username}. Seleziona una voce dal menu.</p>`;
+}
+
+// --- GESTIONE PRODOTTI ADMIN ---
+async function loadAdminProducts() {
+    document.getElementById('view-title').innerText = "ANAGRAFICA PRODOTTI";
+    const container = document.getElementById('dynamic-view');
+    
+    container.innerHTML = `<div class="admin-section">
+        <button class="btn-save" onclick="showAddProductModal()" style="margin-bottom:20px">+ NUOVO PRODOTTO</button>
+        <div id="products-list">Caricamento...</div>
+    </div>`;
+
+    const { data: prodotti, error } = await supabaseClient
+        .from('prodotti')
+        .select('*')
+        .order('nome_prodotto', { ascending: true });
+
+    if (error) {
+        container.innerHTML = "Errore nel caricamento prodotti.";
+        return;
+    }
+
+    let html = `
+        <table class="cantiere-table">
+            <thead>
+                <tr>
+                    <th>PRODOTTO</th>
+                    <th>CATEGORIA</th>
+                    <th>REPARTO</th>
+                    <th>CT/PK</th>
+                    <th>AZIONI</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    prodotti.forEach(p => {
+        html += `
+            <tr>
+                <td style="font-weight:bold">${p.nome_prodotto}</td>
+                <td>${p.categoria || '-'}</td>
+                <td><span class="unit-pill u-pz">${p.reparto || 'NESSUNO'}</span></td>
+                <td>${p.pezzi_per_cartone} / ${p.pezzi_per_pacco}</td>
+                <td>
+                    <i class="bi bi-pencil-square" style="color:var(--accent); cursor:pointer; margin-right:10px"></i>
+                    <i class="bi bi-trash" style="color:var(--danger); cursor:pointer"></i>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `</tbody></table>`;
+    document.getElementById('products-list').innerHTML = html;
+}
+
+async function showAddProductModal() {
+    const { value: formValues } = await Swal.fire({
+        title: 'AGGIUNGI PRODOTTO',
+        background: '#1a1a1a',
+        color: '#fff',
+        html: `
+            <input id="swal-nome" class="swal2-input" placeholder="Nome Prodotto" style="background:#000; color:#fff; border:1px solid #444">
+            <input id="swal-cat" class="swal2-input" placeholder="Categoria" style="background:#000; color:#fff; border:1px solid #444">
+            <select id="swal-rep" class="swal2-input" style="background:#000; color:#fff; border:1px solid #444">
+                <option value="NESSUNO">NESSUN REPARTO</option>
+                <option value="GRIGLIA">GRIGLIA</option>
+                <option value="PANINI">PANINI</option>
+                <option value="FRITTI">FRITTI</option>
+                <option value="LAVAGGIO">LAVAGGIO</option>
+            </select>
+            <div style="display:flex; gap:10px; padding:0 20px">
+                <input id="swal-ct" type="number" class="swal2-input" placeholder="Pz x Cartone" value="1">
+                <input id="swal-pk" type="number" class="swal2-input" placeholder="Pz x Pacco" value="1">
+            </div>
+        `,
+        focusConfirm: false,
+        confirmButtonText: 'SALVA NEL DATABASE',
+        confirmButtonColor: '#FFD700',
+        preConfirm: () => {
+            return {
+                nome_prodotto: document.getElementById('swal-nome').value,
+                categoria: document.getElementById('swal-cat').value,
+                reparto: document.getElementById('swal-rep').value,
+                pezzi_per_cartone: parseInt(document.getElementById('swal-ct').value),
+                pezzi_per_pacco: parseInt(document.getElementById('swal-pk').value)
+            }
+        }
+    });
+
+    if (formValues) {
+        const { error } = await supabaseClient.from('prodotti').insert([formValues]);
+        if (error) {
+            Swal.fire('Errore', 'Impossibile salvare il prodotto', 'error');
+        } else {
+            Swal.fire('Successo', 'Prodotto aggiunto correttamente', 'success');
+            loadAdminProducts(); // Ricarica la lista
+        }
+    }
 }
 
 function logout() {
