@@ -138,6 +138,26 @@
             #app-content { grid-template-columns: 1fr; }
             .sidebar { display: none; } /* Sidebar mobile verrà gestita con menu a scomparsa */
         }
+        /* Stile Tabelle e Form Admin */
+.admin-section { padding: 20px; animation: fadeIn 0.5s; }
+.cantiere-table {
+    width: 100%; border-collapse: collapse; margin-top: 20px;
+    background: var(--bg-panel); border-radius: 8px; overflow: hidden;
+}
+.cantiere-table th { background: #222; color: var(--accent); padding: 15px; text-align: left; font-family: 'Teko'; font-size: 20px; }
+.cantiere-table td { padding: 12px 15px; border-bottom: 1px solid #333; font-size: 14px; }
+
+.form-group { margin-bottom: 15px; text-align: left; }
+.form-group label { display: block; color: var(--accent); margin-bottom: 5px; font-family: 'Teko'; font-size: 18px; }
+.cantiere-input {
+    width: 100%; background: #000; border: 1px solid #444; color: white;
+    padding: 10px; border-radius: 4px; outline: none;
+}
+.btn-save {
+    background: var(--accent); color: black; border: none; padding: 10px 20px;
+    font-family: 'Teko'; font-size: 20px; border-radius: 4px; cursor: pointer;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
