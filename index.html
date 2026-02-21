@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cantiere Hambirreria - Gestionale</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-panel: #1a1a1a;
+            --accent: #FFD700; /* Oro Cantiere */
+            --text-main: #f0f0f0;
+            --c-box: #D2691E;  /* Cartone: Marrone */
+            --c-pack: #00BFFF; /* Pacco: Azzurro */
+            --c-piece: #ffffff; /* Pezzo: Bianco */
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Roboto', sans-serif;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* --- SCHERMATA LOGIN --- */
+        #login-gate {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+            z-index: 9999;
+            position: fixed;
+            width: 100%;
+        }
+
+        .login-card {
+            background: var(--bg-panel);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+        }
+
+        .brand-logo {
+            font-family: 'Teko', sans-serif;
+            font-size: 48px;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+
+        .login-card input {
+            width: 100%;
+            background: #000;
+            border: 1px solid #444;
+            color: white;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .login-card input:focus {
+            border-color: var(--accent);
+        }
+
+        .btn-login {
+            width: 100%;
+            background: var(--accent);
+            color: black;
+            border: none;
+            padding: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Teko', sans-serif;
+            font-size: 20px;
+        }
+
+        /* --- INTERFACCIA PRINCIPALE --- */
+        #app-content {
+            display: none; /* Nascosto finché non loggato */
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+        }
+
+        .sidebar {
+            background: #000;
+            border-right: 1px solid #222;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-view {
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--bg-dark);
+        }
+
+        /* Badge Matematica (Cartoni/Pacchi/Pezzi) */
+        .unit-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-right: 5px;
+            background: rgba(255,255,255,0.05);
+        }
+        .u-ct { color: var(--c-box); border-left: 3px solid var(--c-box); }
+        .u-pk { color: var(--c-pack); border-left: 3px solid var(--c-pack); }
+        .u-pz { color: var(--c-piece); border-left: 3px solid var(--c-piece); }
+
+        @media (max-width: 768px) {
+            #app-content { grid-template-columns: 1fr; }
+            .sidebar { display: none; } /* Sidebar mobile verrà gestita con menu a scomparsa */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-gate">
+        <div class="login-card">
+            <div class="brand-logo">CANTIERE<br>HAMBIRRERIA</div>
+            <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
+            <input type="password" id="password" placeholder="PASSWORD">
+            <button class="btn-login" onclick="handleLogin()">ENTRA NEL CANTIERE</button>
+        </div>
+    </div>
+
+    <div id="app-content">
+        <aside class="sidebar">
+            <div class="brand-logo" style="font-size: 30px;">CANTIERE</div>
+            <nav id="nav-menu">
+                </nav>
+            <div style="margin-top: auto;">
+                <button class="btn-login" style="background:#222; color:var(--danger); font-size: 16px;" onclick="logout()">LOGOUT</button>
+            </div>
+        </aside>
+        
+        <main class="main-view">
+            <h2 id="view-title">Dashboard</h2>
+            <div id="dynamic-view">
+                </div>
+        </main>
+    </div>
+
+    <script>
+        // Configurazione Supabase
+        const SUPABASE_URL = "https://jkekmxhrwwidkfoizhde.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg";
+        const supabase = lib.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentUser = null;
+
+        // --- CONTROLLO SESSIONE INIZIALE ---
+        window.onload = () => {
+            const savedUser = localStorage.getItem('cantiere_session');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showApp();
+            }
+        };
+
+        async function handleLogin() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+
+            if (!u || !p) {
+                Swal.fire('Errore', 'Inserisci tutte le credenziali', 'error');
+                return;
+            }
+
+            // Ricerca utente nella tabella utenti_app
+            const { data, error } = await supabase
+                .from('utenti_app')
+                .select('*')
+                .eq('username', u)
+                .eq('password', p)
+                .single();
+
+            if (error || !data) {
+                Swal.fire('Accesso Negato', 'Username o Password errati', 'error');
+            } else {
+                currentUser = data;
+                localStorage.setItem('cantiere_session', JSON.stringify(data));
+                Swal.fire({
+                    title: 'BENVENUTO NEL CANTIERE',
+                    text: `Accesso come ${data.ruolo}`,
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                setTimeout(showApp, 1500);
+            }
+        }
+
+        function showApp() {
+            document.getElementById('login-gate').style.display = 'none';
+            document.getElementById('app-content').style.display = 'grid';
+            renderSidebar();
+            // Carica la dashboard iniziale
+        }
+
+        function renderSidebar() {
+            const nav = document.getElementById('nav-menu');
+            let html = `
+                <div onclick="loadDashboard()" style="cursor:pointer; padding:10px; border-bottom:1px solid #222">
+                    <i class="bi bi-grid-fill"></i> DASHBOARD
+                </div>
+            `;
+
+            if (currentUser.ruolo === 'ADMIN') {
+                html += `
+                    <div onclick="loadAdminPanel()" style="cursor:pointer; padding:10px; border-bottom:1px solid #222; color:var(--accent)">
+                        <i class="bi bi-shield-lock-fill"></i> PANNELLO ADMIN
+                    </div>
+                `;
+            }
+
+            nav.innerHTML = html;
+        }
+
+        function logout() {
+            localStorage.removeItem('cantiere_session');
+            location.reload();
+        }
+
+        // --- UTILS MATEMATICA CANTIERE ---
+        function formatGiacenza(totale, pezziCartone, pezziPacco) {
+            let html = `<span style="font-weight:bold; color:var(--accent)">${totale} PZ</span> <br>`;
+            let rimanente = totale;
+
+            if (pezziCartone > 1) {
+                const ct = Math.floor(rimanente / pezziCartone);
+                rimanente %= pezziCartone;
+                if (ct > 0) html += `<span class="unit-pill u-ct"><i class="bi bi-box-seam"></i> ${ct} CT</span>`;
+            }
+
+            if (pezziPacco > 1) {
+                const pk = Math.floor(rimanente / pezziPacco);
+                rimanente %= pezziPacco;
+                if (pk > 0) html += `<span class="unit-pill u-pk"><i class="bi bi-box"></i> ${pk} PK</span>`;
+            }
+
+            if (rimanente > 0 || totale === 0) {
+                html += `<span class="unit-pill u-pz"><i class="bi bi-hammer"></i> ${rimanente} PZ</span>`;
+            }
+
+            return html;
+        }
+    </script>
+</body>
+</html>
