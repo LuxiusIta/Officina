@@ -169,109 +169,108 @@
     </div>
 
     <script>
-        // Configurazione Supabase
-        const SUPABASE_URL = "https://jkekmxhrwwidkfoizhde.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg";
-        const supabase = lib.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Usiamo un nome diverso per il nostro client per evitare conflitti con la libreria
+const supabaseClient = supabase.createClient(
+    "https://jkekmxhrwwidkfoizhde.supabase.co", 
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg"
+);
 
-        let currentUser = null;
+let currentUser = null;
 
-        // --- CONTROLLO SESSIONE INIZIALE ---
-        window.onload = () => {
-            const savedUser = localStorage.getItem('cantiere_session');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                showApp();
-            }
-        };
+// --- CONTROLLO SESSIONE INIZIALE ---
+window.onload = () => {
+    const savedUser = localStorage.getItem('cantiere_session');
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        showApp();
+    }
+};
 
-        async function handleLogin() {
-            const u = document.getElementById('username').value;
-            const p = document.getElementById('password').value;
+async function handleLogin() {
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
 
-            if (!u || !p) {
-                Swal.fire('Errore', 'Inserisci tutte le credenziali', 'error');
-                return;
-            }
+    if (!u || !p) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'OOPS...',
+            text: 'Inserisci tutte le credenziali!',
+            background: '#1a1a1a',
+            color: '#fff',
+            confirmButtonColor: '#FFD700'
+        });
+        return;
+    }
 
-            // Ricerca utente nella tabella utenti_app
-            const { data, error } = await supabase
-                .from('utenti_app')
-                .select('*')
-                .eq('username', u)
-                .eq('password', p)
-                .single();
+    try {
+        // Ricerca utente nella tabella utenti_app
+        const { data, error } = await supabaseClient
+            .from('utenti_app')
+            .select('*')
+            .eq('username', u)
+            .eq('password', p)
+            .single();
 
-            if (error || !data) {
-                Swal.fire('Accesso Negato', 'Username o Password errati', 'error');
-            } else {
-                currentUser = data;
-                localStorage.setItem('cantiere_session', JSON.stringify(data));
-                Swal.fire({
-                    title: 'BENVENUTO NEL CANTIERE',
-                    text: `Accesso come ${data.ruolo}`,
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-                setTimeout(showApp, 1500);
-            }
+        if (error || !data) {
+            Swal.fire({
+                icon: 'error',
+                title: 'ACCESSO NEGATO',
+                text: 'Username o Password errati.',
+                background: '#1a1a1a',
+                color: '#fff',
+                confirmButtonColor: '#FFD700'
+            });
+        } else {
+            currentUser = data;
+            localStorage.setItem('cantiere_session', JSON.stringify(data));
+            
+            Swal.fire({
+                title: 'BENVENUTO NEL CANTIERE',
+                text: `Accesso come ${data.ruolo}`,
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+                background: '#1a1a1a',
+                color: '#fff'
+            });
+            
+            setTimeout(showApp, 1500);
         }
+    } catch (err) {
+        console.error("Errore login:", err);
+        Swal.fire('Errore Sistema', 'Problema di connessione al database', 'error');
+    }
+}
 
-        function showApp() {
-            document.getElementById('login-gate').style.display = 'none';
-            document.getElementById('app-content').style.display = 'grid';
-            renderSidebar();
-            // Carica la dashboard iniziale
-        }
+function showApp() {
+    document.getElementById('login-gate').style.display = 'none';
+    document.getElementById('app-content').style.display = 'grid';
+    renderSidebar();
+}
 
-        function renderSidebar() {
-            const nav = document.getElementById('nav-menu');
-            let html = `
-                <div onclick="loadDashboard()" style="cursor:pointer; padding:10px; border-bottom:1px solid #222">
-                    <i class="bi bi-grid-fill"></i> DASHBOARD
-                </div>
-            `;
+function renderSidebar() {
+    const nav = document.getElementById('nav-menu');
+    let html = `
+        <div onclick="location.reload()" style="cursor:pointer; padding:15px; border-bottom:1px solid #222; font-family:'Teko'; font-size:20px">
+            <i class="bi bi-grid-fill" style="color:var(--accent)"></i> DASHBOARD
+        </div>
+    `;
 
-            if (currentUser.ruolo === 'ADMIN') {
-                html += `
-                    <div onclick="loadAdminPanel()" style="cursor:pointer; padding:10px; border-bottom:1px solid #222; color:var(--accent)">
-                        <i class="bi bi-shield-lock-fill"></i> PANNELLO ADMIN
-                    </div>
-                `;
-            }
+    if (currentUser && currentUser.ruolo === 'ADMIN') {
+        html += `
+            <div onclick="Swal.fire('Admin', 'Pannello in arrivo...', 'info')" style="cursor:pointer; padding:15px; border-bottom:1px solid #222; font-family:'Teko'; font-size:20px; color:var(--accent)">
+                <i class="bi bi-shield-lock-fill"></i> PANNELLO ADMIN
+            </div>
+        `;
+    }
 
-            nav.innerHTML = html;
-        }
+    nav.innerHTML = html;
+}
 
-        function logout() {
-            localStorage.removeItem('cantiere_session');
-            location.reload();
-        }
-
-        // --- UTILS MATEMATICA CANTIERE ---
-        function formatGiacenza(totale, pezziCartone, pezziPacco) {
-            let html = `<span style="font-weight:bold; color:var(--accent)">${totale} PZ</span> <br>`;
-            let rimanente = totale;
-
-            if (pezziCartone > 1) {
-                const ct = Math.floor(rimanente / pezziCartone);
-                rimanente %= pezziCartone;
-                if (ct > 0) html += `<span class="unit-pill u-ct"><i class="bi bi-box-seam"></i> ${ct} CT</span>`;
-            }
-
-            if (pezziPacco > 1) {
-                const pk = Math.floor(rimanente / pezziPacco);
-                rimanente %= pezziPacco;
-                if (pk > 0) html += `<span class="unit-pill u-pk"><i class="bi bi-box"></i> ${pk} PK</span>`;
-            }
-
-            if (rimanente > 0 || totale === 0) {
-                html += `<span class="unit-pill u-pz"><i class="bi bi-hammer"></i> ${rimanente} PZ</span>`;
-            }
-
-            return html;
-        }
+function logout() {
+    localStorage.removeItem('cantiere_session');
+    location.reload();
+}
     </script>
 </body>
 </html>
