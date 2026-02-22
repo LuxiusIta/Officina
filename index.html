@@ -2239,7 +2239,7 @@
                 document.getElementById('lbl-op-to').innerText = 'MAGAZZINO:';
             } else if (type.includes('CUCINA')) {
                 divTo.style.display = 'none'; grid.style.gridTemplateColumns = '1fr';
-                document.getElementById('lbl-op-from').innerText = 'DALLA CUCINA:';
+                document.getElementById('lbl-op-from').innerText = 'DAL MAGAZZINO:';
             } else {
                 document.getElementById('lbl-op-from').innerText = 'DA:';
                 document.getElementById('lbl-op-to').innerText = 'A:';
@@ -2392,7 +2392,7 @@
                     <div class="swal-field" style="margin-bottom:15px; text-align:left"><label style="font-size:12px; color:var(--accent)">A MAGAZZINO:</label><select id="s-to" class="dark-input" style="width:100%; padding:8px">${getWhOpts(item.to)}</select></div>`;
                 } else if (item.type.includes('CUCINA')) {
                     whEditHtml = `
-                    <div class="swal-field" style="margin-bottom:15px; text-align:left"><label style="font-size:12px; color:var(--accent)">DALLA CUCINA (DA):</label><select id="s-from" class="dark-input" style="width:100%; padding:8px">${getWhOpts(item.from)}</select></div>`;
+                    <div class="swal-field" style="margin-bottom:15px; text-align:left"><label style="font-size:12px; color:var(--accent)">DAL MAGAZZINO:</label><select id="s-from" class="dark-input" style="width:100%; padding:8px">${getWhOpts(item.from)}</select></div>`;
                 }
             }
 
