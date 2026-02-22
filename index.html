@@ -2376,9 +2376,29 @@
             let pk = dailyData?.pk || Math.floor((val % (p.Pezzi_per_Cartone || 1)) / (p.Pezzi_per_Pacco || 1));
             let ps = dailyData?.ps || (val % (p.Pezzi_per_Pacco || 1));
 
+            let whEditHtml = '';
+            if (!isDaily && editIdx >= 0) {
+                const item = OP_CART[editIdx];
+                const getWhOpts = (selVal) => DB.warehouses.filter(w => w !== 'Cucina').map(w => `<option value="${w}" ${w === selVal ? 'selected' : ''}>${w}</option>`).join('');
+
+                if (item.type === 'TRASFERIMENTO') {
+                    whEditHtml = `
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px; text-align:left">
+                        <div class="swal-field"><label style="font-size:12px; color:var(--accent)">DA MAGAZZINO:</label><select id="s-from" class="dark-input" style="width:100%; padding:8px">${getWhOpts(item.from)}</select></div>
+                        <div class="swal-field"><label style="font-size:12px; color:var(--accent)">A MAGAZZINO:</label><select id="s-to" class="dark-input" style="width:100%; padding:8px">${getWhOpts(item.to)}</select></div>
+                    </div>`;
+                } else if (item.type === 'ARRIVO_MERCE' || item.type === 'CORREZIONE_ADMIN') {
+                    whEditHtml = `
+                    <div class="swal-field" style="margin-bottom:15px; text-align:left"><label style="font-size:12px; color:var(--accent)">A MAGAZZINO:</label><select id="s-to" class="dark-input" style="width:100%; padding:8px">${getWhOpts(item.to)}</select></div>`;
+                } else if (item.type.includes('CUCINA')) {
+                    whEditHtml = `
+                    <div class="swal-field" style="margin-bottom:15px; text-align:left"><label style="font-size:12px; color:var(--accent)">DALLA CUCINA (DA):</label><select id="s-from" class="dark-input" style="width:100%; padding:8px">${getWhOpts(item.from)}</select></div>`;
+                }
+            }
+
             Swal.fire({
                 title: p.Nome,
-                html: `<div class="swal-grid">
+                html: `${whEditHtml}<div class="swal-grid">
                 ${p.Pezzi_per_Cartone > 1 ? `<div class="swal-field"><label><i class="bi bi-box-seam-fill" style="color:var(--c-box)"></i> CARTONI (x${p.Pezzi_per_Cartone})</label>
                     <div style="display:flex; align-items:center; gap:5px">
                         <div class="stepper-btn" onclick="st('s-c',-1)">-</div>
@@ -2407,7 +2427,13 @@
                 cancelButtonText: 'ANNULLA',
                 preConfirm: () => {
                     const tc = parseInt(document.getElementById('s-c')?.value || 0), tpk = parseInt(document.getElementById('s-pk')?.value || 0), tps = parseInt(document.getElementById('s-ps')?.value || 0);
-                    return { tot: (tc * (p.Pezzi_per_Cartone || 1)) + (tpk * (p.Pezzi_per_Pacco || 1)) + tps, c: tc, pk: tpk, ps: tps };
+                    const sFrom = document.getElementById('s-from'), sTo = document.getElementById('s-to');
+                    return {
+                        tot: (tc * (p.Pezzi_per_Cartone || 1)) + (tpk * (p.Pezzi_per_Pacco || 1)) + tps,
+                        c: tc, pk: tpk, ps: tps,
+                        from: sFrom ? sFrom.value : null,
+                        to: sTo ? sTo.value : null
+                    };
                 }
             }).then(res => {
                 if (res.isConfirmed) {
@@ -2418,6 +2444,8 @@
                         if (editIdx >= 0) {
                             OP_CART[editIdx].tot = res.value.tot; OP_CART[editIdx].c = res.value.c;
                             OP_CART[editIdx].pk = res.value.pk; OP_CART[editIdx].ps = res.value.ps;
+                            if (res.value.from) OP_CART[editIdx].from = res.value.from;
+                            if (res.value.to) OP_CART[editIdx].to = res.value.to;
                         } else {
                             const type = document.getElementById('op-type-select').value;
                             const fromWh = (type === 'ARRIVO_MERCE' ? (p.Fornitore || 'FORNITORE') : document.getElementById('op-from-wh').value);
