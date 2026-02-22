@@ -1703,9 +1703,9 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const SUPABASE_URL = 'https://jkekmxhrwwidkfoizhde.supabase.co';
+        const SUPABASE_URL = 'https://jkekmxhrwwidkfoizhde.dbClient.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let DB = { products: [], inventory: {}, warehouses: [], users: [] };
         let USER = null;
@@ -1762,7 +1762,7 @@
         }
 
         async function loadInventoryData() {
-            const { data: inv, error } = await supabase.from('inventory').select('*');
+            const { data: inv, error } = await dbClient.from('inventory').select('*');
             if (error) { console.error(error); return; }
             let whSet = new Set();
             DB.inventory = {};
@@ -1784,7 +1784,7 @@
             showLoader(true);
             try {
                 const fakeEmail = u.toLowerCase() + '@cantiere.local';
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await dbClient.auth.signInWithPassword({
                     email: fakeEmail,
                     password: p
                 });
@@ -1792,7 +1792,7 @@
                 if (error) throw error;
 
                 // Fetch user role
-                const { data: roleData, error: roleError } = await supabase.from('user_roles').select('*').eq('id', data.user.id).single();
+                const { data: roleData, error: roleError } = await dbClient.from('user_roles').select('*').eq('id', data.user.id).single();
                 if (roleError) throw roleError;
 
                 showLoader(false);
@@ -1823,10 +1823,10 @@
         }
 
         async function checkActiveSession() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await dbClient.auth.getSession();
             if (session) {
                 showLoader(true);
-                const { data: roleData, error } = await supabase.from('user_roles').select('*').eq('id', session.user.id).single();
+                const { data: roleData, error } = await dbClient.from('user_roles').select('*').eq('id', session.user.id).single();
                 showLoader(false);
                 if (roleData) {
                     initUserSession(roleData);
@@ -1841,11 +1841,11 @@
 
         async function logout() {
             showLoader(true);
-            await supabase.auth.signOut();
+            await dbClient.auth.signOut();
             showLoader(false);
 
             USER = null; DAILY_DATA = {}; OP_CART = [];
-            if (inventorySubscription) { supabase.removeChannel(inventorySubscription); inventorySubscription = null; }
+            if (inventorySubscription) { dbClient.removeChannel(inventorySubscription); inventorySubscription = null; }
             document.getElementById('app-screen').style.display = 'none';
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('username').value = '';
@@ -1863,7 +1863,7 @@
             closeAllModals();
             showLoader(true);
             try {
-                const { data: prods } = await supabase.from('products').select('*');
+                const { data: prods } = await dbClient.from('products').select('*');
                 if (prods) {
                     DB.products = prods.map(p => ({
                         ID_Prodotto: p.id,
@@ -1879,7 +1879,7 @@
                 await loadInventoryData();
 
                 if (USER.role === 'Admin') {
-                    const { data: usersData } = await supabase.from('user_roles').select('*');
+                    const { data: usersData } = await dbClient.from('user_roles').select('*');
                     if (usersData) DB.users = usersData.map(u => ({ user: u.username, role: u.role, id: u.id }));
                 }
                 showLoader(false);
@@ -2242,7 +2242,7 @@
             const types = Object.keys(groups);
             try {
                 for (let t of types) {
-                    const { error } = await supabase.rpc('process_movement', { p_user: USER.username, p_type: t, p_items: groups[t] });
+                    const { error } = await dbClient.rpc('process_movement', { p_user: USER.username, p_type: t, p_items: groups[t] });
                     if (error) throw error;
                 }
                 showLoader(false); OP_CART = []; renderOpCart(); Swal.fire('Successo', 'Operazioni registrate', 'success');
@@ -2384,7 +2384,7 @@
             try {
                 const today = new Date();
                 const todayStr = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-                const { data: existing } = await supabase.from('daily_reports')
+                const { data: existing } = await dbClient.from('daily_reports')
                     .select('*').gte('date', todayStr + 'T00:00:00Z').lte('date', todayStr + 'T23:59:59Z').limit(1);
 
                 let reportId = (existing && existing.length > 0) ? existing[0].report_id : 'REP-' + Date.now();
@@ -2408,7 +2408,7 @@
                 let payload = { report_id: reportId, details: Object.values(itemsMap), last_modified_by: USER.username, last_modified_at: new Date().toISOString() };
                 if (!existing || existing.length === 0) payload.created_by = USER.username;
 
-                const { error } = await supabase.from('daily_reports').upsert(payload, { onConflict: 'report_id' });
+                const { error } = await dbClient.from('daily_reports').upsert(payload, { onConflict: 'report_id' });
                 if (error) throw error;
 
                 showLoader(false);
@@ -2422,7 +2422,7 @@
         // --- ADMIN FUNZIONI ---
         async function loadMovementsLog() {
             showLoader(true);
-            const { data: logs, error } = await supabase.from('movements').select('*').order('created_at', { ascending: false }).limit(100);
+            const { data: logs, error } = await dbClient.from('movements').select('*').order('created_at', { ascending: false }).limit(100);
             showLoader(false);
             if (error) return console.error(error);
             const tbody = document.getElementById('mov-log-body'); tbody.innerHTML = '';
@@ -2445,7 +2445,7 @@
         async function loadReports() {
             showLoader(true);
             const supp = document.getElementById('report-supp-filter').value;
-            const { data: reports, error } = await supabase.from('daily_reports').select('*').order('date', { ascending: false }).limit(50);
+            const { data: reports, error } = await dbClient.from('daily_reports').select('*').order('date', { ascending: false }).limit(50);
             showLoader(false);
             if (error) return console.error(error);
 
@@ -2550,10 +2550,10 @@
             try {
                 let error;
                 if (oldU) {
-                    const res = await supabase.rpc('admin_update_user', { p_old_username: oldU, p_new_username: newU, p_new_password: newP, p_new_role: newR });
+                    const res = await dbClient.rpc('admin_update_user', { p_old_username: oldU, p_new_username: newU, p_new_password: newP, p_new_role: newR });
                     error = res.error || (res.data?.status === 'error' ? new Error(res.data.message) : null);
                 } else {
-                    const res = await supabase.rpc('admin_create_user', { p_username: newU, p_password: newP, p_role: newR });
+                    const res = await dbClient.rpc('admin_create_user', { p_username: newU, p_password: newP, p_role: newR });
                     error = res.error || (res.data?.status === 'error' ? new Error(res.data.message) : null);
                 }
                 if (error) throw error;
@@ -2566,7 +2566,7 @@
             if (confirm('Eliminare utente ' + u + '?')) {
                 showLoader(true);
                 try {
-                    const { data, error } = await supabase.rpc('admin_delete_user', { p_username: u });
+                    const { data, error } = await dbClient.rpc('admin_delete_user', { p_username: u });
                     if (error || data?.status === 'error') throw error || new Error(data?.message);
                     nav('admin-users');
                 } catch (err) { showLoader(false); Swal.fire('Errore', err.message, 'error'); }
@@ -2625,9 +2625,9 @@
             };
             try {
                 if (window.editingPid) {
-                    await supabase.from('products').update(updates).eq('id', window.editingPid);
+                    await dbClient.from('products').update(updates).eq('id', window.editingPid);
                 } else {
-                    await supabase.from('products').insert(updates);
+                    await dbClient.from('products').insert(updates);
                 }
                 showLoader(false); closeModal('modal-edit-prod'); nav('admin-products');
             } catch (err) { showLoader(false); Swal.fire('Errore', err.message, 'error'); }
@@ -2643,4 +2643,5 @@
         }
     </script>
 </body>
+
 </html>
