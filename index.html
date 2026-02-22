@@ -2074,8 +2074,14 @@
                 if (cat !== 'ALL' && p.Categoria !== cat) return;
                 if (supp !== 'ALL' && p.Fornitore !== supp) return;
 
-                let total = 0;
                 const inv = DB.inventory[p.ID_Prodotto] || {};
+
+                // Filtro visibilità selettiva per magazzino
+                if (wh !== 'ALL' && !inv.hasOwnProperty(wh)) return;
+                // Se guardiamo 'ALL', mostriamo solo i prodotti che hanno almeno un assegnazione
+                if (wh === 'ALL' && Object.keys(inv).length === 0) return;
+
+                let total = 0;
                 if (wh === 'ALL') {
                     DB.warehouses.forEach(w => { if (w !== 'Cucina') total += Number(inv[w] || 0); });
                 } else {
@@ -2147,6 +2153,11 @@
                 if (supp !== 'ALL' && p.Fornitore !== supp) return;
 
                 const inv = DB.inventory[p.ID_Prodotto] || {};
+
+                // Filtro visibilità selettiva per magazzino
+                if (wh !== 'ALL' && !inv.hasOwnProperty(wh)) return;
+                if (wh === 'ALL' && Object.keys(inv).length === 0) return;
+
                 if (wh === 'ALL') {
                     let totalQty = 0; let presentIn = [];
                     DB.warehouses.forEach(w => {
