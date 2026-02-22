@@ -940,27 +940,39 @@
 
         /* ADMIN TABLE STYLE */
         .admin-table-wrapper {
-            overflow-x: auto;
             background: #111;
             border-radius: 8px;
+            padding: 10px;
+            overflow-x: auto;
             border: 1px solid #333;
         }
 
         .admin-table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 13px;
             min-width: 800px;
+            /* Forces scroll on mobile instead of squishing */
         }
 
         .admin-table th {
-            background: #000;
             color: var(--accent);
-            padding: 15px;
-            text-transform: uppercase;
-            font-size: 12px;
+            font-family: 'Teko';
             letter-spacing: 1px;
+            font-size: 16px;
+            padding: 12px 10px;
             border-bottom: 2px solid #333;
-            text-align: left;
+            white-space: nowrap;
+        }
+
+        .admin-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #222;
+            vertical-align: middle;
+        }
+
+        .admin-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
         }
 
         /* PRODUCT LIST AS BUTTONS */
@@ -1652,22 +1664,22 @@
                     </div>
                     <div id="report-view-body" style="padding-bottom:50px"></div>
                 </div>
-            </div>
-        </div>
-    </div>
+                <!-- ADMIN WAREHOUSES -->
+                <div id="page-admin-warehouses" class="page">
+                    <div style="max-width: 600px; margin: 0 auto; padding:15px">
+                        <h3
+                            style="color:var(--accent); margin-bottom:15px; font-family:'Teko'; font-size:28px; text-align:center;">
+                            GESTIONE MAGAZZINI</h3>
+                        <p style="color:#aaa; font-size:14px; margin-bottom:20px; text-align:center;">Modifica i nomi
+                            dei magazzini
+                            in uso. Il cambio nome si propagherà nell'inventario.</p>
+                        <div id="admin-warehouses-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+                    </div>
+                </div>
 
-
-
-    <!-- ADMIN WAREHOUSES -->
-    <div id="page-admin-warehouses" class="page">
-        <div style="max-width: 600px; margin: 0 auto; padding:15px">
-            <h3 style="color:var(--accent); margin-bottom:15px; font-family:'Teko'; font-size:28px; text-align:center;">
-                GESTIONE MAGAZZINI</h3>
-            <p style="color:#aaa; font-size:14px; margin-bottom:20px; text-align:center;">Modifica i nomi dei magazzini
-                in uso. Il cambio nome si propagherà nell'inventario.</p>
-            <div id="admin-warehouses-list" style="display:flex; flex-direction:column; gap:10px;"></div>
-        </div>
-    </div>
+            </div> <!-- End of .content -->
+        </div> <!-- End of .main-content -->
+    </div> <!-- End of .app-container -->
 
 
 
@@ -2567,8 +2579,8 @@
                 grouped[it.supp].push(it);
             });
 
-            let modInfo = r.mod ? `<div class="hide-print" style="font-size:12px; color:#888;">Ultima mod: ${r.mod} (da ${r.user})</div>` : '';
-            let h = `<div style="text-align:center"><h2 class="hide-print" style="color:var(--accent); font-family:'Teko'; border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:5px;">REPORT ${r.date}</h2>${modInfo}</div>`;
+            let modInfo = r.mod ? `<div style="font-size:12px; color:#555; text-align:center; padding-bottom:10px;">Ultima mod: ${r.mod} (da ${r.user})</div>` : '';
+            let h = `<div style="text-align:center"><h2 class="hide-print" style="color:var(--accent); font-family:'Teko'; border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:5px;">REPORT ${r.date}</h2></div>${modInfo}`;
 
             const supps = Object.keys(grouped);
             if (supps.length === 0) h += `<div style="text-align:center; padding:40px; color:#888">Nessun dato</div>`;
