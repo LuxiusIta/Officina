@@ -44,1352 +44,1352 @@
         }
     </style>
     <style>
-  :root {
-    --bg-dark: #0a0a0a;
-    --bg-panel: #1a1a1a;
-    --accent: #FFD700;
-    --text-main: #f0f0f0;
-    --danger: #FF4444;
-    --steel: #cfd8dc;
-
-    /* COLORI ICONE UNITÃ€ */
-    --c-box: #D2691E;
-    /* Cartone: Marrone */
-    --c-pack: #00BFFF;
-    /* Pacco: Azzurro */
-    --c-piece: #ffffff;
-    /* Pezzo: Bianco */
-  }
-
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', sans-serif;
-    background: #0a0a0a;
-    color: white;
-    overflow-x: hidden;
-    max-width: 100vw;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  .brand-title {
-    font-family: 'Teko', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .hidden {
-    display: none !important;
-  }
-
-  /* STICKY BUTTON */
-  .sticky {
-    position: fixed;
-    bottom: 20px;
-    left: 5%;
-    width: 90%;
-    max-width: 800px;
-    z-index: 90;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
-    margin-left: auto;
-    margin-right: auto;
-    right: 5%;
-  }
-
-  /* SFONDI */
-  .bg-steel-login {
-    background: url('https://previews.123rf.com/images/wasansos1/wasansos11901/wasansos1190100009/133826034-background-of-the-surface-of-the-steel-plate.jpg') no-repeat center center fixed;
-    background-size: cover;
-  }
-
-  .bg-app-main {
-    background: url('https://i.imgur.com/f0y6jAe.jpeg') no-repeat center center fixed;
-    background-size: cover;
-    min-height: 100vh;
-    background-attachment: fixed;
-  }
-
-  .vignette {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* LAYOUT */
-  #main-content {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    box-sizing: border-box;
-    padding-top: 20px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .desktop-wrapper {
-    width: 100%;
-    max-width: 900px;
-    padding: 20px;
-    box-sizing: border-box;
-    background: #121212;
-    border-radius: 8px;
-    min-height: 90vh;
-    border: 1px solid #333;
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
-    margin-bottom: 50px;
-  }
-
-  /* HEADER & SIDEBAR */
-  .top-header {
-    height: 60px;
-    background: #000;
-    display: flex;
-    align-items: center;
-    padding: 0 15px;
-    border-bottom: 2px solid var(--accent);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    justify-content: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
-  }
-
-  .header-title {
-    font-family: 'Teko';
-    font-size: 28px;
-    flex-grow: 1;
-    color: white;
-    margin-left: 15px;
-    letter-spacing: 1px;
-  }
-
-  .user-badge {
-    background: #222;
-    padding: 5px 12px;
-    border-radius: 4px;
-    font-size: 14px;
-    color: var(--accent);
-    font-weight: bold;
-    border: 1px solid #444;
-  }
-
-  .icon-btn {
-    background: none;
-    border: none;
-    color: var(--accent);
-    font-size: 26px;
-    cursor: pointer;
-    padding: 5px;
-  }
-
-  #sidebar {
-    position: fixed;
-    top: 0;
-    left: -280px;
-    width: 280px;
-    height: 100vh;
-    background: #000;
-    z-index: 2000;
-    transition: 0.3s;
-    border-right: 2px solid var(--accent);
-    display: flex;
-    flex-direction: column;
-    box-shadow: 10px 0 50px rgba(0, 0, 0, 1);
-  }
-
-  #sidebar.active {
-    left: 0;
-  }
-
-  #sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 1999;
-    display: none;
-    backdrop-filter: blur(5px);
-  }
-
-  #sidebar-overlay.active {
-    display: block;
-  }
-
-  .sidebar-top {
-    padding: 30px 20px;
-    background: #111;
-    border-bottom: 1px solid #333;
-  }
-
-  .nav-links {
-    overflow-y: auto;
-    flex: 1;
-  }
-
-  .nav-links a {
-    display: block;
-    padding: 12px 15px;
-    color: #ccc;
-    text-decoration: none;
-    border-left: 4px solid transparent;
-    font-size: 15px;
-    /* Slightly smaller for better fit */
-    transition: 0.2s;
-    border-bottom: 1px solid #1a1a1a;
-    white-space: nowrap;
-    /* Prevent wrapping */
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .nav-links a i {
-    width: 25px;
-    text-align: center;
-    color: var(--accent);
-    margin-right: 10px;
-  }
-
-  .nav-links a.active {
-    background: #1a1a1a;
-    color: white;
-    border-left-color: var(--accent);
-  }
-
-  .sidebar-footer {
-    padding: 20px;
-    border-top: 1px solid #333;
-  }
-
-  .btn-logout {
-    width: 100%;
-    padding: 12px;
-    background: #111;
-    color: var(--danger);
-    border: 1px solid #333;
-    cursor: pointer;
-    font-weight: bold;
-    font-family: 'Teko';
-    font-size: 20px;
-    letter-spacing: 1px;
-  }
-
-  /* UI ELEMENTI */
-  .btn-neon {
-    background: var(--accent);
-    color: #000;
-    font-family: 'Teko';
-    font-size: 22px;
-    border: none;
-    padding: 12px;
-    width: 100%;
-    border-radius: 6px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: 0.2s;
-    text-transform: uppercase;
-  }
-
-  .btn-neon:hover {
-    background: #e5c100;
-  }
-
-  .dark-input,
-  .dark-select {
-    background: #000;
-    border: 1px solid #444;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    width: 100%;
-    box-sizing: border-box;
-    text-align: center;
-    font-size: 14px;
-    height: 40px;
-  }
-
-  .dark-input:focus,
-  .dark-select:focus {
-    border-color: var(--accent);
-    outline: none;
-  }
-
-  /* GRID & CARDS */
-  .grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 15px;
-    padding-bottom: 20px;
-  }
-
-  .card-item {
-    background: #1e1e1e;
-    border-radius: 8px;
-    padding: 10px;
-    border: 1px solid #333;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  }
-
-  .card-item h4 {
-    margin: 5px 0;
-    color: white;
-    font-size: 15px;
-  }
-
-  .card-item img {
-    width: 100%;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 4px;
-    border: 1px solid #333;
-  }
-
-  .total-row {
-    color: var(--steel);
-    font-family: 'Teko';
-    font-size: 22px;
-    margin-top: 5px;
-    border-top: 1px solid #444;
-    padding-top: 5px;
-  }
-
-  /* TABS & CART */
-  .scrolling-tabs {
-    display: flex;
-    overflow-x: auto;
-    gap: 8px;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
-  }
-
-  .cart-list {
-    margin: 15px 0;
-    max-height: 200px;
-    overflow-y: auto;
-    background: #000;
-    border: 1px solid #333;
-    border-radius: 5px;
-    padding: 5px;
-  }
-
-  .cart-row {
-    background: #111;
-    padding: 10px;
-    border-bottom: 1px solid #333;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
-  }
-
-  /* MODAL */
-  .modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    z-index: 5000;
-    /* Over everything */
-    backdrop-filter: blur(5px);
-    justify-content: center;
-    align-items: center;
-    display: none;
-    /* Controlled by JS */
-  }
-
-  /* UNIT PILLS (Universal Iconography) */
-  .unit-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 1px 5px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: bold;
-    margin-right: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .unit-pill b {
-    font-family: 'Roboto', sans-serif;
-    font-size: 12px;
-  }
-
-  .icon-box {
-    background: rgba(210, 105, 30, 0.15);
-    color: #D2691E;
-    border-color: #D2691E;
-  }
-
-  .icon-pack {
-    background: rgba(0, 191, 255, 0.15);
-    color: #00BFFF;
-    border-color: #00BFFF;
-  }
-
-  .icon-piece {
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    border-color: #ffffff;
-  }
-
-  .u-icon {
-    font-size: 10px;
-  }
-
-  .modal-body {
-    background: #111;
-    margin: 20px auto;
-    width: 95%;
-    max-width: 500px;
-    border-radius: 12px;
-    padding: 25px;
-    border: 1px solid var(--accent);
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-    box-shadow: 0 0 50px rgba(0, 0, 0, 1);
-    animation: slideIn 0.3s ease-out;
-  }
-
-  @keyframes slideIn {
-    from {
-      transform: translateY(-30px);
-      opacity: 0;
-    }
-
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 24px;
-    color: var(--accent);
-    font-family: 'Teko';
-    margin-bottom: 15px;
-    border-bottom: 1px solid #333;
-    padding-bottom: 10px;
-  }
-
-  .close-icon {
-    font-size: 28px;
-    cursor: pointer;
-    color: white;
-  }
-
-  /* SEARCH & LOGIN */
-  .search-wrapper {
-    position: relative;
-    margin-bottom: 15px;
-  }
-
-  .search-wrapper i {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--accent);
-  }
-
-  .search-wrapper input {
-    padding-left: 45px !important;
-    text-align: left !important;
-    background: #000;
-  }
-
-  .cat-header {
-    background: #222;
-    color: var(--accent);
-    padding: 10px;
-    font-weight: bold;
-    font-size: 14px;
-    border-bottom: 1px solid #444;
-    position: sticky;
-    top: 0;
-    z-index: 5;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-left: 4px solid var(--accent);
-  }
-
-  #login-screen {
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    z-index: 10;
-  }
-
-  .login-container {
-    background: #111;
-    padding: 40px 30px;
-    border-radius: 10px;
-    text-align: center;
-    width: 90%;
-    max-width: 380px;
-    border: 2px solid var(--accent);
-    position: relative;
-    box-shadow: 0 0 60px rgba(0, 0, 0, 1);
-    z-index: 20;
-  }
-
-  .brand-stripe {
-    height: 4px;
-    background: var(--accent);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-  }
-
-  .logo-circle {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    border: 3px solid var(--accent);
-    object-fit: cover;
-    margin-bottom: 15px;
-    background: #000;
-    padding: 2px;
-  }
-
-  .brand-title {
-    font-size: 40px;
-    margin: 5px 0 25px;
-    line-height: 1;
-    color: white;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
-  }
-
-  .input-wrap {
-    background: #000;
-    border: 1px solid #444;
-    border-radius: 6px;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-  }
-
-  .input-wrap i {
-    color: var(--accent);
-    padding: 0 10px;
-    font-size: 18px;
-  }
-
-  .input-wrap input {
-    background: transparent;
-    border: none;
-    color: white;
-    padding: 15px 5px;
-    width: 100%;
-    font-size: 16px;
-    outline: none;
-    font-family: 'Roboto';
-  }
-
-  /* CUSTOM POPUP GRID */
-  .swal-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-    margin-top: 15px;
-    max-width: 100%;
-    overflow: hidden;
-  }
-
-  @media (max-width: 500px) {
-    .swal-grid {
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-  }
-
-  .swal-field {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #000;
-    padding: 10px 5px;
-    border-radius: 6px;
-    border: 1px solid #333;
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .swal-field label {
-    font-size: 10px;
-    color: #888;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    text-align: center;
-  }
-
-  .swal-field input {
-    width: 50px;
-    max-width: 100%;
-    background: transparent;
-    border: none;
-    color: white;
-    text-align: center;
-    font-size: 22px;
-    font-weight: bold;
-    padding: 5px 2px;
-    outline: none;
-    -moz-appearance: textfield;
-    appearance: textfield;
-  }
-
-  /* Hide default arrows to use custom ones */
-  .swal-field input::-webkit-outer-spin-button,
-  .swal-field input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
-  .stepper-btn {
-    background: #222;
-    border: 1px solid #444;
-    color: var(--accent);
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    font-size: 18px;
-    user-select: none;
-    transition: 0.2s;
-  }
-
-  .stepper-btn:active {
-    background: var(--accent);
-    color: black;
-    transform: scale(0.9);
-  }
-
-  /* SWEETALERT OVERRIDES */
-  div:where(.swal2-container) div:where(.swal2-popup) {
-    background: #151515 !important;
-    border: 2px solid var(--accent) !important;
-    border-radius: 10px;
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
-  }
-
-  /* MODAL FORM STYLING */
-  .modal-form-group {
-    margin-bottom: 15px;
-    text-align: center;
-  }
-
-  .modal-form-group label {
-    display: block;
-    font-family: 'Teko';
-    color: var(--accent);
-    font-size: 16px;
-    margin-bottom: 5px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .modal-form-group i {
-    margin-right: 5px;
-    font-size: 14px;
-    vertical-align: middle;
-  }
-
-  .swal2-cancel {
-    background: #333 !important;
-    color: white !important;
-    font-weight: bold;
-    padding: 12px 20px !important;
-    border-radius: 5px !important;
-  }
-
-  /* Fixed Loader Alignment */
-  #loader-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    z-index: 5000;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .loader-container {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .loader-gear {
-    font-size: 100px;
-    color: #222;
-    animation: spin 4s linear infinite;
-    position: absolute;
-    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.1));
-  }
-
-  .loader-wrench {
-    font-size: 50px;
-    color: var(--accent);
-    position: absolute;
-    animation: rock 2s ease-in-out infinite;
-    transform-origin: center;
-    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
-  }
-
-  @keyframes spin {
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-
-  .bi-spin {
-    animation: spin 2s linear infinite;
-  }
-
-  @keyframes rock {
-    0% {
-      transform: rotate(-20deg);
-    }
-
-    50% {
-      transform: rotate(20deg);
-    }
-
-    100% {
-      transform: rotate(-20deg);
-    }
-  }
-
-  /* Ensure Number Inputs have arrows (disabled for cleaner swal) */
-  input[type=number].native-arrows::-webkit-inner-spin-button,
-  input[type=number].native-arrows::-webkit-outer-spin-button {
-    opacity: 1;
-    margin-left: 5px;
-  }
-
-  /* Make simple report table nicer */
-  .simple-report-card {
-    background: #222;
-    border: 1px solid #444;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    padding: 10px;
-  }
-
-  .simple-report-header {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid #444;
-    padding-bottom: 5px;
-    margin-bottom: 5px;
-    align-items: center;
-  }
-
-  .simple-report-table {
-    width: 100%;
-    font-size: 13px;
-    color: #ccc;
-    border-collapse: collapse;
-  }
-
-  .simple-report-table td {
-    padding: 4px;
-    border-bottom: 1px solid #333;
-  }
-
-  /* UNIVERSAL ICONS & PILLS */
-  .unit-pill {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 6px;
-    border-radius: 4px;
-    border: 1px solid #333;
-    margin: 2px;
-    font-size: 13px;
-    background: #111;
-  }
-
-  .u-icon {
-    margin-right: 4px;
-  }
-
-  .icon-box {
-    border-color: var(--c-box);
-    color: var(--c-box);
-  }
-
-  .icon-pack {
-    border-color: var(--c-pack);
-    color: var(--c-pack);
-  }
-
-  .icon-piece {
-    border-color: #666;
-    color: #ccc;
-  }
-
-  .icon-box b,
-  .icon-pack b,
-  .icon-piece b {
-    font-weight: bold;
-    margin-left: 2px;
-    color: white;
-  }
-
-  /* --- NEW UI OVERHAUL STYLES --- */
-
-  /* SPLIT VIEW (Inputs | List) */
-  .split-view-container {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-
-  .split-left,
-  .split-right {
-    flex: 1;
-    min-width: 300px;
-    background: #111;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #222;
-  }
-
-  .split-left label {
-    display: block;
-    text-align: center;
-    color: var(--accent);
-    font-family: 'Teko';
-    font-size: 20px;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-  }
-
-  /* GRID 3 INPUTS */
-  .input-grid-3 {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 15px;
-  }
-
-  .input-box-wrapper {
-    background: #222;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #444;
-    text-align: center;
-  }
-
-  .input-box-wrapper label {
-    display: block;
-    font-size: 12px;
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-
-  .input-box-wrapper input {
-    width: 100%;
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 20px;
-    font-weight: bold;
-    text-align: center;
-    outline: none;
-  }
-
-  /* ADMIN TABLE STYLE */
-  .admin-table-wrapper {
-    overflow-x: auto;
-    background: #111;
-    border-radius: 8px;
-    border: 1px solid #333;
-  }
-
-  .admin-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 800px;
-  }
-
-  .admin-table th {
-    background: #000;
-    color: var(--accent);
-    padding: 15px;
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 1px;
-    border-bottom: 2px solid #333;
-    text-align: left;
-  }
-
-  /* PRODUCT LIST AS BUTTONS */
-  .prod-btn-list {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
-  .prod-btn {
-    background: #111;
-    border: 1px solid #333;
-    padding: 8px 12px;
-    border-radius: 4px;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    transition: 0.2s;
-    text-align: left;
-    height: 38px;
-  }
-
-  .prod-btn:hover {
-    background: #1a1a1a;
-    border-color: var(--accent);
-    transform: translateX(5px);
-  }
-
-  .prod-btn b {
-    font-size: 14px;
-    text-transform: uppercase;
-  }
-
-  .admin-table tr:hover {
-    background: #1a1a1a;
-  }
-
-  /* BADGES & TAGS */
-  .badge-type {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: 11px;
-    text-transform: uppercase;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .badge-green {
-    background: rgba(46, 204, 113, 0.2);
-    color: #2ecc71;
-    border: 1px solid #2ecc71;
-  }
-
-  .badge-red {
-    background: rgba(231, 76, 60, 0.2);
-    color: #e74c3c;
-    border: 1px solid #e74c3c;
-  }
-
-  .path-tag {
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-family: monospace;
-    border: 1px solid;
-    display: block;
-    width: fit-content;
-    margin-bottom: 2px;
-  }
-
-  .path-in {
-    border-color: #2ecc71;
-    color: #2ecc71;
-  }
-
-  .path-out {
-    border-color: #e74c3c;
-    color: #e74c3c;
-  }
-
-  .total-live {
-    font-size: 24px;
-    color: white;
-    text-align: center;
-    margin-top: 10px;
-    font-family: 'Teko', sans-serif;
-    letter-spacing: 2px;
-  }
-
-  /* CARRELLO LISTA */
-  .cart-item-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #222;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 5px;
-    border-left: 3px solid var(--accent);
-  }
-
-  .cart-del-btn {
-    color: #555;
-    cursor: pointer;
-    font-size: 18px;
-  }
-
-  .cart-del-btn:hover {
-    color: var(--danger);
-  }
-
-  /* ZERO QTY MARKER */
-  .zero {
-    color: var(--danger) !important;
-  }
-
-  /* CATEGORY CHIPS */
-  .tab-chip {
-    padding: 4px 10px;
-    border-radius: 4px;
-    background: #1a1a1a;
-    border: 1px solid #333;
-    color: #888;
-    cursor: pointer;
-    font-size: 12px;
-    text-transform: uppercase;
-    font-weight: bold;
-    display: inline-block;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .tab-chip:hover {
-    border-color: #666;
-    color: white;
-  }
-
-  .tab-chip.active {
-    background: var(--accent);
-    color: black;
-    border-color: var(--accent);
-  }
-
-  /* PREMIUM CART STYLES */
-  .badge-total-gold {
-    background: #FFD700;
-    color: black;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-family: 'Teko', sans-serif;
-    font-size: 16px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: bold;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  }
-
-  .cart-card {
-    background: #111;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 12px;
-    border-left: 4px solid transparent;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    position: relative;
-    border: 1px solid #333;
-    text-align: center;
-  }
-
-  .pill-type {
-    font-size: 11px;
-    font-weight: bold;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 6px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 10px;
-    letter-spacing: 0.5px;
-  }
-
-  .pill-green {
-    background: rgba(46, 204, 113, 0.15);
-    color: #2ecc71;
-    border: 1px solid rgba(46, 204, 113, 0.4);
-  }
-
-  .pill-blue {
-    background: rgba(52, 152, 219, 0.15);
-    color: #3498db;
-    border: 1px solid rgba(52, 152, 219, 0.4);
-  }
-
-  .pill-red {
-    background: rgba(231, 76, 60, 0.15);
-    color: #e74c3c;
-    border: 1px solid rgba(231, 76, 60, 0.4);
-  }
-
-  .cart-path-info {
-    font-size: 14px;
-    font-family: 'Teko', sans-serif;
-    letter-spacing: 1px;
-    margin: 4px 0 10px 0;
-    color: #888;
-    text-transform: uppercase;
-  }
-
-  .unit-line {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-top: 15px;
-    padding-top: 12px;
-    border-top: 1px solid #222;
-    font-family: 'Teko', sans-serif;
-    font-size: 16px;
-  }
-
-  .unit-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  /* UTILITIES */
-  .narrow-content-wrapper {
-    max-width: 600px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  .text-center {
-    text-align: center;
-  }
-
-  /* GLOBAL PRINT SAFEGUARD: Hide main app elements if window.print() is mis-targeted */
-  @media print {
-    body {
-      background: #fff !important;
-      color: #000 !important;
-    }
-
-    #sidebar,
-    #sidebar-overlay,
-    .top-header,
-    .vignette,
-    .sidebar-top,
-    .nav-links,
-    .sidebar-footer,
-    .sticky,
-    .btn-neon,
-    #main-content,
-    .desktop-wrapper,
-    .modal {
-      display: none !important;
-    }
-
-    /* Keep the iframe's content if we are printing through it */
-    #print-frame {
-      display: block !important;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-  }
-
-  /* --- CANTIERE THEME STYLES --- */
-  .cantiere-container {
-    background: #0d0d0d;
-    border: 2px solid #333;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.5);
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* Industrial Header with rivets */
-  .industrial-header {
-    background: linear-gradient(90deg, #1a1a1a 0%, #252525 50%, #1a1a1a 100%);
-    border: 1px solid #333;
-    padding: 15px;
-    border-radius: 8px 8px 0 0;
-    margin: -20px -20px 20px -20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    position: relative;
-    border-bottom: 3px solid var(--accent);
-  }
-
-  .industrial-header::before,
-  .industrial-header::after {
-    content: '';
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    background: #444;
-    border-radius: 50%;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.1);
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
-  .industrial-header::before {
-    left: 15px;
-  }
-
-  .industrial-header::after {
-    right: 15px;
-  }
-
-  .industrial-label {
-    font-size: 10px;
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: bold;
-    margin-bottom: 5px;
-    display: block;
-  }
-
-  /* Toolboard style for inputs */
-  .tool-wrap {
-    background: #151515;
-    border: 1px solid #222;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  }
-
-  .search-tool {
-    background: #000 !important;
-    border: 1px solid #333 !important;
-    border-left: 4px solid var(--accent) !important;
-    border-radius: 4px !important;
-    height: 45px !important;
-    font-size: 16px !important;
-    transition: 0.3s !important;
-  }
-
-  .search-tool:focus {
-    border-color: var(--accent) !important;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.1) !important;
-  }
-
-  /* Product Tiles */
-  .prod-tile {
-    background: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 6px;
-    padding: 12px 15px;
-    margin-bottom: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    transition: 0.2s;
-    border-right: 4px solid transparent;
-  }
-
-  .prod-tile:hover {
-    background: #222;
-    border-color: #444;
-    border-right-color: var(--accent);
-    transform: translateX(5px);
-  }
-
-  .prod-tile b {
-    color: #eee;
-    font-size: 15px;
-    letter-spacing: 0.5px;
-  }
-
-  .prod-tile i {
-    color: var(--accent);
-    font-size: 18px;
-    opacity: 0.5;
-  }
-
-  .prod-tile:hover i {
-    opacity: 1;
-  }
-
-  /* Mobile-specific improvements */
-  #op-cat-chips::-webkit-scrollbar {
-    display: none;
-  }
-
-  #op-cat-chips {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  #op-cat-chips::after {
-    content: '';
-    display: block;
-    min-width: 1px;
-    height: 1px;
-  }
-
-  @media (max-width: 768px) {
-    .cantiere-container {
-      padding: 15px;
-      border-radius: 0;
-      border-left: none;
-      border-right: none;
-      background: #151515;
-      border-color: #444;
-      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3), 0 5px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .industrial-header {
-      margin: -15px -15px 15px -15px;
-      background: linear-gradient(90deg, #222 0%, #2a2a2a 50%, #222 100%);
-      border-bottom: 2px solid var(--accent);
-    }
-  }
-</style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-panel: #1a1a1a;
+            --accent: #FFD700;
+            --text-main: #f0f0f0;
+            --danger: #FF4444;
+            --steel: #cfd8dc;
+
+            /* COLORI ICONE UNITÃ€ */
+            --c-box: #D2691E;
+            /* Cartone: Marrone */
+            --c-pack: #00BFFF;
+            /* Pacco: Azzurro */
+            --c-piece: #ffffff;
+            /* Pezzo: Bianco */
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: white;
+            overflow-x: hidden;
+            max-width: 100vw;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .brand-title {
+            font-family: 'Teko', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* STICKY BUTTON */
+        .sticky {
+            position: fixed;
+            bottom: 20px;
+            left: 5%;
+            width: 90%;
+            max-width: 800px;
+            z-index: 90;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
+            margin-left: auto;
+            margin-right: auto;
+            right: 5%;
+        }
+
+        /* SFONDI */
+        .bg-steel-login {
+            background: url('https://previews.123rf.com/images/wasansos1/wasansos11901/wasansos1190100009/133826034-background-of-the-surface-of-the-steel-plate.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .bg-app-main {
+            background: url('https://i.imgur.com/f0y6jAe.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            background-attachment: fixed;
+        }
+
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* LAYOUT */
+        #main-content {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
+            padding-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .desktop-wrapper {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            box-sizing: border-box;
+            background: #121212;
+            border-radius: 8px;
+            min-height: 90vh;
+            border: 1px solid #333;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+            margin-bottom: 50px;
+        }
+
+        /* HEADER & SIDEBAR */
+        .top-header {
+            height: 60px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            border-bottom: 2px solid var(--accent);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
+        }
+
+        .header-title {
+            font-family: 'Teko';
+            font-size: 28px;
+            flex-grow: 1;
+            color: white;
+            margin-left: 15px;
+            letter-spacing: 1px;
+        }
+
+        .user-badge {
+            background: #222;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: var(--accent);
+            font-weight: bold;
+            border: 1px solid #444;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-size: 26px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100vh;
+            background: #000;
+            z-index: 2000;
+            transition: 0.3s;
+            border-right: 2px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 10px 0 50px rgba(0, 0, 0, 1);
+        }
+
+        #sidebar.active {
+            left: 0;
+        }
+
+        #sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1999;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+
+        #sidebar-overlay.active {
+            display: block;
+        }
+
+        .sidebar-top {
+            padding: 30px 20px;
+            background: #111;
+            border-bottom: 1px solid #333;
+        }
+
+        .nav-links {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 12px 15px;
+            color: #ccc;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+            font-size: 15px;
+            /* Slightly smaller for better fit */
+            transition: 0.2s;
+            border-bottom: 1px solid #1a1a1a;
+            white-space: nowrap;
+            /* Prevent wrapping */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav-links a i {
+            width: 25px;
+            text-align: center;
+            color: var(--accent);
+            margin-right: 10px;
+        }
+
+        .nav-links a.active {
+            background: #1a1a1a;
+            color: white;
+            border-left-color: var(--accent);
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid #333;
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 12px;
+            background: #111;
+            color: var(--danger);
+            border: 1px solid #333;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Teko';
+            font-size: 20px;
+            letter-spacing: 1px;
+        }
+
+        /* UI ELEMENTI */
+        .btn-neon {
+            background: var(--accent);
+            color: #000;
+            font-family: 'Teko';
+            font-size: 22px;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 6px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn-neon:hover {
+            background: #e5c100;
+        }
+
+        .dark-input,
+        .dark-select {
+            background: #000;
+            border: 1px solid #444;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            font-size: 14px;
+            height: 40px;
+        }
+
+        .dark-input:focus,
+        .dark-select:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        /* GRID & CARDS */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px;
+            padding-bottom: 20px;
+        }
+
+        .card-item {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #333;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-item h4 {
+            margin: 5px 0;
+            color: white;
+            font-size: 15px;
+        }
+
+        .card-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #333;
+        }
+
+        .total-row {
+            color: var(--steel);
+            font-family: 'Teko';
+            font-size: 22px;
+            margin-top: 5px;
+            border-top: 1px solid #444;
+            padding-top: 5px;
+        }
+
+        /* TABS & CART */
+        .scrolling-tabs {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .cart-list {
+            margin: 15px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .cart-row {
+            background: #111;
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 5000;
+            /* Over everything */
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            display: none;
+            /* Controlled by JS */
+        }
+
+        /* UNIT PILLS (Universal Iconography) */
+        .unit-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-right: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .unit-pill b {
+            font-family: 'Roboto', sans-serif;
+            font-size: 12px;
+        }
+
+        .icon-box {
+            background: rgba(210, 105, 30, 0.15);
+            color: #D2691E;
+            border-color: #D2691E;
+        }
+
+        .icon-pack {
+            background: rgba(0, 191, 255, 0.15);
+            color: #00BFFF;
+            border-color: #00BFFF;
+        }
+
+        .icon-piece {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-color: #ffffff;
+        }
+
+        .u-icon {
+            font-size: 10px;
+        }
+
+        .modal-body {
+            background: #111;
+            margin: 20px auto;
+            width: 95%;
+            max-width: 500px;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--accent);
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 1);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 24px;
+            color: var(--accent);
+            font-family: 'Teko';
+            margin-bottom: 15px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .close-icon {
+            font-size: 28px;
+            cursor: pointer;
+            color: white;
+        }
+
+        /* SEARCH & LOGIN */
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent);
+        }
+
+        .search-wrapper input {
+            padding-left: 45px !important;
+            text-align: left !important;
+            background: #000;
+        }
+
+        .cat-header {
+            background: #222;
+            color: var(--accent);
+            padding: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            border-bottom: 1px solid #444;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-left: 4px solid var(--accent);
+        }
+
+        #login-screen {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-container {
+            background: #111;
+            padding: 40px 30px;
+            border-radius: 10px;
+            text-align: center;
+            width: 90%;
+            max-width: 380px;
+            border: 2px solid var(--accent);
+            position: relative;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 1);
+            z-index: 20;
+        }
+
+        .brand-stripe {
+            height: 4px;
+            background: var(--accent);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .logo-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            object-fit: cover;
+            margin-bottom: 15px;
+            background: #000;
+            padding: 2px;
+        }
+
+        .brand-title {
+            font-size: 40px;
+            margin: 5px 0 25px;
+            line-height: 1;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .input-wrap {
+            background: #000;
+            border: 1px solid #444;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        .input-wrap i {
+            color: var(--accent);
+            padding: 0 10px;
+            font-size: 18px;
+        }
+
+        .input-wrap input {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 15px 5px;
+            width: 100%;
+            font-size: 16px;
+            outline: none;
+            font-family: 'Roboto';
+        }
+
+        /* CUSTOM POPUP GRID */
+        .swal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        @media (max-width: 500px) {
+            .swal-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+
+        .swal-field {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #000;
+            padding: 10px 5px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .swal-field label {
+            font-size: 10px;
+            color: #888;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            text-align: center;
+        }
+
+        .swal-field input {
+            width: 50px;
+            max-width: 100%;
+            background: transparent;
+            border: none;
+            color: white;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 5px 2px;
+            outline: none;
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        /* Hide default arrows to use custom ones */
+        .swal-field input::-webkit-outer-spin-button,
+        .swal-field input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .stepper-btn {
+            background: #222;
+            border: 1px solid #444;
+            color: var(--accent);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 18px;
+            user-select: none;
+            transition: 0.2s;
+        }
+
+        .stepper-btn:active {
+            background: var(--accent);
+            color: black;
+            transform: scale(0.9);
+        }
+
+        /* SWEETALERT OVERRIDES */
+        div:where(.swal2-container) div:where(.swal2-popup) {
+            background: #151515 !important;
+            border: 2px solid var(--accent) !important;
+            border-radius: 10px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+        }
+
+        /* MODAL FORM STYLING */
+        .modal-form-group {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .modal-form-group label {
+            display: block;
+            font-family: 'Teko';
+            color: var(--accent);
+            font-size: 16px;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .modal-form-group i {
+            margin-right: 5px;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .swal2-cancel {
+            background: #333 !important;
+            color: white !important;
+            font-weight: bold;
+            padding: 12px 20px !important;
+            border-radius: 5px !important;
+        }
+
+        /* Fixed Loader Alignment */
+        #loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 5000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader-gear {
+            font-size: 100px;
+            color: #222;
+            animation: spin 4s linear infinite;
+            position: absolute;
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.1));
+        }
+
+        .loader-wrench {
+            font-size: 50px;
+            color: var(--accent);
+            position: absolute;
+            animation: rock 2s ease-in-out infinite;
+            transform-origin: center;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .bi-spin {
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes rock {
+            0% {
+                transform: rotate(-20deg);
+            }
+
+            50% {
+                transform: rotate(20deg);
+            }
+
+            100% {
+                transform: rotate(-20deg);
+            }
+        }
+
+        /* Ensure Number Inputs have arrows (disabled for cleaner swal) */
+        input[type=number].native-arrows::-webkit-inner-spin-button,
+        input[type=number].native-arrows::-webkit-outer-spin-button {
+            opacity: 1;
+            margin-left: 5px;
+        }
+
+        /* Make simple report table nicer */
+        .simple-report-card {
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+
+        .simple-report-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+            align-items: center;
+        }
+
+        .simple-report-table {
+            width: 100%;
+            font-size: 13px;
+            color: #ccc;
+            border-collapse: collapse;
+        }
+
+        .simple-report-table td {
+            padding: 4px;
+            border-bottom: 1px solid #333;
+        }
+
+        /* UNIVERSAL ICONS & PILLS */
+        .unit-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #333;
+            margin: 2px;
+            font-size: 13px;
+            background: #111;
+        }
+
+        .u-icon {
+            margin-right: 4px;
+        }
+
+        .icon-box {
+            border-color: var(--c-box);
+            color: var(--c-box);
+        }
+
+        .icon-pack {
+            border-color: var(--c-pack);
+            color: var(--c-pack);
+        }
+
+        .icon-piece {
+            border-color: #666;
+            color: #ccc;
+        }
+
+        .icon-box b,
+        .icon-pack b,
+        .icon-piece b {
+            font-weight: bold;
+            margin-left: 2px;
+            color: white;
+        }
+
+        /* --- NEW UI OVERHAUL STYLES --- */
+
+        /* SPLIT VIEW (Inputs | List) */
+        .split-view-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .split-left,
+        .split-right {
+            flex: 1;
+            min-width: 300px;
+            background: #111;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #222;
+        }
+
+        .split-left label {
+            display: block;
+            text-align: center;
+            color: var(--accent);
+            font-family: 'Teko';
+            font-size: 20px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        /* GRID 3 INPUTS */
+        .input-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-box-wrapper {
+            background: #222;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            text-align: center;
+        }
+
+        .input-box-wrapper label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .input-box-wrapper input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            outline: none;
+        }
+
+        /* ADMIN TABLE STYLE */
+        .admin-table-wrapper {
+            overflow-x: auto;
+            background: #111;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .admin-table th {
+            background: #000;
+            color: var(--accent);
+            padding: 15px;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #333;
+            text-align: left;
+        }
+
+        /* PRODUCT LIST AS BUTTONS */
+        .prod-btn-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .prod-btn {
+            background: #111;
+            border: 1px solid #333;
+            padding: 8px 12px;
+            border-radius: 4px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: left;
+            height: 38px;
+        }
+
+        .prod-btn:hover {
+            background: #1a1a1a;
+            border-color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .prod-btn b {
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .admin-table tr:hover {
+            background: #1a1a1a;
+        }
+
+        /* BADGES & TAGS */
+        .badge-type {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-green {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border: 1px solid #2ecc71;
+        }
+
+        .badge-red {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+
+        .path-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: monospace;
+            border: 1px solid;
+            display: block;
+            width: fit-content;
+            margin-bottom: 2px;
+        }
+
+        .path-in {
+            border-color: #2ecc71;
+            color: #2ecc71;
+        }
+
+        .path-out {
+            border-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        .total-live {
+            font-size: 24px;
+            color: white;
+            text-align: center;
+            margin-top: 10px;
+            font-family: 'Teko', sans-serif;
+            letter-spacing: 2px;
+        }
+
+        /* CARRELLO LISTA */
+        .cart-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #222;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .cart-del-btn {
+            color: #555;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .cart-del-btn:hover {
+            color: var(--danger);
+        }
+
+        /* ZERO QTY MARKER */
+        .zero {
+            color: var(--danger) !important;
+        }
+
+        /* CATEGORY CHIPS */
+        .tab-chip {
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #888;
+            cursor: pointer;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: bold;
+            display: inline-block;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab-chip:hover {
+            border-color: #666;
+            color: white;
+        }
+
+        .tab-chip.active {
+            background: var(--accent);
+            color: black;
+            border-color: var(--accent);
+        }
+
+        /* PREMIUM CART STYLES */
+        .badge-total-gold {
+            background: #FFD700;
+            color: black;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-family: 'Teko', sans-serif;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .cart-card {
+            background: #111;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid transparent;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            position: relative;
+            border: 1px solid #333;
+            text-align: center;
+        }
+
+        .pill-type {
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .pill-green {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.4);
+        }
+
+        .pill-blue {
+            background: rgba(52, 152, 219, 0.15);
+            color: #3498db;
+            border: 1px solid rgba(52, 152, 219, 0.4);
+        }
+
+        .pill-red {
+            background: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.4);
+        }
+
+        .cart-path-info {
+            font-size: 14px;
+            font-family: 'Teko', sans-serif;
+            letter-spacing: 1px;
+            margin: 4px 0 10px 0;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .unit-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+            padding-top: 12px;
+            border-top: 1px solid #222;
+            font-family: 'Teko', sans-serif;
+            font-size: 16px;
+        }
+
+        .unit-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* UTILITIES */
+        .narrow-content-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* GLOBAL PRINT SAFEGUARD: Hide main app elements if window.print() is mis-targeted */
+        @media print {
+            body {
+                background: #fff !important;
+                color: #000 !important;
+            }
+
+            #sidebar,
+            #sidebar-overlay,
+            .top-header,
+            .vignette,
+            .sidebar-top,
+            .nav-links,
+            .sidebar-footer,
+            .sticky,
+            .btn-neon,
+            #main-content,
+            .desktop-wrapper,
+            .modal {
+                display: none !important;
+            }
+
+            /* Keep the iframe's content if we are printing through it */
+            #print-frame {
+                display: block !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        /* --- CANTIERE THEME STYLES --- */
+        .cantiere-container {
+            background: #0d0d0d;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Industrial Header with rivets */
+        .industrial-header {
+            background: linear-gradient(90deg, #1a1a1a 0%, #252525 50%, #1a1a1a 100%);
+            border: 1px solid #333;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            margin: -20px -20px 20px -20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            border-bottom: 3px solid var(--accent);
+        }
+
+        .industrial-header::before,
+        .industrial-header::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #444;
+            border-radius: 50%;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.1);
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .industrial-header::before {
+            left: 15px;
+        }
+
+        .industrial-header::after {
+            right: 15px;
+        }
+
+        .industrial-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* Toolboard style for inputs */
+        .tool-wrap {
+            background: #151515;
+            border: 1px solid #222;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-tool {
+            background: #000 !important;
+            border: 1px solid #333 !important;
+            border-left: 4px solid var(--accent) !important;
+            border-radius: 4px !important;
+            height: 45px !important;
+            font-size: 16px !important;
+            transition: 0.3s !important;
+        }
+
+        .search-tool:focus {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.1) !important;
+        }
+
+        /* Product Tiles */
+        .prod-tile {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.2s;
+            border-right: 4px solid transparent;
+        }
+
+        .prod-tile:hover {
+            background: #222;
+            border-color: #444;
+            border-right-color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .prod-tile b {
+            color: #eee;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .prod-tile i {
+            color: var(--accent);
+            font-size: 18px;
+            opacity: 0.5;
+        }
+
+        .prod-tile:hover i {
+            opacity: 1;
+        }
+
+        /* Mobile-specific improvements */
+        #op-cat-chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        #op-cat-chips {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        #op-cat-chips::after {
+            content: '';
+            display: block;
+            min-width: 1px;
+            height: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .cantiere-container {
+                padding: 15px;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                background: #151515;
+                border-color: #444;
+                box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3), 0 5px 15px rgba(0, 0, 0, 0.3);
+            }
+
+            .industrial-header {
+                margin: -15px -15px 15px -15px;
+                background: linear-gradient(90deg, #222 0%, #2a2a2a 50%, #222 100%);
+                border-bottom: 2px solid var(--accent);
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -1702,266 +1702,299 @@
 
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-    const SUPABASE_URL = 'https://jkekmxhrwwidkfoizhde.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    <script>
+        const SUPABASE_URL = 'https://jkekmxhrwwidkfoizhde.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZWtteGhyd3dpZGtmb2l6aGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjEwMTcsImV4cCI6MjA4NzAzNzAxN30.U_XxfpAR76Y7bhB_DdUu2CMeuIarR4158dgwITFRWAg';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let DB = { products: [], inventory: {}, warehouses: [], users: [] };
-    let USER = null;
-    let DAILY_DATA = {};
-    let ALL_REPORTS = [];
-    let deferredPrompt;
-    let inventorySubscription = null;
+        let DB = { products: [], inventory: {}, warehouses: [], users: [] };
+        let USER = null;
+        let DAILY_DATA = {};
+        let ALL_REPORTS = [];
+        let deferredPrompt;
+        let inventorySubscription = null;
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-    });
-
-    // --- UTILITIES ---
-    function showLoader(show) {
-        const el = document.getElementById('loader-overlay');
-        if (el) el.className = show ? '' : 'hidden';
-    }
-
-    function renderQtyBadges(qty, prod) {
-        if (!qty || qty === 0) return '<span style="color:#444; font-size:12px; font-style:italic">0 pz</span>';
-        let html = '';
-        let rem = qty;
-        const pCrt = prod.Pezzi_per_Cartone || 1;
-        const pPck = prod.Pezzi_per_Pacco || 1;
-
-        if (pCrt > 1 && rem >= pCrt) {
-            const c = Math.floor(rem / pCrt);
-            rem %= pCrt;
-            html += `<span class="unit-pill icon-box"><i class="bi bi-box-seam-fill u-icon"></i><b>${c}</b></span>`;
-        }
-        if (pPck > 1 && rem >= pPck) {
-            const pk = Math.floor(rem / pPck);
-            rem %= pPck;
-            html += `<span class="unit-pill icon-pack"><i class="bi bi-archive-fill u-icon"></i><b>${pk}</b></span>`;
-        }
-        if (rem > 0 || html === '') {
-            html += `<span class="unit-pill icon-piece"><i class="bi bi-gear-wide-connected u-icon"></i><b>${rem}</b></span>`;
-        }
-        return html;
-    }
-
-    // --- REALTIME SUBSCRIPTION ---
-    function setupRealtime() {
-        if (inventorySubscription) return;
-        inventorySubscription = supabase
-            .channel('inventory_changes')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory' }, payload => {
-                loadInventoryData().then(() => {
-                    if (document.getElementById('page-dashboard').style.display === 'block') renderDashboard();
-                });
-            })
-            .subscribe();
-    }
-
-    async function loadInventoryData() {
-        const { data: inv, error } = await supabase.from('inventory').select('*');
-        if (error) { console.error(error); return; }
-        let whSet = new Set();
-        DB.inventory = {};
-        inv.forEach(row => {
-            if (!DB.inventory[row.product_id]) DB.inventory[row.product_id] = {};
-            DB.inventory[row.product_id][row.warehouse_name] = row.quantity;
-            whSet.add(row.warehouse_name);
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
         });
-        DB.warehouses = Array.from(whSet).filter(w => w !== 'Cucina');
-        if (DB.warehouses.length === 0) { DB.warehouses = ['Officina', 'Furgone 1']; }
-    }
 
-    // --- LOGIN & AUTH ---
-    async function attemptLogin() {
-        const u = document.getElementById('username').value;
-        const p = document.getElementById('password').value;
-        if (!u || !p) return Swal.fire('Errore', 'Inserisci dati', 'error');
-
-        showLoader(true);
-        try {
-            const { data, error } = await supabase.from('users').select('*').ilike('username', u).eq('password', p).single();
-            showLoader(false);
-            if (data) {
-                USER = { username: data.username, role: data.role };
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('app-screen').style.display = 'block';
-                document.getElementById('user-badge').innerText = USER.username.toUpperCase();
-
-                if (USER.role === 'Admin') {
-                    document.getElementById('admin-menu').classList.remove('hidden');
-                    document.getElementById('admin-filters').classList.remove('hidden');
-                    document.getElementById('user-badge').style.color = 'var(--accent)';
-                } else {
-                    document.getElementById('admin-menu').classList.add('hidden');
-                    document.getElementById('admin-filters').classList.add('hidden');
-                }
-                setupRealtime();
-                nav('dashboard');
-            } else {
-                Swal.fire('Accesso Negato', 'Credenziali errate', 'error');
-            }
-        } catch (err) {
-            showLoader(false);
-            Swal.fire('Errore Server', err.message || 'Credenziali errate', 'error');
+        // --- UTILITIES ---
+        function showLoader(show) {
+            const el = document.getElementById('loader-overlay');
+            if (el) el.className = show ? '' : 'hidden';
         }
-    }
 
-    function logout() {
-        USER = null; DAILY_DATA = {}; OP_CART = [];
-        if (inventorySubscription) { supabase.removeChannel(inventorySubscription); inventorySubscription = null; }
-        document.getElementById('app-screen').style.display = 'none';
-        document.getElementById('login-screen').style.display = 'flex';
-        document.getElementById('username').value = '';
-        document.getElementById('password').value = '';
-    }
+        function renderQtyBadges(qty, prod) {
+            if (!qty || qty === 0) return '<span style="color:#444; font-size:12px; font-style:italic">0 pz</span>';
+            let html = '';
+            let rem = qty;
+            const pCrt = prod.Pezzi_per_Cartone || 1;
+            const pPck = prod.Pezzi_per_Pacco || 1;
 
-    // --- NAVIGATION ---
-    function toggleMenu() {
-        document.getElementById('sidebar').classList.toggle('active');
-        document.getElementById('sidebar-overlay').classList.toggle('active');
-    }
-
-    async function nav(page) {
-        if (USER.role !== 'Admin' && page.startsWith('admin-')) return;
-        closeAllModals();
-        showLoader(true);
-        try {
-            const { data: prods } = await supabase.from('products').select('*');
-            if (prods) {
-                DB.products = prods.map(p => ({
-                    ID_Prodotto: p.id,
-                    Nome: p.nome,
-                    Categoria: p.categoria,
-                    Fornitore: p.fornitore,
-                    Reparto: p.reparto,
-                    Pezzi_per_Cartone: p.pezzi_per_cartone,
-                    Pezzi_per_Pacco: p.pezzi_per_pacco,
-                    URL_Immagine: p.url_immagine
-                }));
+            if (pCrt > 1 && rem >= pCrt) {
+                const c = Math.floor(rem / pCrt);
+                rem %= pCrt;
+                html += `<span class="unit-pill icon-box"><i class="bi bi-box-seam-fill u-icon"></i><b>${c}</b></span>`;
             }
-            await loadInventoryData();
+            if (pPck > 1 && rem >= pPck) {
+                const pk = Math.floor(rem / pPck);
+                rem %= pPck;
+                html += `<span class="unit-pill icon-pack"><i class="bi bi-archive-fill u-icon"></i><b>${pk}</b></span>`;
+            }
+            if (rem > 0 || html === '') {
+                html += `<span class="unit-pill icon-piece"><i class="bi bi-gear-wide-connected u-icon"></i><b>${rem}</b></span>`;
+            }
+            return html;
+        }
+
+        // --- REALTIME SUBSCRIPTION ---
+        function setupRealtime() {
+            if (inventorySubscription) return;
+            inventorySubscription = supabase
+                .channel('inventory_changes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory' }, payload => {
+                    loadInventoryData().then(() => {
+                        if (document.getElementById('page-dashboard').style.display === 'block') renderDashboard();
+                    });
+                })
+                .subscribe();
+        }
+
+        async function loadInventoryData() {
+            const { data: inv, error } = await supabase.from('inventory').select('*');
+            if (error) { console.error(error); return; }
+            let whSet = new Set();
+            DB.inventory = {};
+            inv.forEach(row => {
+                if (!DB.inventory[row.product_id]) DB.inventory[row.product_id] = {};
+                DB.inventory[row.product_id][row.warehouse_name] = row.quantity;
+                whSet.add(row.warehouse_name);
+            });
+            DB.warehouses = Array.from(whSet).filter(w => w !== 'Cucina');
+            if (DB.warehouses.length === 0) { DB.warehouses = ['Officina', 'Furgone 1']; }
+        }
+
+        // --- LOGIN & AUTH ---
+        async function attemptLogin() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+            if (!u || !p) return Swal.fire('Errore', 'Inserisci dati', 'error');
+
+            showLoader(true);
+            try {
+                const fakeEmail = u.toLowerCase() + '@cantiere.local';
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: fakeEmail,
+                    password: p
+                });
+
+                if (error) throw error;
+
+                // Fetch user role
+                const { data: roleData, error: roleError } = await supabase.from('user_roles').select('*').eq('id', data.user.id).single();
+                if (roleError) throw roleError;
+
+                showLoader(false);
+                initUserSession(roleData);
+
+            } catch (err) {
+                showLoader(false);
+                Swal.fire('Accesso Negato', err.message || 'Credenziali errate', 'error');
+            }
+        }
+
+        function initUserSession(roleData) {
+            USER = { id: roleData.id, username: roleData.username, role: roleData.role };
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-screen').style.display = 'block';
+            document.getElementById('user-badge').innerText = USER.username.toUpperCase();
 
             if (USER.role === 'Admin') {
-                const { data: usersData } = await supabase.from('users').select('*');
-                if (usersData) DB.users = usersData.map(u => ({ user: u.username, pass: u.password, role: u.role, id: u.id }));
-            }
-            showLoader(false);
-            performPageSwitch(page);
-        } catch (err) {
-            showLoader(false);
-            Swal.fire('Errore Caricamento', err.message, 'error');
-        }
-    }
-
-    function closeAllModals() {
-        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-        if (Swal.isVisible()) Swal.close();
-    }
-
-    function performPageSwitch(page) {
-        document.querySelectorAll('.page').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.nav-links a').forEach(el => el.classList.remove('active'));
-
-        const pageEl = document.getElementById('page-' + page);
-        if (pageEl) pageEl.style.display = 'block';
-
-        const navLink = document.getElementById('nav-' + page);
-        if (navLink) navLink.classList.add('active');
-
-        const labels = {
-            'dashboard': 'MAGAZZINO',
-            'operations': 'OPERAZIONI',
-            'dailylist': 'LISTA GIORNALIERA CUCINA',
-            'admin-products': 'GESTIONE PRODOTTI',
-            'admin-movements-log': 'REGISTRO MOVIMENTI',
-            'admin-reports': 'REPORTS GIORNALIERI',
-            'admin-users': 'GESTIONE UTENTI'
-        };
-        document.getElementById('page-title').innerText = labels[page] || page.toUpperCase();
-
-        document.getElementById('sidebar').classList.remove('active');
-        document.getElementById('sidebar-overlay').classList.remove('active');
-
-        if (page === 'dashboard') renderDashboard();
-        if (page === 'operations') renderOperationsUI();
-        if (page === 'dailylist') renderDailyList('LAVAGGIO');
-        if (page === 'admin-products') renderAdminProds();
-        if (page === 'admin-movements-log') loadMovementsLog();
-        if (page === 'admin-reports') loadReports();
-        if (page === 'admin-users') renderUsers();
-
-        initSelects();
-    }
-
-    function initSelects() {
-        const whs = DB.warehouses.filter(w => w !== 'Cucina');
-        const opts = whs.map(w => `<option value="${w}">${w}</option>`).join('');
-
-        const dWh = document.getElementById('dash-wh-filter');
-        if (dWh && dWh.options.length <= 1) {
-            dWh.innerHTML = '<option value="ALL">TOTALE OFFICINA</option>' + opts;
-        }
-
-        const dCat = document.getElementById('dash-cat-filter');
-        if (dCat && dCat.options.length <= 1) {
-            const cats = [...new Set(DB.products.map(p => p.Categoria))].filter(Boolean).sort();
-            dCat.innerHTML = '<option value="ALL">TUTTE LE CATEGORIE</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
-        }
-
-        if (USER.role === 'Admin') {
-            const dSupp = document.getElementById('dash-supp-filter');
-            const rSupp = document.getElementById('report-supp-filter');
-            const supps = [...new Set(DB.products.map(p => p.Fornitore))].filter(Boolean).sort();
-            const sOpts = '<option value="ALL">TUTTI I FORNITORI</option>' + supps.map(s => `<option value="${s}">${s}</option>`).join('');
-            if (dSupp && dSupp.options.length <= 1) dSupp.innerHTML = sOpts;
-            if (rSupp && rSupp.options.length <= 1) rSupp.innerHTML = sOpts;
-        }
-    }
-
-    // --- DASHBOARD ---
-    function renderDashboard() {
-        const q = document.getElementById('dash-search').value.toLowerCase();
-        const wh = document.getElementById('dash-wh-filter').value;
-        const cat = document.getElementById('dash-cat-filter').value;
-        const supp = (USER.role === 'Admin') ? document.getElementById('dash-supp-filter').value : 'ALL';
-        const grid = document.getElementById('dashboard-grid');
-        grid.innerHTML = '';
-
-        DB.products.forEach(p => {
-            if (q && !p.Nome.toLowerCase().includes(q)) return;
-            if (cat !== 'ALL' && p.Categoria !== cat) return;
-            if (supp !== 'ALL' && p.Fornitore !== supp) return;
-
-            let total = 0;
-            const inv = DB.inventory[p.ID_Prodotto] || {};
-            if (wh === 'ALL') {
-                DB.warehouses.forEach(w => { if (w !== 'Cucina') total += Number(inv[w] || 0); });
+                document.getElementById('admin-menu').classList.remove('hidden');
+                document.getElementById('admin-filters').classList.remove('hidden');
+                document.getElementById('user-badge').style.color = 'var(--accent)';
             } else {
-                total = Number(inv[wh] || 0);
+                document.getElementById('admin-menu').classList.add('hidden');
+                document.getElementById('admin-filters').classList.add('hidden');
+            }
+            setupRealtime();
+            nav('dashboard');
+        }
+
+        async function checkActiveSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                showLoader(true);
+                const { data: roleData, error } = await supabase.from('user_roles').select('*').eq('id', session.user.id).single();
+                showLoader(false);
+                if (roleData) {
+                    initUserSession(roleData);
+                } else {
+                    logout();
+                }
+            }
+        }
+
+        // Check session on startup
+        document.addEventListener('DOMContentLoaded', checkActiveSession);
+
+        async function logout() {
+            showLoader(true);
+            await supabase.auth.signOut();
+            showLoader(false);
+
+            USER = null; DAILY_DATA = {}; OP_CART = [];
+            if (inventorySubscription) { supabase.removeChannel(inventorySubscription); inventorySubscription = null; }
+            document.getElementById('app-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // --- NAVIGATION ---
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebar-overlay').classList.toggle('active');
+        }
+
+        async function nav(page) {
+            if (USER.role !== 'Admin' && page.startsWith('admin-')) return;
+            closeAllModals();
+            showLoader(true);
+            try {
+                const { data: prods } = await supabase.from('products').select('*');
+                if (prods) {
+                    DB.products = prods.map(p => ({
+                        ID_Prodotto: p.id,
+                        Nome: p.nome,
+                        Categoria: p.categoria,
+                        Fornitore: p.fornitore,
+                        Reparto: p.reparto,
+                        Pezzi_per_Cartone: p.pezzi_per_cartone,
+                        Pezzi_per_Pacco: p.pezzi_per_pacco,
+                        URL_Immagine: p.url_immagine
+                    }));
+                }
+                await loadInventoryData();
+
+                if (USER.role === 'Admin') {
+                    const { data: usersData } = await supabase.from('user_roles').select('*');
+                    if (usersData) DB.users = usersData.map(u => ({ user: u.username, role: u.role, id: u.id }));
+                }
+                showLoader(false);
+                performPageSwitch(page);
+            } catch (err) {
+                showLoader(false);
+                Swal.fire('Errore Caricamento', err.message, 'error');
+            }
+        }
+
+        function closeAllModals() {
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+            if (Swal.isVisible()) Swal.close();
+        }
+
+        function performPageSwitch(page) {
+            document.querySelectorAll('.page').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.nav-links a').forEach(el => el.classList.remove('active'));
+
+            const pageEl = document.getElementById('page-' + page);
+            if (pageEl) pageEl.style.display = 'block';
+
+            const navLink = document.getElementById('nav-' + page);
+            if (navLink) navLink.classList.add('active');
+
+            const labels = {
+                'dashboard': 'MAGAZZINO',
+                'operations': 'OPERAZIONI',
+                'dailylist': 'LISTA GIORNALIERA CUCINA',
+                'admin-products': 'GESTIONE PRODOTTI',
+                'admin-movements-log': 'REGISTRO MOVIMENTI',
+                'admin-reports': 'REPORTS GIORNALIERI',
+                'admin-users': 'GESTIONE UTENTI'
+            };
+            document.getElementById('page-title').innerText = labels[page] || page.toUpperCase();
+
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('sidebar-overlay').classList.remove('active');
+
+            if (page === 'dashboard') renderDashboard();
+            if (page === 'operations') renderOperationsUI();
+            if (page === 'dailylist') renderDailyList('LAVAGGIO');
+            if (page === 'admin-products') renderAdminProds();
+            if (page === 'admin-movements-log') loadMovementsLog();
+            if (page === 'admin-reports') loadReports();
+            if (page === 'admin-users') renderUsers();
+
+            initSelects();
+        }
+
+        function initSelects() {
+            const whs = DB.warehouses.filter(w => w !== 'Cucina');
+            const opts = whs.map(w => `<option value="${w}">${w}</option>`).join('');
+
+            const dWh = document.getElementById('dash-wh-filter');
+            if (dWh && dWh.options.length <= 1) {
+                dWh.innerHTML = '<option value="ALL">TOTALE OFFICINA</option>' + opts;
             }
 
-            grid.innerHTML += `
+            const dCat = document.getElementById('dash-cat-filter');
+            if (dCat && dCat.options.length <= 1) {
+                const cats = [...new Set(DB.products.map(p => p.Categoria))].filter(Boolean).sort();
+                dCat.innerHTML = '<option value="ALL">TUTTE LE CATEGORIE</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+            }
+
+            if (USER.role === 'Admin') {
+                const dSupp = document.getElementById('dash-supp-filter');
+                const rSupp = document.getElementById('report-supp-filter');
+                const supps = [...new Set(DB.products.map(p => p.Fornitore))].filter(Boolean).sort();
+                const sOpts = '<option value="ALL">TUTTI I FORNITORI</option>' + supps.map(s => `<option value="${s}">${s}</option>`).join('');
+                if (dSupp && dSupp.options.length <= 1) dSupp.innerHTML = sOpts;
+                if (rSupp && rSupp.options.length <= 1) rSupp.innerHTML = sOpts;
+            }
+        }
+
+        // --- DASHBOARD ---
+        function renderDashboard() {
+            const q = document.getElementById('dash-search').value.toLowerCase();
+            const wh = document.getElementById('dash-wh-filter').value;
+            const cat = document.getElementById('dash-cat-filter').value;
+            const supp = (USER.role === 'Admin') ? document.getElementById('dash-supp-filter').value : 'ALL';
+            const grid = document.getElementById('dashboard-grid');
+            grid.innerHTML = '';
+
+            DB.products.forEach(p => {
+                if (q && !p.Nome.toLowerCase().includes(q)) return;
+                if (cat !== 'ALL' && p.Categoria !== cat) return;
+                if (supp !== 'ALL' && p.Fornitore !== supp) return;
+
+                let total = 0;
+                const inv = DB.inventory[p.ID_Prodotto] || {};
+                if (wh === 'ALL') {
+                    DB.warehouses.forEach(w => { if (w !== 'Cucina') total += Number(inv[w] || 0); });
+                } else {
+                    total = Number(inv[wh] || 0);
+                }
+
+                grid.innerHTML += `
                 <div class="card-item">
                     ${p.URL_Immagine ? `<img src="${p.URL_Immagine}">` : ''}
                     <h4>${p.Nome}</h4>
                     <div class="stock-grid">${renderQtyBadges(total, p)}</div>
                     <div class="total-row ${total === 0 ? 'zero' : ''}">${total} <span style="font-size:12px; color:#888">pz</span></div>
                 </div>`;
-        });
-    }
+            });
+        }
 
-    function printStock() {
-        const q = document.getElementById('dash-search').value.toLowerCase();
-        const wh = document.getElementById('dash-wh-filter').value;
-        const cat = document.getElementById('dash-cat-filter').value;
-        const supp = (USER.role === 'Admin') ? document.getElementById('dash-supp-filter').value : 'ALL';
-        const dateStr = new Date().toLocaleDateString();
+        function printStock() {
+            const q = document.getElementById('dash-search').value.toLowerCase();
+            const wh = document.getElementById('dash-wh-filter').value;
+            const cat = document.getElementById('dash-cat-filter').value;
+            const supp = (USER.role === 'Admin') ? document.getElementById('dash-supp-filter').value : 'ALL';
+            const dateStr = new Date().toLocaleDateString();
 
-        let html = `<html><head><title>Giacenza ${wh}</title>
+            let html = `<html><head><title>Giacenza ${wh}</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
         <style>
             body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; color: #1a1a1a; }
@@ -1994,172 +2027,172 @@
             <th style="width:10%">Tot Pz</th>
         </tr></thead><tbody>`;
 
-        function getQtyDisplay(qty, p) {
-            let parts = []; let rem = qty;
-            const pCrt = p.Pezzi_per_Cartone || 1; const pPck = p.Pezzi_per_Pacco || 1;
-            if (pCrt > 1 && rem >= pCrt) { const c = Math.floor(rem / pCrt); rem %= pCrt; parts.push(`<div class="unit-box"><i class="bi bi-box-seam-fill i-box"></i> ${c} Ct</div>`); }
-            if (pPck > 1 && rem >= pPck) { const pk = Math.floor(rem / pPck); rem %= pPck; parts.push(`<div class="unit-box"><i class="bi bi-archive-fill i-pack"></i> ${pk} Pk</div>`); }
-            if (rem > 0 || parts.length === 0) { parts.push(`<div class="unit-box"><i class="bi bi-gear-wide-connected i-piece"></i> ${rem} Pz</div>`); }
-            return parts.join(' ');
-        }
+            function getQtyDisplay(qty, p) {
+                let parts = []; let rem = qty;
+                const pCrt = p.Pezzi_per_Cartone || 1; const pPck = p.Pezzi_per_Pacco || 1;
+                if (pCrt > 1 && rem >= pCrt) { const c = Math.floor(rem / pCrt); rem %= pCrt; parts.push(`<div class="unit-box"><i class="bi bi-box-seam-fill i-box"></i> ${c} Ct</div>`); }
+                if (pPck > 1 && rem >= pPck) { const pk = Math.floor(rem / pPck); rem %= pPck; parts.push(`<div class="unit-box"><i class="bi bi-archive-fill i-pack"></i> ${pk} Pk</div>`); }
+                if (rem > 0 || parts.length === 0) { parts.push(`<div class="unit-box"><i class="bi bi-gear-wide-connected i-piece"></i> ${rem} Pz</div>`); }
+                return parts.join(' ');
+            }
 
-        DB.products.forEach(p => {
-            if (q && !p.Nome.toLowerCase().includes(q)) return;
-            if (cat !== 'ALL' && p.Categoria !== cat) return;
-            if (supp !== 'ALL' && p.Fornitore !== supp) return;
+            DB.products.forEach(p => {
+                if (q && !p.Nome.toLowerCase().includes(q)) return;
+                if (cat !== 'ALL' && p.Categoria !== cat) return;
+                if (supp !== 'ALL' && p.Fornitore !== supp) return;
 
-            const inv = DB.inventory[p.ID_Prodotto] || {};
-            if (wh === 'ALL') {
-                let totalQty = 0; let presentIn = [];
-                DB.warehouses.forEach(w => {
-                    if (w === 'Cucina') return;
-                    const qty = Number(inv[w] || 0);
-                    if (qty > 0) { totalQty += qty; presentIn.push(w); }
-                });
+                const inv = DB.inventory[p.ID_Prodotto] || {};
+                if (wh === 'ALL') {
+                    let totalQty = 0; let presentIn = [];
+                    DB.warehouses.forEach(w => {
+                        if (w === 'Cucina') return;
+                        const qty = Number(inv[w] || 0);
+                        if (qty > 0) { totalQty += qty; presentIn.push(w); }
+                    });
 
-                html += `<tr>
+                    html += `<tr>
                     <td style="font-size:11px; color:#666">${p.Fornitore || '-'}</td>
                     <td style="font-weight:500; font-size:11px; color:var(--accent)">${presentIn.length > 0 ? presentIn.join(', ') : '-'}</td>
                     <td style="text-align:center"><b style="font-size:14px">${p.Nome}</b></td>
                     <td><div class="qty-box">${getQtyDisplay(totalQty, p)}</div></td>
                     <td class="tot-pz">${totalQty}</td>
                 </tr>`;
-            } else {
-                const qty = Number(inv[wh] || 0);
-                html += `<tr>
+                } else {
+                    const qty = Number(inv[wh] || 0);
+                    html += `<tr>
                     <td style="font-size:11px; color:#666">${p.Fornitore || '-'}</td>
                     <td style="font-weight:500">${wh}</td>
                     <td style="text-align:center"><b style="font-size:14px">${p.Nome}</b></td>
                     <td><div class="qty-box">${getQtyDisplay(qty, p)}</div></td>
                     <td class="tot-pz">${qty}</td>
                 </tr>`;
+                }
+            });
+
+            html += `</tbody></table></body></html>`;
+
+            let frame = document.getElementById('print-frame');
+            if (!frame) {
+                frame = document.createElement('iframe');
+                frame.id = 'print-frame';
+                frame.style.display = 'none';
+                document.body.appendChild(frame);
             }
-        });
-
-        html += `</tbody></table></body></html>`;
-
-        let frame = document.getElementById('print-frame');
-        if (!frame) {
-            frame = document.createElement('iframe');
-            frame.id = 'print-frame';
-            frame.style.display = 'none';
-            document.body.appendChild(frame);
+            const doc = frame.contentWindow.document; doc.open(); doc.write(html); doc.close();
+            frame.contentWindow.focus();
+            setTimeout(() => frame.contentWindow.print(), 100);
         }
-        const doc = frame.contentWindow.document; doc.open(); doc.write(html); doc.close();
-        frame.contentWindow.focus();
-        setTimeout(() => frame.contentWindow.print(), 100);
-    }
 
-    // --- OPERAZIONI ---
-    let OP_CART = [];
-    let OP_ACTIVE_CAT = 'ALL';
+        // --- OPERAZIONI ---
+        let OP_CART = [];
+        let OP_ACTIVE_CAT = 'ALL';
 
-    function renderOperationsUI() {
-        const sel = document.getElementById('op-type-select');
-        sel.innerHTML = (USER.role === 'Admin') ?
-            `<option value="ARRIVO_MERCE">ðŸŸ© ARRIVO MERCE (Carico)</option>
+        function renderOperationsUI() {
+            const sel = document.getElementById('op-type-select');
+            sel.innerHTML = (USER.role === 'Admin') ?
+                `<option value="ARRIVO_MERCE">ðŸŸ© ARRIVO MERCE (Carico)</option>
              <option value="TRASFERIMENTO">ðŸŸ¨ SPOSTAMENTO INTERNO</option>
              <option value="CARICO_CUCINA">ðŸŸ¥ CARICHI (Cucina)</option>
              <option value="CORREZIONE_ADMIN">ðŸ›  CORREZIONE INVENTARIO</option>` :
-            `<option value="CARICO_CUCINA">ðŸŸ¥ CARICHI (Cucina)</option>
+                `<option value="CARICO_CUCINA">ðŸŸ¥ CARICHI (Cucina)</option>
              <option value="TRASFERIMENTO">ðŸŸ¨ SPOSTAMENTO INTERNO</option>`;
 
-        updateOpTypeUI();
-        renderOpCategoryChips();
-        renderOpSearch();
-        renderOpCart();
-    }
-
-    function updateOpTypeUI() {
-        const type = document.getElementById('op-type-select').value;
-        const divFrom = document.getElementById('div-op-from');
-        const divTo = document.getElementById('div-op-to');
-        const sFrom = document.getElementById('op-from-wh');
-        const sTo = document.getElementById('op-to-wh');
-        const grid = document.getElementById('op-wh-grid');
-
-        const whOpts = DB.warehouses.filter(w => w !== 'Cucina').map(w => `<option value="${w}">${w}</option>`).join('');
-        sFrom.innerHTML = whOpts; sTo.innerHTML = whOpts;
-
-        divFrom.style.display = 'block'; divTo.style.display = 'block';
-        grid.style.gridTemplateColumns = '1fr 1fr';
-
-        if (type === 'ARRIVO_MERCE') {
-            divFrom.style.display = 'none'; grid.style.gridTemplateColumns = '1fr';
-        } else if (type === 'CORREZIONE_ADMIN') {
-            divFrom.style.display = 'none'; grid.style.gridTemplateColumns = '1fr';
-            document.getElementById('lbl-op-to').innerText = 'MAGAZZINO:';
-        } else if (type.includes('CUCINA')) {
-            divTo.style.display = 'none'; grid.style.gridTemplateColumns = '1fr';
-            document.getElementById('lbl-op-from').innerText = 'DALLA:';
-        } else {
-            document.getElementById('lbl-op-from').innerText = 'DA:';
-            document.getElementById('lbl-op-to').innerText = 'A:';
+            updateOpTypeUI();
+            renderOpCategoryChips();
+            renderOpSearch();
+            renderOpCart();
         }
-    }
 
-    function renderOpCategoryChips() {
-        const div = document.getElementById('op-cat-chips');
-        if (!div) return;
-        const cats = ['ALL', ...new Set(DB.products.map(p => p.Categoria))].filter(Boolean);
-        div.innerHTML = cats.map(c => `
+        function updateOpTypeUI() {
+            const type = document.getElementById('op-type-select').value;
+            const divFrom = document.getElementById('div-op-from');
+            const divTo = document.getElementById('div-op-to');
+            const sFrom = document.getElementById('op-from-wh');
+            const sTo = document.getElementById('op-to-wh');
+            const grid = document.getElementById('op-wh-grid');
+
+            const whOpts = DB.warehouses.filter(w => w !== 'Cucina').map(w => `<option value="${w}">${w}</option>`).join('');
+            sFrom.innerHTML = whOpts; sTo.innerHTML = whOpts;
+
+            divFrom.style.display = 'block'; divTo.style.display = 'block';
+            grid.style.gridTemplateColumns = '1fr 1fr';
+
+            if (type === 'ARRIVO_MERCE') {
+                divFrom.style.display = 'none'; grid.style.gridTemplateColumns = '1fr';
+            } else if (type === 'CORREZIONE_ADMIN') {
+                divFrom.style.display = 'none'; grid.style.gridTemplateColumns = '1fr';
+                document.getElementById('lbl-op-to').innerText = 'MAGAZZINO:';
+            } else if (type.includes('CUCINA')) {
+                divTo.style.display = 'none'; grid.style.gridTemplateColumns = '1fr';
+                document.getElementById('lbl-op-from').innerText = 'DALLA:';
+            } else {
+                document.getElementById('lbl-op-from').innerText = 'DA:';
+                document.getElementById('lbl-op-to').innerText = 'A:';
+            }
+        }
+
+        function renderOpCategoryChips() {
+            const div = document.getElementById('op-cat-chips');
+            if (!div) return;
+            const cats = ['ALL', ...new Set(DB.products.map(p => p.Categoria))].filter(Boolean);
+            div.innerHTML = cats.map(c => `
     <div class="tab-chip ${OP_ACTIVE_CAT === c ? 'active' : ''}" 
          onclick="OP_ACTIVE_CAT='${c.replace(/'/g, "\\'")}'; renderOpCategoryChips(); renderOpSearch()">
         ${c === 'ALL' ? 'TUTTI' : c}
     </div>`).join('');
-    }
-
-    function renderOpSearch() {
-        const q = document.getElementById('op-search').value.toLowerCase();
-        const div = document.getElementById('op-prod-list');
-        if (!div) return;
-        div.innerHTML = '';
-        const prods = DB.products.filter(p => {
-            const matchesQuery = !q || p.Nome.toLowerCase().includes(q);
-            const matchesCat = OP_ACTIVE_CAT === 'ALL' || p.Categoria === OP_ACTIVE_CAT;
-            return matchesQuery && matchesCat;
-        });
-
-        if (prods.length === 0) {
-            div.innerHTML = '<div style="text-align:center; padding:15px; color:#444; font-size:14px">Nessun prodotto trovato</div>';
-            return;
         }
 
-        prods.forEach(p => {
-            div.innerHTML += `
+        function renderOpSearch() {
+            const q = document.getElementById('op-search').value.toLowerCase();
+            const div = document.getElementById('op-prod-list');
+            if (!div) return;
+            div.innerHTML = '';
+            const prods = DB.products.filter(p => {
+                const matchesQuery = !q || p.Nome.toLowerCase().includes(q);
+                const matchesCat = OP_ACTIVE_CAT === 'ALL' || p.Categoria === OP_ACTIVE_CAT;
+                return matchesQuery && matchesCat;
+            });
+
+            if (prods.length === 0) {
+                div.innerHTML = '<div style="text-align:center; padding:15px; color:#444; font-size:14px">Nessun prodotto trovato</div>';
+                return;
+            }
+
+            prods.forEach(p => {
+                div.innerHTML += `
             <div class="prod-tile" onclick='openQtyPopup(${JSON.stringify(p).replace(/'/g, "&#39;")}, "OP")'>
                 <span><b>${p.Nome}</b></span>
                 <i class="bi bi-chevron-right"></i>
             </div>`;
-        });
-    }
+            });
+        }
 
-    function selectOpProduct(p, editIdx = -1) {
-        const initialVal = (editIdx >= 0) ? OP_CART[editIdx].tot : 0;
-        openQtyPopup(p, 'OPERATIONS', initialVal, editIdx);
-    }
+        function selectOpProduct(p, editIdx = -1) {
+            const initialVal = (editIdx >= 0) ? OP_CART[editIdx].tot : 0;
+            openQtyPopup(p, 'OPERATIONS', initialVal, editIdx);
+        }
 
-    function renderOpCart() {
-        const div = document.getElementById('op-cart-list');
-        const btn = document.getElementById('btn-confirm-op');
-        div.innerHTML = OP_CART.length ? '' : '<div style="color:#444; padding:20px; text-align:center">Lista vuota</div>';
-        btn.style.display = OP_CART.length ? 'block' : 'none';
+        function renderOpCart() {
+            const div = document.getElementById('op-cart-list');
+            const btn = document.getElementById('btn-confirm-op');
+            div.innerHTML = OP_CART.length ? '' : '<div style="color:#444; padding:20px; text-align:center">Lista vuota</div>';
+            btn.style.display = OP_CART.length ? 'block' : 'none';
 
-        OP_CART.forEach((it, idx) => {
-            const config = {
-                ARRIVO_MERCE: { label: 'Ordini (Entrate)', color: '#2ecc71', square: 'ðŸŸ©', path: `<span style="color:#888">${it.from} <i class="bi bi-arrow-right-short" style="vertical-align:middle; color:var(--accent)"></i> <span style="color:#2ecc71">${it.to}</span></span>` },
-                TRASFERIMENTO: { label: 'Spostamento', color: '#f1c40f', square: 'ðŸŸ¨', path: `<span style="color:#f1c40f">${it.from} <i class="bi bi-arrow-right-circle-fill" style="font-size:10px"></i> ${it.to}</span>` },
-                CARICO_CUCINA: { label: 'Carichi (Uscite)', color: '#e74c3c', square: 'ðŸŸ¥', path: `<span style="color:#888">${it.from} <i class="bi bi-arrow-right-short" style="color:var(--accent)"></i> <span style="color:#e74c3c">CUCINA</span></span>` },
-                CORREZIONE_ADMIN: { label: 'Correzione', color: '#3498db', square: 'âš™ï¸', path: `<span style="color:#3498db">${it.to}</span>` }
-            };
-            const c = config[it.type] || config.TRASFERIMENTO;
+            OP_CART.forEach((it, idx) => {
+                const config = {
+                    ARRIVO_MERCE: { label: 'Ordini (Entrate)', color: '#2ecc71', square: 'ðŸŸ©', path: `<span style="color:#888">${it.from} <i class="bi bi-arrow-right-short" style="vertical-align:middle; color:var(--accent)"></i> <span style="color:#2ecc71">${it.to}</span></span>` },
+                    TRASFERIMENTO: { label: 'Spostamento', color: '#f1c40f', square: 'ðŸŸ¨', path: `<span style="color:#f1c40f">${it.from} <i class="bi bi-arrow-right-circle-fill" style="font-size:10px"></i> ${it.to}</span>` },
+                    CARICO_CUCINA: { label: 'Carichi (Uscite)', color: '#e74c3c', square: 'ðŸŸ¥', path: `<span style="color:#888">${it.from} <i class="bi bi-arrow-right-short" style="color:var(--accent)"></i> <span style="color:#e74c3c">CUCINA</span></span>` },
+                    CORREZIONE_ADMIN: { label: 'Correzione', color: '#3498db', square: 'âš™ï¸', path: `<span style="color:#3498db">${it.to}</span>` }
+                };
+                const c = config[it.type] || config.TRASFERIMENTO;
 
-            let units = [];
-            if (it.c > 0) units.push(`<span><i class="bi bi-box-seam-fill" style="color:var(--c-box)"></i> ${it.c}</span>`);
-            if (it.pk > 0) units.push(`<span><i class="bi bi-archive-fill" style="color:var(--c-pack)"></i> ${it.pk}</span>`);
-            if (it.ps > 0) units.push(`<span><i class="bi bi-gear-wide-connected" style="color:var(--c-piece)"></i> ${it.ps}</span>`);
+                let units = [];
+                if (it.c > 0) units.push(`<span><i class="bi bi-box-seam-fill" style="color:var(--c-box)"></i> ${it.c}</span>`);
+                if (it.pk > 0) units.push(`<span><i class="bi bi-archive-fill" style="color:var(--c-pack)"></i> ${it.pk}</span>`);
+                if (it.ps > 0) units.push(`<span><i class="bi bi-gear-wide-connected" style="color:var(--c-piece)"></i> ${it.ps}</span>`);
 
-            div.innerHTML += `
+                div.innerHTML += `
         <div class="cart-card" onclick='selectOpProduct(${JSON.stringify(it.p).replace(/'/g, "&#39;")}, ${idx})' style="cursor:pointer; border-left:none; border:1px solid ${c.color}33; background: linear-gradient(180deg, ${c.color}10 0%, #111 100%); padding:0; overflow:hidden; margin-bottom:10px; text-align:center">
             <div style="background:${c.color}15; padding:4px 10px; display:flex; justify-content:center; align-items:center; gap:10px; border-bottom:1px solid ${c.color}20">
                 <div style="font-size:11px; font-weight:bold; color:${c.color}; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:5px">
@@ -2183,54 +2216,54 @@
                 </div>
             </div>
         </div>`;
-        });
-    }
-
-    function formatQtyStrHelper(qty, p) {
-        if (!qty || qty === 0) return "0 Pz";
-        let rem = qty; let det = [];
-        const crt = Math.floor(rem / (p.Pezzi_per_Cartone || 1));
-        if ((p.Pezzi_per_Cartone || 1) > 1 && crt > 0) { det.push(crt + " Ct"); rem %= (p.Pezzi_per_Cartone || 1); }
-        const pck = Math.floor(rem / (p.Pezzi_per_Pacco || 1));
-        if ((p.Pezzi_per_Pacco || 1) > 1 && pck > 0) { det.push(pck + " Pk"); rem %= (p.Pezzi_per_Pacco || 1); }
-        if (rem > 0 || det.length === 0) det.push(rem + " Pz");
-        return `${det.join(' ')} (Tot: ${qty})`;
-    }
-
-    async function submitOpMovements() {
-        if (!OP_CART.length) return;
-        showLoader(true);
-        const groups = {};
-        OP_CART.forEach(x => {
-            if (!groups[x.type]) groups[x.type] = [];
-            groups[x.type].push({ prodId: x.p.ID_Prodotto, qty: x.tot, fromWh: x.from, toWh: x.to, qtyStr: formatQtyStrHelper(x.tot, x.p) });
-        });
-
-        const types = Object.keys(groups);
-        try {
-            for (let t of types) {
-                const { error } = await supabase.rpc('process_movement', { p_user: USER.username, p_type: t, p_items: groups[t] });
-                if (error) throw error;
-            }
-            showLoader(false); OP_CART = []; renderOpCart(); Swal.fire('Successo', 'Operazioni registrate', 'success');
-        } catch (err) {
-            showLoader(false); Swal.fire('Errore', err.message, 'error');
+            });
         }
-    }
 
-    function openQtyPopup(p, context, initialVal = 0, editIdx = -1) {
-        window.tempP = p;
-        const isDaily = (context === 'DAILY');
-        const dailyData = isDaily ? DAILY_DATA[p.ID_Prodotto] : null;
-        const val = dailyData?.tot || initialVal;
+        function formatQtyStrHelper(qty, p) {
+            if (!qty || qty === 0) return "0 Pz";
+            let rem = qty; let det = [];
+            const crt = Math.floor(rem / (p.Pezzi_per_Cartone || 1));
+            if ((p.Pezzi_per_Cartone || 1) > 1 && crt > 0) { det.push(crt + " Ct"); rem %= (p.Pezzi_per_Cartone || 1); }
+            const pck = Math.floor(rem / (p.Pezzi_per_Pacco || 1));
+            if ((p.Pezzi_per_Pacco || 1) > 1 && pck > 0) { det.push(pck + " Pk"); rem %= (p.Pezzi_per_Pacco || 1); }
+            if (rem > 0 || det.length === 0) det.push(rem + " Pz");
+            return `${det.join(' ')} (Tot: ${qty})`;
+        }
 
-        let c = dailyData?.c || Math.floor(val / (p.Pezzi_per_Cartone || 1));
-        let pk = dailyData?.pk || Math.floor((val % (p.Pezzi_per_Cartone || 1)) / (p.Pezzi_per_Pacco || 1));
-        let ps = dailyData?.ps || (val % (p.Pezzi_per_Pacco || 1));
+        async function submitOpMovements() {
+            if (!OP_CART.length) return;
+            showLoader(true);
+            const groups = {};
+            OP_CART.forEach(x => {
+                if (!groups[x.type]) groups[x.type] = [];
+                groups[x.type].push({ prodId: x.p.ID_Prodotto, qty: x.tot, fromWh: x.from, toWh: x.to, qtyStr: formatQtyStrHelper(x.tot, x.p) });
+            });
 
-        Swal.fire({
-            title: p.Nome,
-            html: `<div class="swal-grid">
+            const types = Object.keys(groups);
+            try {
+                for (let t of types) {
+                    const { error } = await supabase.rpc('process_movement', { p_user: USER.username, p_type: t, p_items: groups[t] });
+                    if (error) throw error;
+                }
+                showLoader(false); OP_CART = []; renderOpCart(); Swal.fire('Successo', 'Operazioni registrate', 'success');
+            } catch (err) {
+                showLoader(false); Swal.fire('Errore', err.message, 'error');
+            }
+        }
+
+        function openQtyPopup(p, context, initialVal = 0, editIdx = -1) {
+            window.tempP = p;
+            const isDaily = (context === 'DAILY');
+            const dailyData = isDaily ? DAILY_DATA[p.ID_Prodotto] : null;
+            const val = dailyData?.tot || initialVal;
+
+            let c = dailyData?.c || Math.floor(val / (p.Pezzi_per_Cartone || 1));
+            let pk = dailyData?.pk || Math.floor((val % (p.Pezzi_per_Cartone || 1)) / (p.Pezzi_per_Pacco || 1));
+            let ps = dailyData?.ps || (val % (p.Pezzi_per_Pacco || 1));
+
+            Swal.fire({
+                title: p.Nome,
+                html: `<div class="swal-grid">
                 ${p.Pezzi_per_Cartone > 1 ? `<div class="swal-field"><label><i class="bi bi-box-seam-fill" style="color:var(--c-box)"></i> CARTONI (x${p.Pezzi_per_Cartone})</label>
                     <div style="display:flex; align-items:center; gap:5px">
                         <div class="stepper-btn" onclick="st('s-c',-1)">-</div>
@@ -2254,150 +2287,150 @@
                 </div>
             </div>
             <div style="margin-top:15px; font-size:22px; font-family:'Teko'; letter-spacing:1px; text-align:center">Totale: <i class="bi bi-gear-wide-connected" style="color:var(--accent)"></i> <b id="s-t" style="color:var(--accent)">${val}</b> pezzi</div>`,
-            showCancelButton: true,
-            confirmButtonText: 'CONFERMA',
-            cancelButtonText: 'ANNULLA',
-            preConfirm: () => {
-                const tc = parseInt(document.getElementById('s-c')?.value || 0), tpk = parseInt(document.getElementById('s-pk')?.value || 0), tps = parseInt(document.getElementById('s-ps')?.value || 0);
-                return { tot: (tc * (p.Pezzi_per_Cartone || 1)) + (tpk * (p.Pezzi_per_Pacco || 1)) + tps, c: tc, pk: tpk, ps: tps };
-            }
-        }).then(res => {
-            if (res.isConfirmed) {
-                if (isDaily) {
-                    DAILY_DATA[p.ID_Prodotto] = { tot: res.value.tot, c: res.value.c, pk: res.value.pk, ps: res.value.ps };
-                    renderDailyList(p.Reparto);
-                } else {
-                    if (editIdx >= 0) {
-                        OP_CART[editIdx].tot = res.value.tot; OP_CART[editIdx].c = res.value.c;
-                        OP_CART[editIdx].pk = res.value.pk; OP_CART[editIdx].ps = res.value.ps;
+                showCancelButton: true,
+                confirmButtonText: 'CONFERMA',
+                cancelButtonText: 'ANNULLA',
+                preConfirm: () => {
+                    const tc = parseInt(document.getElementById('s-c')?.value || 0), tpk = parseInt(document.getElementById('s-pk')?.value || 0), tps = parseInt(document.getElementById('s-ps')?.value || 0);
+                    return { tot: (tc * (p.Pezzi_per_Cartone || 1)) + (tpk * (p.Pezzi_per_Pacco || 1)) + tps, c: tc, pk: tpk, ps: tps };
+                }
+            }).then(res => {
+                if (res.isConfirmed) {
+                    if (isDaily) {
+                        DAILY_DATA[p.ID_Prodotto] = { tot: res.value.tot, c: res.value.c, pk: res.value.pk, ps: res.value.ps };
+                        renderDailyList(p.Reparto);
                     } else {
-                        const type = document.getElementById('op-type-select').value;
-                        const fromWh = (type === 'ARRIVO_MERCE' ? (p.Fornitore || 'FORNITORE') : document.getElementById('op-from-wh').value);
-                        const toWh = (type.includes('CUCINA') ? 'CUCINA' : document.getElementById('op-to-wh').value);
-
-                        const existing = OP_CART.find(it => it.p.ID_Prodotto === p.ID_Prodotto && it.from === fromWh && it.to === toWh && it.type === type);
-                        if (existing) {
-                            existing.tot += res.value.tot; existing.c += res.value.c;
-                            existing.pk += res.value.pk; existing.ps += res.value.ps;
+                        if (editIdx >= 0) {
+                            OP_CART[editIdx].tot = res.value.tot; OP_CART[editIdx].c = res.value.c;
+                            OP_CART[editIdx].pk = res.value.pk; OP_CART[editIdx].ps = res.value.ps;
                         } else {
-                            OP_CART.push({ p, tot: res.value.tot, c: res.value.c, pk: res.value.pk, ps: res.value.ps, from: fromWh, to: toWh, type });
+                            const type = document.getElementById('op-type-select').value;
+                            const fromWh = (type === 'ARRIVO_MERCE' ? (p.Fornitore || 'FORNITORE') : document.getElementById('op-from-wh').value);
+                            const toWh = (type.includes('CUCINA') ? 'CUCINA' : document.getElementById('op-to-wh').value);
+
+                            const existing = OP_CART.find(it => it.p.ID_Prodotto === p.ID_Prodotto && it.from === fromWh && it.to === toWh && it.type === type);
+                            if (existing) {
+                                existing.tot += res.value.tot; existing.c += res.value.c;
+                                existing.pk += res.value.pk; existing.ps += res.value.ps;
+                            } else {
+                                OP_CART.push({ p, tot: res.value.tot, c: res.value.c, pk: res.value.pk, ps: res.value.ps, from: fromWh, to: toWh, type });
+                            }
                         }
+                        renderOpCart();
                     }
-                    renderOpCart();
                 }
-            }
-        });
-    }
+            });
+        }
 
-    function uPT() {
-        const p = window.tempP;
-        const cc = document.getElementById('s-c')?.value || 0;
-        const pp = document.getElementById('s-pk')?.value || 0;
-        const ss = document.getElementById('s-ps')?.value || 0;
-        const tot = (parseInt(cc || 0) * (p.Pezzi_per_Cartone || 1)) + (parseInt(pp || 0) * (p.Pezzi_per_Pacco || 1)) + parseInt(ss || 0);
-        document.getElementById('s-t').innerText = tot;
-    }
+        function uPT() {
+            const p = window.tempP;
+            const cc = document.getElementById('s-c')?.value || 0;
+            const pp = document.getElementById('s-pk')?.value || 0;
+            const ss = document.getElementById('s-ps')?.value || 0;
+            const tot = (parseInt(cc || 0) * (p.Pezzi_per_Cartone || 1)) + (parseInt(pp || 0) * (p.Pezzi_per_Pacco || 1)) + parseInt(ss || 0);
+            document.getElementById('s-t').innerText = tot;
+        }
 
-    window.st = function (id, d) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        let v = parseInt(el.value || 0) + d;
-        if (v < 0) v = 0;
-        el.value = v;
-        uPT();
-    }
+        window.st = function (id, d) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            let v = parseInt(el.value || 0) + d;
+            if (v < 0) v = 0;
+            el.value = v;
+            uPT();
+        }
 
-    // --- LISTA GIORNALIERA CUCINA ---
-    function renderDailyList(dept) {
-        document.getElementById('dept-tabs').innerHTML = ['LAVAGGIO', 'FRIGGITRICI', 'GRIGLIA', 'PANINI'].map(d => `<div class="tab-chip ${d === dept ? 'active' : ''}" onclick="renderDailyList('${d}')">${d}</div>`).join('');
-        const div = document.getElementById('daily-list-body'); div.innerHTML = '';
-        const prods = DB.products.filter(p => (p.Reparto || '').toUpperCase() === dept);
+        // --- LISTA GIORNALIERA CUCINA ---
+        function renderDailyList(dept) {
+            document.getElementById('dept-tabs').innerHTML = ['LAVAGGIO', 'FRIGGITRICI', 'GRIGLIA', 'PANINI'].map(d => `<div class="tab-chip ${d === dept ? 'active' : ''}" onclick="renderDailyList('${d}')">${d}</div>`).join('');
+            const div = document.getElementById('daily-list-body'); div.innerHTML = '';
+            const prods = DB.products.filter(p => (p.Reparto || '').toUpperCase() === dept);
 
-        if (!prods.length) { div.innerHTML = '<div style="text-align:center; padding:20px; color:#444">Nessun prodotto in questo reparto</div>'; return; }
+            if (!prods.length) { div.innerHTML = '<div style="text-align:center; padding:20px; color:#444">Nessun prodotto in questo reparto</div>'; return; }
 
-        [...new Set(prods.map(p => p.Categoria))].forEach(cat => {
-            div.innerHTML += `<div class="cat-header">${cat || 'Altro'}</div>`;
-            const catProds = prods.filter(p => p.Categoria === cat);
-            const container = document.createElement('div');
-            container.className = 'prod-btn-list';
-            catProds.forEach(p => {
-                const data = DAILY_DATA[p.ID_Prodotto];
-                const val = (data?.tot !== undefined) ? data.tot : 0;
-                let breakdownHTML = '';
-                if (data) {
-                    let parts = [];
-                    if (data.c > 0) parts.push(`<span class="unit-pill"><i class="bi bi-box-seam-fill" style="color:var(--c-box)"></i> ${data.c}</span>`);
-                    if (data.pk > 0) parts.push(`<span class="unit-pill"><i class="bi bi-archive-fill" style="color:var(--c-pack)"></i> ${data.pk}</span>`);
-                    if (data.ps > 0) parts.push(`<span class="unit-pill"><i class="bi bi-gear-wide-connected" style="color:white"></i> ${data.ps}</span>`);
-                    parts.push(`<span class="unit-pill" style="background:#222; border-color:var(--accent); padding:6px 10px"><span style="color:#888; font-size:10px; margin-right:4px">TOT:</span><i class="bi bi-gear-wide-connected" style="color:var(--accent)"></i> <b style="color:var(--accent)">${val}</b></span>`);
-                    breakdownHTML = parts.join(' ');
-                } else {
-                    breakdownHTML = '<span style="color:#444">Non inserito</span>';
-                }
+            [...new Set(prods.map(p => p.Categoria))].forEach(cat => {
+                div.innerHTML += `<div class="cat-header">${cat || 'Altro'}</div>`;
+                const catProds = prods.filter(p => p.Categoria === cat);
+                const container = document.createElement('div');
+                container.className = 'prod-btn-list';
+                catProds.forEach(p => {
+                    const data = DAILY_DATA[p.ID_Prodotto];
+                    const val = (data?.tot !== undefined) ? data.tot : 0;
+                    let breakdownHTML = '';
+                    if (data) {
+                        let parts = [];
+                        if (data.c > 0) parts.push(`<span class="unit-pill"><i class="bi bi-box-seam-fill" style="color:var(--c-box)"></i> ${data.c}</span>`);
+                        if (data.pk > 0) parts.push(`<span class="unit-pill"><i class="bi bi-archive-fill" style="color:var(--c-pack)"></i> ${data.pk}</span>`);
+                        if (data.ps > 0) parts.push(`<span class="unit-pill"><i class="bi bi-gear-wide-connected" style="color:white"></i> ${data.ps}</span>`);
+                        parts.push(`<span class="unit-pill" style="background:#222; border-color:var(--accent); padding:6px 10px"><span style="color:#888; font-size:10px; margin-right:4px">TOT:</span><i class="bi bi-gear-wide-connected" style="color:var(--accent)"></i> <b style="color:var(--accent)">${val}</b></span>`);
+                        breakdownHTML = parts.join(' ');
+                    } else {
+                        breakdownHTML = '<span style="color:#444">Non inserito</span>';
+                    }
 
-                container.innerHTML += `
+                    container.innerHTML += `
                     <div class="prod-btn" onclick='openQtyPopup(${JSON.stringify(p).replace(/'/g, "&#39;")}, "DAILY")'>
                         <span><b>${p.Nome}</b></span>
                         <div style="text-align:right; display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end; align-items:center">${breakdownHTML}</div>
                     </div>`;
+                });
+                div.appendChild(container);
             });
-            div.appendChild(container);
-        });
-    }
-
-    async function submitDaily() {
-        if (!Object.keys(DAILY_DATA).length) return;
-        showLoader(true);
-        try {
-            const today = new Date();
-            const todayStr = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-            const { data: existing } = await supabase.from('daily_reports')
-                .select('*').gte('date', todayStr + 'T00:00:00Z').lte('date', todayStr + 'T23:59:59Z').limit(1);
-
-            let reportId = (existing && existing.length > 0) ? existing[0].report_id : 'REP-' + Date.now();
-            let itemsMap = {};
-            if (existing && existing.length > 0 && Array.isArray(existing[0].details)) {
-                existing[0].details.forEach(it => { itemsMap[it.pid] = it; });
-            }
-
-            for (let prodId in DAILY_DATA) {
-                let qty = parseInt(DAILY_DATA[prodId].tot);
-                if (!isNaN(qty) && qty >= 0) {
-                    const p = DB.products.find(x => x.ID_Prodotto == prodId) || { Nome: prodId, Fornitore: '-', Pezzi_per_Cartone: 1, Pezzi_per_Pacco: 1 };
-                    itemsMap[prodId] = {
-                        pid: prodId, name: p.Nome, supp: p.Fornitore, qty: qty,
-                        fmt: formatQtyStrHelper(qty, p),
-                        c: DAILY_DATA[prodId].c, pk: DAILY_DATA[prodId].pk, ps: DAILY_DATA[prodId].ps,
-                        lastUser: USER.username
-                    };
-                }
-            }
-            let payload = { report_id: reportId, details: Object.values(itemsMap), last_modified_by: USER.username, last_modified_at: new Date().toISOString() };
-            if (!existing || existing.length === 0) payload.created_by = USER.username;
-
-            const { error } = await supabase.from('daily_reports').upsert(payload, { onConflict: 'report_id' });
-            if (error) throw error;
-
-            showLoader(false);
-            Swal.fire('Inviato', 'Report salvato', 'success');
-            DAILY_DATA = {}; renderDailyList('LAVAGGIO');
-        } catch (err) {
-            showLoader(false); Swal.fire('Errore', err.message, 'error');
         }
-    }
 
-    // --- ADMIN FUNZIONI ---
-    async function loadMovementsLog() {
-        showLoader(true);
-        const { data: logs, error } = await supabase.from('movements').select('*').order('created_at', { ascending: false }).limit(100);
-        showLoader(false);
-        if (error) return console.error(error);
-        const tbody = document.getElementById('mov-log-body'); tbody.innerHTML = '';
-        logs.forEach(l => {
-            const dt = new Date(l.created_at).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' });
-            const pInfo = DB.products.find(x => x.Nome === l.product_name) || { Pezzi_per_Cartone: 1, Pezzi_per_Pacco: 1 };
-            const tot = l.qty_string.match(/Tot:\s*(\d+)/)?.[1] || 0;
-            tbody.innerHTML += `<tr>
+        async function submitDaily() {
+            if (!Object.keys(DAILY_DATA).length) return;
+            showLoader(true);
+            try {
+                const today = new Date();
+                const todayStr = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+                const { data: existing } = await supabase.from('daily_reports')
+                    .select('*').gte('date', todayStr + 'T00:00:00Z').lte('date', todayStr + 'T23:59:59Z').limit(1);
+
+                let reportId = (existing && existing.length > 0) ? existing[0].report_id : 'REP-' + Date.now();
+                let itemsMap = {};
+                if (existing && existing.length > 0 && Array.isArray(existing[0].details)) {
+                    existing[0].details.forEach(it => { itemsMap[it.pid] = it; });
+                }
+
+                for (let prodId in DAILY_DATA) {
+                    let qty = parseInt(DAILY_DATA[prodId].tot);
+                    if (!isNaN(qty) && qty >= 0) {
+                        const p = DB.products.find(x => x.ID_Prodotto == prodId) || { Nome: prodId, Fornitore: '-', Pezzi_per_Cartone: 1, Pezzi_per_Pacco: 1 };
+                        itemsMap[prodId] = {
+                            pid: prodId, name: p.Nome, supp: p.Fornitore, qty: qty,
+                            fmt: formatQtyStrHelper(qty, p),
+                            c: DAILY_DATA[prodId].c, pk: DAILY_DATA[prodId].pk, ps: DAILY_DATA[prodId].ps,
+                            lastUser: USER.username
+                        };
+                    }
+                }
+                let payload = { report_id: reportId, details: Object.values(itemsMap), last_modified_by: USER.username, last_modified_at: new Date().toISOString() };
+                if (!existing || existing.length === 0) payload.created_by = USER.username;
+
+                const { error } = await supabase.from('daily_reports').upsert(payload, { onConflict: 'report_id' });
+                if (error) throw error;
+
+                showLoader(false);
+                Swal.fire('Inviato', 'Report salvato', 'success');
+                DAILY_DATA = {}; renderDailyList('LAVAGGIO');
+            } catch (err) {
+                showLoader(false); Swal.fire('Errore', err.message, 'error');
+            }
+        }
+
+        // --- ADMIN FUNZIONI ---
+        async function loadMovementsLog() {
+            showLoader(true);
+            const { data: logs, error } = await supabase.from('movements').select('*').order('created_at', { ascending: false }).limit(100);
+            showLoader(false);
+            if (error) return console.error(error);
+            const tbody = document.getElementById('mov-log-body'); tbody.innerHTML = '';
+            logs.forEach(l => {
+                const dt = new Date(l.created_at).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' });
+                const pInfo = DB.products.find(x => x.Nome === l.product_name) || { Pezzi_per_Cartone: 1, Pezzi_per_Pacco: 1 };
+                const tot = l.qty_string.match(/Tot:\s*(\d+)/)?.[1] || 0;
+                tbody.innerHTML += `<tr>
                 <td>${dt}</td>
                 <td><span class="badge-type ${l.type.includes('CUCINA') ? 'badge-red' : 'badge-green'}">${l.type}</span></td>
                 <td><b style="color:white">${l.product_name}</b></td>
@@ -2406,62 +2439,62 @@
                 <td><span style="color:#888">${l.from_wh}</span> <i class="bi bi-arrow-right-circle-fill" style="color:var(--accent); font-size:12px"></i> <span style="color:#888">${l.to_wh}</span></td>
                 <td style="font-size:11px; color:#666">${l.user_name}</td>
             </tr>`;
-        });
-    }
+            });
+        }
 
-    async function loadReports() {
-        showLoader(true);
-        const supp = document.getElementById('report-supp-filter').value;
-        const { data: reports, error } = await supabase.from('daily_reports').select('*').order('date', { ascending: false }).limit(50);
-        showLoader(false);
-        if (error) return console.error(error);
+        async function loadReports() {
+            showLoader(true);
+            const supp = document.getElementById('report-supp-filter').value;
+            const { data: reports, error } = await supabase.from('daily_reports').select('*').order('date', { ascending: false }).limit(50);
+            showLoader(false);
+            if (error) return console.error(error);
 
-        ALL_REPORTS = reports.map(r => ({
-            date: new Date(r.date).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' }),
-            mod: r.last_modified_at ? new Date(r.last_modified_at).toLocaleString('it-IT', { timeStyle: 'short' }) : '',
-            user: r.last_modified_by || r.created_by,
-            items: r.details || []
-        }));
+            ALL_REPORTS = reports.map(r => ({
+                date: new Date(r.date).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' }),
+                mod: r.last_modified_at ? new Date(r.last_modified_at).toLocaleString('it-IT', { timeStyle: 'short' }) : '',
+                user: r.last_modified_by || r.created_by,
+                items: r.details || []
+            }));
 
-        const div = document.getElementById('report-view-body'); div.innerHTML = '';
-        const filtered = ALL_REPORTS.filter(r => (supp === 'ALL' ? true : r.items.some(it => it.supp === supp)));
+            const div = document.getElementById('report-view-body'); div.innerHTML = '';
+            const filtered = ALL_REPORTS.filter(r => (supp === 'ALL' ? true : r.items.some(it => it.supp === supp)));
 
-        filtered.forEach((r, idx) => {
-            div.innerHTML += `<button class="btn-neon" style="width:100%; margin-bottom:5px" onclick="openReportDetail(${ALL_REPORTS.indexOf(r)})">${r.date}</button>`;
-        });
-    }
+            filtered.forEach((r, idx) => {
+                div.innerHTML += `<button class="btn-neon" style="width:100%; margin-bottom:5px" onclick="openReportDetail(${ALL_REPORTS.indexOf(r)})">${r.date}</button>`;
+            });
+        }
 
-    function openReportDetail(idx) {
-        const r = ALL_REPORTS[idx]; if (!r) return;
-        window.currentReport = r;
-        const suppFilter = document.getElementById('report-supp-filter').value;
-        const grouped = {};
-        r.items.forEach(it => {
-            if (suppFilter !== 'ALL' && it.supp !== suppFilter) return;
-            if (!grouped[it.supp]) grouped[it.supp] = [];
-            grouped[it.supp].push(it);
-        });
+        function openReportDetail(idx) {
+            const r = ALL_REPORTS[idx]; if (!r) return;
+            window.currentReport = r;
+            const suppFilter = document.getElementById('report-supp-filter').value;
+            const grouped = {};
+            r.items.forEach(it => {
+                if (suppFilter !== 'ALL' && it.supp !== suppFilter) return;
+                if (!grouped[it.supp]) grouped[it.supp] = [];
+                grouped[it.supp].push(it);
+            });
 
-        let modInfo = r.mod ? `<div style="font-size:12px; color:#888;">Ultima mod: ${r.mod} (da ${r.user})</div>` : '';
-        let h = `<div style="text-align:center"><h2 style="color:var(--accent); font-family:'Teko'; border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:5px;">REPORT ${r.date}</h2>${modInfo}</div>`;
+            let modInfo = r.mod ? `<div style="font-size:12px; color:#888;">Ultima mod: ${r.mod} (da ${r.user})</div>` : '';
+            let h = `<div style="text-align:center"><h2 style="color:var(--accent); font-family:'Teko'; border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:5px;">REPORT ${r.date}</h2>${modInfo}</div>`;
 
-        const supps = Object.keys(grouped);
-        if (supps.length === 0) h += `<div style="text-align:center; padding:40px; color:#888">Nessun dato</div>`;
+            const supps = Object.keys(grouped);
+            if (supps.length === 0) h += `<div style="text-align:center; padding:40px; color:#888">Nessun dato</div>`;
 
-        const rowColors = [
-            { head: '#bbdefb', prod: '#e3f2fd', break: '#f5faff' },
-            { head: '#c8e6c9', prod: '#e8f5e9', break: '#f1f8e9' },
-            { head: '#fff9c4', prod: '#fffde7', break: '#fffef0' }
-        ];
+            const rowColors = [
+                { head: '#bbdefb', prod: '#e3f2fd', break: '#f5faff' },
+                { head: '#c8e6c9', prod: '#e8f5e9', break: '#f1f8e9' },
+                { head: '#fff9c4', prod: '#fffde7', break: '#fffef0' }
+            ];
 
-        supps.forEach((s, sIdx) => {
-            const theme = rowColors[sIdx % rowColors.length];
-            h += `<div style="width:300px; margin: 15px auto 0 auto; height:32px; display:flex; align-items:center; justify-content:center; background:${theme.head}; color:#000; font-family:sans-serif; font-size:14px; font-weight:bold; letter-spacing:1px">${s}</div><div style="width:300px; margin: 0 auto 15px auto; color:#000">`;
-            grouped[s].forEach((it, i) => {
-                const p = DB.products.find(x => x.ID_Prodotto == it.pid) || { Nome: it.name, Pezzi_per_Cartone: 1, Pezzi_per_Pacco: 1 };
-                const isLast = i === grouped[s].length - 1;
-                const userBadge = it.lastUser ? `<span style="font-size:10px; color:#666; display:block">(${it.lastUser})</span>` : '';
-                h += `<table style="width:100%; border-collapse:collapse; border:1px solid #000; margin:0; ${isLast ? '' : 'border-bottom:none'}">
+            supps.forEach((s, sIdx) => {
+                const theme = rowColors[sIdx % rowColors.length];
+                h += `<div style="width:300px; margin: 15px auto 0 auto; height:32px; display:flex; align-items:center; justify-content:center; background:${theme.head}; color:#000; font-family:sans-serif; font-size:14px; font-weight:bold; letter-spacing:1px">${s}</div><div style="width:300px; margin: 0 auto 15px auto; color:#000">`;
+                grouped[s].forEach((it, i) => {
+                    const p = DB.products.find(x => x.ID_Prodotto == it.pid) || { Nome: it.name, Pezzi_per_Cartone: 1, Pezzi_per_Pacco: 1 };
+                    const isLast = i === grouped[s].length - 1;
+                    const userBadge = it.lastUser ? `<span style="font-size:10px; color:#666; display:block">(${it.lastUser})</span>` : '';
+                    h += `<table style="width:100%; border-collapse:collapse; border:1px solid #000; margin:0; ${isLast ? '' : 'border-bottom:none'}">
                         <tr style="background:${theme.prod}">
                             <td style="padding:4px; height:30px; font-size:13px; font-weight:bold; border-bottom:1px solid #000; border-right:1px solid #000; text-align:center; width:60%;">${p.Nome}${userBadge}</td>
                             <td style="padding:4px; text-align:center; font-size:12px; border-bottom:1px solid #000; width:40%;"><span style="color:#555; font-size:10px">Tot:</span> <b>${it.qty}</b> pz</td>
@@ -2470,80 +2503,90 @@
                             <td colspan="2" style="padding:2px; height:24px; text-align:center;"><div class="qty-box" style="margin:0; justify-content:center; gap:5px">${renderQtyBadges(it.qty, p)}</div></td>
                         </tr>
                       </table>`;
+                });
+                h += `</div>`;
             });
-            h += `</div>`;
-        });
-        document.getElementById('report-print-content').innerHTML = h;
-        document.getElementById('modal-report-print').style.display = 'flex';
-    }
+            document.getElementById('report-print-content').innerHTML = h;
+            document.getElementById('modal-report-print').style.display = 'flex';
+        }
 
-    // Per semplicitÃ  omettiamo printReportDiv (che generava css extra etc) in questo stub, lo potremmo incollare.
-    function printReportDiv() { Swal.fire('Avviso', 'Stampa report da implementare', 'info'); }
+        // Per semplicitÃ  omettiamo printReportDiv (che generava css extra etc) in questo stub, lo potremmo incollare.
+        function printReportDiv() { Swal.fire('Avviso', 'Stampa report da implementare', 'info'); }
 
-    function renderUsers() {
-        const div = document.getElementById('admin-users-list'); div.innerHTML = '';
-        DB.users.forEach(u => {
-            div.innerHTML += `<div class="prod-btn" style="cursor:default; margin-bottom:5px">
+        function renderUsers() {
+            const div = document.getElementById('admin-users-list'); div.innerHTML = '';
+            DB.users.forEach(u => {
+                div.innerHTML += `<div class="prod-btn" style="cursor:default; margin-bottom:5px">
                     <b>${u.user} <small style="color:var(--accent)">[${u.role}]</small></b>
                     <div>
                         <button class="icon-btn" style="font-size:18px" onclick="openUserModal('${u.user}')"><i class="bi bi-pencil"></i></button>
-                        <button class="icon-btn" style="font-size:18px; color:var(--danger)" onclick="deleteUser('${u.user}')"><i class="bi bi-trash"></i></button>
+                        ${u.user !== USER.username ? `<button class="icon-btn" style="font-size:18px; color:var(--danger)" onclick="deleteUser('${u.user}')"><i class="bi bi-trash"></i></button>` : ''}
                     </div>
                 </div>`;
-        });
-    }
+            });
+        }
 
-    function openUserModal(username) {
-        document.getElementById('modal-user').querySelector('.modal-header span').innerText = username ? 'MODIFICA UTENTE' : 'NUOVO UTENTE';
-        const u = DB.users.find(x => x.user === username) || { user: '', pass: '', role: 'User' };
-        document.getElementById('user-old-name').value = u.user;
-        document.getElementById('user-name').value = u.user;
-        document.getElementById('user-pass').value = u.pass;
-        document.getElementById('user-role').value = u.role;
-        document.getElementById('modal-user').style.display = 'flex';
-    }
+        function openUserModal(username) {
+            document.getElementById('modal-user').querySelector('.modal-header span').innerText = username ? 'MODIFICA UTENTE' : 'NUOVO UTENTE';
+            const u = DB.users.find(x => x.user === username) || { user: '', pass: '', role: 'User' };
+            document.getElementById('user-old-name').value = u.user;
+            document.getElementById('user-name').value = u.user;
+            document.getElementById('user-pass').value = ''; // Don't show password
+            document.getElementById('user-pass').placeholder = username ? 'Lascia vuoto per non cambiare' : 'Password (Obbligatoria)';
+            document.getElementById('user-role').value = u.role;
+            document.getElementById('modal-user').style.display = 'flex';
+        }
 
-    async function saveUser() {
-        showLoader(true);
-        try {
+        async function saveUser() {
             const oldU = document.getElementById('user-old-name').value;
             const newU = document.getElementById('user-name').value;
             const newP = document.getElementById('user-pass').value;
             const newR = document.getElementById('user-role').value;
-            if (oldU) {
-                const existing = DB.users.find(u => u.user === oldU);
-                if (existing) await supabase.from('users').update({ username: newU, password: newP, role: newR }).eq('id', existing.id);
-            } else {
-                await supabase.from('users').insert({ username: newU, password: newP, role: newR });
-            }
-            showLoader(false); closeModal('modal-user'); nav('admin-users');
-        } catch (err) { showLoader(false); Swal.fire('Errore', err.message, 'error'); }
-    }
 
-    async function deleteUser(u) {
-        if (confirm('Eliminare utente ' + u + '?')) {
+            if (!newU) return Swal.fire('Errore', 'Inserisci username', 'error');
+            if (!oldU && !newP) return Swal.fire('Errore', 'Password obbligatoria per nuovi utenti', 'error');
+
             showLoader(true);
             try {
-                await supabase.from('users').delete().eq('username', u);
-                nav('admin-users');
+                let error;
+                if (oldU) {
+                    const res = await supabase.rpc('admin_update_user', { p_old_username: oldU, p_new_username: newU, p_new_password: newP, p_new_role: newR });
+                    error = res.error || (res.data?.status === 'error' ? new Error(res.data.message) : null);
+                } else {
+                    const res = await supabase.rpc('admin_create_user', { p_username: newU, p_password: newP, p_role: newR });
+                    error = res.error || (res.data?.status === 'error' ? new Error(res.data.message) : null);
+                }
+                if (error) throw error;
+
+                showLoader(false); closeModal('modal-user'); nav('admin-users');
             } catch (err) { showLoader(false); Swal.fire('Errore', err.message, 'error'); }
         }
-    }
 
-    function renderAdminProds() {
-        const q = document.getElementById('admin-prod-search').value.toLowerCase();
-        const div = document.getElementById('admin-prod-list'); div.innerHTML = '<button class="btn-neon" style="font-size:18px; margin-bottom:20px" onclick="openUserModal()">+ NUOVO PRODOTTO</button>';
-        const btn = document.createElement('button');
-        btn.innerHTML = "+ NUOVO PRODOTTO";
-        btn.className = "btn-neon";
-        btn.style.marginBottom = "20px";
-        btn.onclick = () => editProduct(null);
-        div.innerHTML = '';
-        div.appendChild(btn);
+        async function deleteUser(u) {
+            if (confirm('Eliminare utente ' + u + '?')) {
+                showLoader(true);
+                try {
+                    const { data, error } = await supabase.rpc('admin_delete_user', { p_username: u });
+                    if (error || data?.status === 'error') throw error || new Error(data?.message);
+                    nav('admin-users');
+                } catch (err) { showLoader(false); Swal.fire('Errore', err.message, 'error'); }
+            }
+        }
 
-        const container = document.createElement('div'); container.className = 'prod-btn-list';
-        DB.products.filter(p => p.Nome.toLowerCase().includes(q)).forEach(p => {
-            container.innerHTML += `
+        function renderAdminProds() {
+            const q = document.getElementById('admin-prod-search').value.toLowerCase();
+            const div = document.getElementById('admin-prod-list'); div.innerHTML = '<button class="btn-neon" style="font-size:18px; margin-bottom:20px" onclick="openUserModal()">+ NUOVO PRODOTTO</button>';
+            const btn = document.createElement('button');
+            btn.innerHTML = "+ NUOVO PRODOTTO";
+            btn.className = "btn-neon";
+            btn.style.marginBottom = "20px";
+            btn.onclick = () => editProduct(null);
+            div.innerHTML = '';
+            div.appendChild(btn);
+
+            const container = document.createElement('div'); container.className = 'prod-btn-list';
+            DB.products.filter(p => p.Nome.toLowerCase().includes(q)).forEach(p => {
+                container.innerHTML += `
                 <div class="prod-btn" onclick="editProduct('${p.ID_Prodotto}')">
                     <div style="display:flex; flex-direction:column">
                         <b>${p.Nome}</b>
@@ -2551,13 +2594,13 @@
                     </div>
                     <i class="bi bi-pencil" style="color:var(--accent)"></i>
                 </div>`;
-        });
-        div.appendChild(container);
-    }
+            });
+            div.appendChild(container);
+        }
 
-    function editProduct(pid) {
-        const p = DB.products.find(x => x.ID_Prodotto == pid) || { Nome: '', Categoria: '', Fornitore: '', Pezzi_per_Cartone: 1, Pezzi_per_Pacco: 1, Reparto: '' };
-        document.getElementById('edit-form-content').innerHTML = `
+        function editProduct(pid) {
+            const p = DB.products.find(x => x.ID_Prodotto == pid) || { Nome: '', Categoria: '', Fornitore: '', Pezzi_per_Cartone: 1, Pezzi_per_Pacco: 1, Reparto: '' };
+            document.getElementById('edit-form-content').innerHTML = `
             <div class="modal-form-group"><label>NOME PRODOTTO</label><input id="edt-name" class="dark-input" value="${p.Nome}" autocomplete="off"></div>
             <div class="modal-form-group"><label>CATEGORIA</label><input id="edt-cat" class="dark-input" value="${p.Categoria}" autocomplete="off"></div>
             <div class="modal-form-group"><label>FORNITORE</label><input id="edt-supp" class="dark-input" value="${p.Fornitore}" autocomplete="off"></div>
@@ -2566,39 +2609,38 @@
                 <div class="modal-form-group"><label><i class="bi bi-box-seam-fill"></i> Cartoni</label><input id="edt-pct" type="number" class="dark-input" value="${p.Pezzi_per_Cartone}"></div>
                 <div class="modal-form-group"><label><i class="bi bi-archive-fill"></i> Pacchi</label><input id="edt-ppk" type="number" class="dark-input" value="${p.Pezzi_per_Pacco}"></div>
             </div>`;
-        window.editingPid = pid;
-        document.getElementById('modal-edit-prod').style.display = 'flex';
-    }
-
-    async function saveProductEdits() {
-        showLoader(true);
-        const updates = {
-            nome: document.getElementById('edt-name').value,
-            categoria: document.getElementById('edt-cat').value,
-            fornitore: document.getElementById('edt-supp').value,
-            reparto: document.getElementById('edt-rep').value.toUpperCase(),
-            pezzi_per_cartone: parseInt(document.getElementById('edt-pct').value || 1),
-            pezzi_per_pacco: parseInt(document.getElementById('edt-ppk').value || 1)
-        };
-        try {
-            if (window.editingPid) {
-                await supabase.from('products').update(updates).eq('id', window.editingPid);
-            } else {
-                await supabase.from('products').insert(updates);
-            }
-            showLoader(false); closeModal('modal-edit-prod'); nav('admin-products');
-        } catch (err) { showLoader(false); Swal.fire('Errore', err.message, 'error'); }
-    }
-
-    function showInstallHelp() {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
-        } else {
-            Swal.fire({ title: `INSTALLA WEB APP`, html: `Usa il menu del browser per "Creare una scorciatoia" o "Aggiungere ai preferiti" per installarla sui dispositivi mobili.`, background: '#1a1a1a', color: '#fff' });
+            window.editingPid = pid;
+            document.getElementById('modal-edit-prod').style.display = 'flex';
         }
-    }
-</script>
-</body>
 
+        async function saveProductEdits() {
+            showLoader(true);
+            const updates = {
+                nome: document.getElementById('edt-name').value,
+                categoria: document.getElementById('edt-cat').value,
+                fornitore: document.getElementById('edt-supp').value,
+                reparto: document.getElementById('edt-rep').value.toUpperCase(),
+                pezzi_per_cartone: parseInt(document.getElementById('edt-pct').value || 1),
+                pezzi_per_pacco: parseInt(document.getElementById('edt-ppk').value || 1)
+            };
+            try {
+                if (window.editingPid) {
+                    await supabase.from('products').update(updates).eq('id', window.editingPid);
+                } else {
+                    await supabase.from('products').insert(updates);
+                }
+                showLoader(false); closeModal('modal-edit-prod'); nav('admin-products');
+            } catch (err) { showLoader(false); Swal.fire('Errore', err.message, 'error'); }
+        }
+
+        function showInstallHelp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
+            } else {
+                Swal.fire({ title: `INSTALLA WEB APP`, html: `Usa il menu del browser per "Creare una scorciatoia" o "Aggiungere ai preferiti" per installarla sui dispositivi mobili.`, background: '#1a1a1a', color: '#fff' });
+            }
+        }
+    </script>
+</body>
 </html>
