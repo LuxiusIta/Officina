@@ -2596,8 +2596,32 @@
             document.getElementById('modal-report-print').style.display = 'flex';
         }
 
-        // Per semplicitÃ  omettiamo printReportDiv (che generava css extra etc) in questo stub, lo potremmo incollare.
-        function printReportDiv() { Swal.fire('Avviso', 'Stampa report da implementare', 'info'); }
+        function printReportDiv() {
+            const r = window.currentReport;
+            if (!r) return;
+            const content = document.getElementById('report-print-content').innerHTML;
+
+            // Generate full HTML for printing
+            const html = `<html><head><title>Report ${r.date}</title>
+            <style>
+                body { font-family: sans-serif; padding: 20px; }
+                h2 { color: #000; text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
+            </style></head><body>
+            <h2>REPORT GIORNALIERO: ${r.date}</h2>
+            ${content}
+            </body></html>`;
+
+            let frame = document.getElementById('print-frame');
+            if (!frame) {
+                frame = document.createElement('iframe');
+                frame.id = 'print-frame';
+                frame.style.display = 'none';
+                document.body.appendChild(frame);
+            }
+            const doc = frame.contentWindow.document; doc.open(); doc.write(html); doc.close();
+            frame.contentWindow.focus();
+            setTimeout(() => frame.contentWindow.print(), 300);
+        }
 
         function renderUsers() {
             const div = document.getElementById('admin-users-list'); div.innerHTML = '';
@@ -2715,6 +2739,17 @@
                 } else {
                     await dbClient.from('products').insert(updates);
                 }
+
+                // Aggiorna la cache dei prodotti dopo la modifica
+                const { data: prods } = await dbClient.from('products').select('*');
+                if (prods) {
+                    DB.products = prods.map(p => ({
+                        ID_Prodotto: p.id, Nome: p.nome, Categoria: p.categoria, Fornitore: p.fornitore,
+                        Reparto: p.reparto, Pezzi_per_Cartone: p.pezzi_per_cartone, Pezzi_per_Pacco: p.pezzi_per_pacco,
+                        URL_Immagine: p.url_immagine
+                    }));
+                }
+
                 showLoader(false); closeModal('modal-edit-prod'); nav('admin-products');
             } catch (err) { showLoader(false); Swal.fire('Errore', err.message, 'error'); }
         }
