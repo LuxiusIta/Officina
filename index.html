@@ -2228,7 +2228,7 @@
                 document.getElementById('lbl-op-to').innerText = 'MAGAZZINO:';
             } else if (type.includes('CUCINA')) {
                 divTo.style.display = 'none'; grid.style.gridTemplateColumns = '1fr';
-                document.getElementById('lbl-op-from').innerText = 'DALLA:';
+                document.getElementById('lbl-op-from').innerText = 'DALLA CUCINA:';
             } else {
                 document.getElementById('lbl-op-from').innerText = 'DA:';
                 document.getElementById('lbl-op-to').innerText = 'A:';
@@ -2744,14 +2744,27 @@
 
         function editProduct(pid) {
             const p = DB.products.find(x => x.ID_Prodotto == pid) || { Nome: '', Categoria: '', Fornitore: '', Pezzi_per_Cartone: 1, Pezzi_per_Pacco: 1, Reparto: '' };
+
+            const whCheckboxes = DB.warehouses.filter(w => w !== 'Cucina').map(w => {
+                const isChecked = (pid && DB.inventory[pid] && DB.inventory[pid].hasOwnProperty(w)) ? 'checked' : '';
+                return `<label style="display:flex; align-items:center; gap:8px; font-size:14px; text-transform:none; color:#ccc"><input type="checkbox" class="wh-chk" value="${w}" ${isChecked} style="width:18px; height:18px"> ${w}</label>`;
+            }).join('');
+
             document.getElementById('edit-form-content').innerHTML = `
-            <div class="modal-form-group"><label>NOME PRODOTTO</label><input id="edt-name" class="dark-input" value="${p.Nome}" autocomplete="off"></div>
-            <div class="modal-form-group"><label>CATEGORIA</label><input id="edt-cat" class="dark-input" value="${p.Categoria}" autocomplete="off"></div>
-            <div class="modal-form-group"><label>FORNITORE</label><input id="edt-supp" class="dark-input" value="${p.Fornitore}" autocomplete="off"></div>
-            <div class="modal-form-group"><label>REPARTO (es. LAVAGGIO)</label><input id="edt-rep" class="dark-input" value="${p.Reparto}" autocomplete="off"></div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
-                <div class="modal-form-group"><label><i class="bi bi-box-seam-fill"></i> Cartoni</label><input id="edt-pct" type="number" class="dark-input" value="${p.Pezzi_per_Cartone}"></div>
-                <div class="modal-form-group"><label><i class="bi bi-archive-fill"></i> Pacchi</label><input id="edt-ppk" type="number" class="dark-input" value="${p.Pezzi_per_Pacco}"></div>
+            <div style="max-height:60vh; overflow-y:auto; padding-right:10px">
+                <div class="modal-form-group"><label>NOME PRODOTTO</label><input id="edt-name" class="dark-input" value="${p.Nome}" autocomplete="off"></div>
+                <div class="modal-form-group"><label>CATEGORIA</label><input id="edt-cat" class="dark-input" value="${p.Categoria}" autocomplete="off"></div>
+                <div class="modal-form-group"><label>FORNITORE</label><input id="edt-supp" class="dark-input" value="${p.Fornitore}" autocomplete="off"></div>
+                <div class="modal-form-group"><label>REPARTO (es. LAVAGGIO)</label><input id="edt-rep" class="dark-input" value="${p.Reparto}" autocomplete="off"></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+                    <div class="modal-form-group"><label><i class="bi bi-box-seam-fill"></i> Cartoni</label><input id="edt-pct" type="number" class="dark-input" value="${p.Pezzi_per_Cartone}"></div>
+                    <div class="modal-form-group"><label><i class="bi bi-archive-fill"></i> Pacchi</label><input id="edt-ppk" type="number" class="dark-input" value="${p.Pezzi_per_Pacco}"></div>
+                </div>
+                <div class="modal-form-group" style="margin-top:15px; background:rgba(255,255,255,0.05); padding:15px; border-radius:6px; border:1px solid #333">
+                    <label style="color:var(--accent); margin-bottom:10px"><i class="bi bi-eye"></i> VISIBILITÀ MAGAZZINI</label>
+                    <div style="font-size:11px; color:#888; font-style:italic; text-transform:none; margin-bottom:10px; line-height:1.2">Seleziona in quali magazzini questo prodotto deve apparire fisso sulla Dashboard (anche a quantità zero).</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">${whCheckboxes}</div>
+                </div>
             </div>`;
             window.editingPid = pid;
             document.getElementById('modal-edit-prod').style.display = 'flex';
@@ -2768,11 +2781,22 @@
                 pezzi_per_pacco: parseInt(document.getElementById('edt-ppk').value || 1)
             };
             try {
-                if (window.editingPid) {
-                    await dbClient.from('products').update(updates).eq('id', window.editingPid);
+                let prodId = window.editingPid;
+                if (prodId) {
+                    await dbClient.from('products').update(updates).eq('id', prodId);
                 } else {
-                    await dbClient.from('products').insert(updates);
+                    const { data: newP, error: iErr } = await dbClient.from('products').insert(updates).select('id').single();
+                    if (iErr) throw iErr;
+                    prodId = newP.id;
                 }
+
+                // Assegna esplicitamente magazzini per visibilità
+                const selectedWh = Array.from(document.querySelectorAll('.wh-chk:checked')).map(c => c.value);
+                const { error: asErr } = await dbClient.rpc('admin_assign_product_warehouses', { p_prod_id: prodId, p_warehouses: selectedWh });
+                if (asErr) throw asErr;
+
+                // Ricarica la cache inventario così che gli `0` freschi compaiano sulla dashboard
+                await loadInventoryData();
 
                 // Aggiorna la cache dei prodotti dopo la modifica
                 const { data: prods } = await dbClient.from('products').select('*');
