@@ -1975,6 +1975,11 @@
             if (Swal.isVisible()) Swal.close();
         }
 
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        }
+
         function performPageSwitch(page) {
             document.querySelectorAll('.page').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.nav-links a').forEach(el => el.classList.remove('active'));
@@ -2172,12 +2177,11 @@
         function renderOperationsUI() {
             const sel = document.getElementById('op-type-select');
             sel.innerHTML = (USER.role === 'Admin') ?
-                `<option value="ARRIVO_MERCE">ðŸŸ© ARRIVO MERCE (Carico)</option>
-             <option value="TRASFERIMENTO">ðŸŸ¨ SPOSTAMENTO INTERNO</option>
-             <option value="CARICO_CUCINA">ðŸŸ¥ CARICHI (Cucina)</option>
-             <option value="CORREZIONE_ADMIN">ðŸ›  CORREZIONE INVENTARIO</option>` :
-                `<option value="CARICO_CUCINA">ðŸŸ¥ CARICHI (Cucina)</option>
-             <option value="TRASFERIMENTO">ðŸŸ¨ SPOSTAMENTO INTERNO</option>`;
+                `<option value="ARRIVO_MERCE">🟩 ARRIVO MERCE (Carico)</option>
+             <option value="TRASFERIMENTO">🟨 SPOSTAMENTO INTERNO</option>
+             <option value="CARICO_CUCINA">🟥 CARICHI (Cucina)</option>
+             <option value="CORREZIONE_ADMIN">🛠️ CORREZIONE INVENTARIO</option>` :
+                `<option value="CARICO_CUCINA">🟥 CARICHI</option>`;
 
             updateOpTypeUI();
             renderOpCategoryChips();
