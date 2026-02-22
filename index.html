@@ -1459,6 +1459,8 @@
                     style="border-top:1px solid #333; margin-top:10px; background:#0f0f0f">
                     <div style="padding:15px 20px; color:#666; font-size:12px; font-weight:bold">CAPO OFFICINA</div>
 
+                    <a onclick="nav('admin-warehouses')" id="nav-admin-warehouses"><i class="bi bi-box"></i> Gestione
+                        Magazzini</a>
                     <a onclick="nav('admin-products')" id="nav-admin-products"><i class="bi bi-boxes"></i> Gestione
                         Prodotti</a>
                     <a onclick="nav('admin-movements-log')" id="nav-admin-movements-log"><i class="bi bi-table"></i>
@@ -1532,10 +1534,13 @@
                         </div>
 
                         <div class="tool-wrap">
-                            <span class="industrial-label">CONFIGURAZIONE FLUSSO</span>
+                            <div style="text-align:center; width:100%;">
+                                <span class="industrial-label"
+                                    style="display:inline-block; margin-bottom:10px;">OPERAZIONE</span>
+                            </div>
                             <div style="margin-bottom:15px; text-align:center">
                                 <select id="op-type-select" class="dark-input" onchange="updateOpTypeUI()"
-                                    style="border-left:4px solid var(--accent); font-weight:bold; letter-spacing:1px">
+                                    style="border-left:4px solid var(--accent); font-weight:bold; letter-spacing:1px; text-align:center; text-align-last:center;">
                                 </select>
                             </div>
 
@@ -1651,6 +1656,16 @@
 
 
 
+    <!-- ADMIN WAREHOUSES -->
+    <div id="page-admin-warehouses" class="page" style="display:none; padding:15px;">
+        <h3 style="color:var(--accent); margin-bottom:15px; font-family:'Teko'; font-size:28px">GESTIONE MAGAZZINI</h3>
+        <p style="color:#aaa; font-size:14px; margin-bottom:20px">Modifica i nomi dei 7 magazzini in uso. Il cambio nome
+            si propagherà nell'inventario.</p>
+        <div id="admin-warehouses-list" class="grid-container"></div>
+    </div>
+
+
+
     <!-- MODAL REPORT PRINT -->
     <div id="modal-report-print" class="modal">
         <div class="modal-body" style="max-width:360px; color:white; padding:15px 10px">
@@ -1751,7 +1766,7 @@
         // --- REALTIME SUBSCRIPTION ---
         function setupRealtime() {
             if (inventorySubscription) return;
-            inventorySubscription = supabase
+            inventorySubscription = dbClient
                 .channel('inventory_changes')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory' }, payload => {
                     loadInventoryData().then(() => {
@@ -1762,17 +1777,77 @@
         }
 
         async function loadInventoryData() {
+            // Fetch explicit standard warehouses
+            const { data: whData, error: whErr } = await dbClient.from('warehouses').select('*').order('name');
+            if (!whErr && whData) {
+                DB.warehouses = whData.map(w => w.name);
+            } else {
+                DB.warehouses = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7'];
+            }
+
+            // Fetch actual inventory quantities
             const { data: inv, error } = await dbClient.from('inventory').select('*');
             if (error) { console.error(error); return; }
-            let whSet = new Set();
             DB.inventory = {};
             inv.forEach(row => {
                 if (!DB.inventory[row.product_id]) DB.inventory[row.product_id] = {};
                 DB.inventory[row.product_id][row.warehouse_name] = row.quantity;
-                whSet.add(row.warehouse_name);
             });
-            DB.warehouses = Array.from(whSet).filter(w => w !== 'Cucina');
-            if (DB.warehouses.length === 0) { DB.warehouses = ['Officina', 'Furgone 1']; }
+        }
+
+        // --- ADMIN WAREHOUSES LOGIC ---
+        function renderAdminWarehouses() {
+            const container = document.getElementById('admin-warehouses-list');
+            container.innerHTML = '';
+
+            DB.warehouses.forEach(wName => {
+                const card = document.createElement('div');
+                card.className = 'grid-item bg-dark-layer';
+                card.style.display = 'flex';
+                card.style.justifyContent = 'space-between';
+                card.style.alignItems = 'center';
+
+                card.innerHTML = `
+                    <div style="font-size:18px; font-weight:bold; letter-spacing:1px; flex:1">${wName}</div>
+                    <button class="btn-neon" style="padding:8px 15px; font-size:12px" onclick="promptRenameWarehouse('${wName}')">
+                        <i class="bi bi-pencil-square"></i> RINOMINA
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function promptRenameWarehouse(oldName) {
+            const { value: newName } = await Swal.fire({
+                title: 'Rinomina Magazzino',
+                input: 'text',
+                inputValue: oldName,
+                inputLabel: 'Nuovo Nome Magazzino',
+                showCancelButton: true,
+                confirmButtonText: 'Modifica',
+                cancelButtonText: 'Annulla'
+            });
+
+            if (newName && newName.trim() !== '' && newName.trim() !== oldName) {
+                showLoader(true);
+                try {
+                    const cleanName = newName.trim();
+                    const { data, error } = await dbClient.rpc('admin_rename_warehouse', {
+                        p_old_name: oldName,
+                        p_new_name: cleanName
+                    });
+                    if (error) throw error;
+                    if (data && data.status === 'error') throw new Error(data.message);
+
+                    await loadInventoryData();
+                    renderAdminWarehouses();
+                    showLoader(false);
+                    Swal.fire('Aggiornato!', 'Magazzino rinominato con successo.', 'success');
+                } catch (e) {
+                    showLoader(false);
+                    Swal.fire('Errore', e.message, 'error');
+                }
+            }
         }
 
         // --- LOGIN & AUTH ---
@@ -1861,33 +1936,38 @@
         async function nav(page) {
             if (USER.role !== 'Admin' && page.startsWith('admin-')) return;
             closeAllModals();
-            showLoader(true);
-            try {
-                const { data: prods } = await dbClient.from('products').select('*');
-                if (prods) {
-                    DB.products = prods.map(p => ({
-                        ID_Prodotto: p.id,
-                        Nome: p.nome,
-                        Categoria: p.categoria,
-                        Fornitore: p.fornitore,
-                        Reparto: p.reparto,
-                        Pezzi_per_Cartone: p.pezzi_per_cartone,
-                        Pezzi_per_Pacco: p.pezzi_per_pacco,
-                        URL_Immagine: p.url_immagine
-                    }));
-                }
-                await loadInventoryData();
 
-                if (USER.role === 'Admin') {
-                    const { data: usersData } = await dbClient.from('user_roles').select('*');
-                    if (usersData) DB.users = usersData.map(u => ({ user: u.username, role: u.role, id: u.id }));
+            // Only fetch data if we haven't loaded it yet
+            if (!DB.products || DB.products.length === 0) {
+                showLoader(true);
+                try {
+                    const { data: prods } = await dbClient.from('products').select('*');
+                    if (prods) {
+                        DB.products = prods.map(p => ({
+                            ID_Prodotto: p.id,
+                            Nome: p.nome,
+                            Categoria: p.categoria,
+                            Fornitore: p.fornitore,
+                            Reparto: p.reparto,
+                            Pezzi_per_Cartone: p.pezzi_per_cartone,
+                            Pezzi_per_Pacco: p.pezzi_per_pacco,
+                            URL_Immagine: p.url_immagine
+                        }));
+                    }
+                    await loadInventoryData();
+
+                    if (USER.role === 'Admin') {
+                        const { data: usersData } = await dbClient.from('user_roles').select('*');
+                        if (usersData) DB.users = usersData.map(u => ({ user: u.username, role: u.role, id: u.id }));
+                    }
+                    showLoader(false);
+                } catch (err) {
+                    showLoader(false);
+                    Swal.fire('Errore Caricamento', err.message, 'error');
+                    return;
                 }
-                showLoader(false);
-                performPageSwitch(page);
-            } catch (err) {
-                showLoader(false);
-                Swal.fire('Errore Caricamento', err.message, 'error');
             }
+            performPageSwitch(page);
         }
 
         function closeAllModals() {
@@ -1909,6 +1989,7 @@
                 'dashboard': 'MAGAZZINO',
                 'operations': 'OPERAZIONI',
                 'dailylist': 'LISTA GIORNALIERA CUCINA',
+                'admin-warehouses': 'GESTIONE MAGAZZINI',
                 'admin-products': 'GESTIONE PRODOTTI',
                 'admin-movements-log': 'REGISTRO MOVIMENTI',
                 'admin-reports': 'REPORTS GIORNALIERI',
@@ -1922,6 +2003,7 @@
             if (page === 'dashboard') renderDashboard();
             if (page === 'operations') renderOperationsUI();
             if (page === 'dailylist') renderDailyList('LAVAGGIO');
+            if (page === 'admin-warehouses') renderAdminWarehouses();
             if (page === 'admin-products') renderAdminProds();
             if (page === 'admin-movements-log') loadMovementsLog();
             if (page === 'admin-reports') loadReports();
@@ -1935,8 +2017,8 @@
             const opts = whs.map(w => `<option value="${w}">${w}</option>`).join('');
 
             const dWh = document.getElementById('dash-wh-filter');
-            if (dWh && dWh.options.length <= 1) {
-                dWh.innerHTML = '<option value="ALL">TOTALE OFFICINA</option>' + opts;
+            if (dWh) {
+                dWh.innerHTML = '<option value="ALL">TUTTI I MAGAZZINI</option>' + opts;
             }
 
             const dCat = document.getElementById('dash-cat-filter');
@@ -2643,4 +2725,5 @@
         }
     </script>
 </body>
+
 </html>
